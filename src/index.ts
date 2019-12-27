@@ -10,7 +10,7 @@ interface Babel {
   types: typeof BabelTypes;
 }
 
-type PluginHandler = (babel: Babel) => {
+export type PluginHandler = (babel: Babel) => {
   name?: string
   visitor: Visitor
 }
@@ -18,12 +18,6 @@ type PluginHandler = (babel: Babel) => {
 result = babylon.parse(`
   const a = 4;
 `);
-
-// onUnmounted
-
-const replaceCallbackToUnmounted = (callback: ) => {
-
-}
 
 /**
  * @example
@@ -82,35 +76,3 @@ result = babel.transform(
   `,
   { plugins: [useEffectPlugin] }
 );
-
-console.log(result.code);
-
-const pluginHandler: PluginHandler = (babel) => ({
-  visitor: {
-    BinaryExpression(path) {
-    },
-    CallExpression(path) {
-    },
-    Identifier(path) {
-      if (path.node.name === 'useState') {
-        const useRefIdentifier = babel.types.identifier('useRef');
-        path.replaceWith(useRefIdentifier);
-      }
-    },
-    ArrayPattern(path) {
-      if (path.node.elements.length === 2) {
-        const [firstExpression] = path.node.elements;
-        if (firstExpression.type === 'Identifier') {
-          const variableIdentifier = babel.types.identifier(firstExpression.name);
-          path.replaceWith(variableIdentifier);
-        }
-      }
-    },
-  }
-});
-
-export default pluginHandler;
-
-// export default declare((api, options, dirname) => {
-//   return {};
-// });
