@@ -17,11 +17,7 @@ type PluginHandler = (babel: Babel) => {
 
 result = babylon.parse(`
   const a = 4;
-`, {});
-
-result
-
-console.log(result);
+`);
 
 // onUnmounted
 
@@ -61,7 +57,8 @@ const useEffectPlugin: PluginHandler = (babel) => ({
             element => element.type === 'ReturnStatement'
           );
 
-          const isCleanupCallback = returnStatement.type === 'ReturnStatement' &&
+          const isCleanupCallback = returnStatement &&
+            returnStatement.type === 'ReturnStatement' &&
             returnStatement.argument.type === 'ArrowFunctionExpression';
 
           if (isCleanupCallback) {
@@ -69,11 +66,24 @@ const useEffectPlugin: PluginHandler = (babel) => ({
           }
         }
 
-        return path.replaceWith(watchCallExpression);
+        path.replaceWith(watchCallExpression);
       }
     }
   }
 });
+
+result = babel.transform(
+  ` 
+    const [counter, setCounter] = useState(0);
+
+    useEffect(() => {
+
+    }, [counter]);
+  `,
+  { plugins: [useEffectPlugin] }
+);
+
+console.log(result.code);
 
 const pluginHandler: PluginHandler = (babel) => ({
   visitor: {
