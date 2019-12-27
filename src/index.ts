@@ -31,11 +31,17 @@ const pluginHandler: PluginHandler = (babel) => ({
     },
     Identifier(path) {
       if (path.node.name === 'useState') {
-        const a = babel.types.callExpression(
-          babel.types.identifier("multiply"),
-          []
-        )
-        path.replaceWith(a)
+        const useRefIdentifier = babel.types.identifier('useRef');
+        path.replaceWith(useRefIdentifier);
+      }
+    },
+    ArrayPattern(path) {
+      if (path.node.elements.length === 2) {
+        const [firstExpression] = path.node.elements;
+        if (firstExpression.type === 'Identifier') {
+          const variableIdentifier = babel.types.identifier(firstExpression.name);
+          path.replaceWith(variableIdentifier);
+        }
       }
     },
   }
