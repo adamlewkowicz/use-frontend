@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`useState Plugin should transform useState correctly 1`] = `"const counter = reactive(0);"`;

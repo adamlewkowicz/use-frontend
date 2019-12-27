@@ -29,6 +29,8 @@ export const useStatePlugin: PluginHandler = (babel) => ({
       if (path.node.elements.length === 2) {
         const [firstExpression] = path.node.elements;
         if (firstExpression.type === 'Identifier') {
+          // TODO: check if a second destructured variable starts with 'set___'
+          // to make sure that it's set's state array 
           const variableIdentifier = babel.types.identifier(firstExpression.name);
           path.replaceWith(variableIdentifier);
         }
@@ -49,4 +51,4 @@ let result = babel.transform(
   { plugins: [useStatePlugin] }
 );
 
-console.log(result.code);
+console.log(result?.code);
