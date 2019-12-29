@@ -3,7 +3,7 @@ import { mountPluginTester } from './utils';
 
 describe('useState Plugin', () => {
 
-  let pluginTester = mountPluginTester(useStatePlugin);
+  const pluginTester = mountPluginTester(useStatePlugin);
 
   describe('state declaration', () => {
 

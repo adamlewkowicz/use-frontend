@@ -1,5 +1,32 @@
 import * as babel from '@babel/core';
 import { PluginHandler } from '.';
+import { PluginPartial } from './types';
+import { combinePartials } from './utils';
+
+/**
+ * Transforms React's `useState` to Vue's `reactive` state declaration:
+ * `const [counter, setCounter] = useState(0);` transforms into
+ * `const counter = reactive(0);`
+ */
+const transformUseStateDeclaration: PluginPartial = (babel) => ({
+  Identifier(path) {
+    if (path.node.name === 'useState') {
+      const useRefIdentifier = babel.types.identifier('reactive');
+      path.replaceWith(useRefIdentifier);
+    }
+  },
+  ArrayPattern(path) {
+    if (path.node.elements.length === 2) {
+      const [firstExpression] = path.node.elements;
+      if (firstExpression.type === 'Identifier') {
+        // TODO: check if a second destructured variable starts with 'set___'
+        // to make sure that it's set's state array 
+        const variableIdentifier = babel.types.identifier(firstExpression.name);
+        path.replaceWith(variableIdentifier);
+      }
+    }
+  },
+});
 
 export const useStatePlugin: PluginHandler = (babel) => ({
   visitor: {
@@ -38,6 +65,13 @@ export const useStatePlugin: PluginHandler = (babel) => ({
     },
   }
 });
+
+/* POC
+const plugin = combinePartials(
+  transformUseStateDeclaration,
+  ...
+)
+*/
 
 let result = babel.transform(
   `
