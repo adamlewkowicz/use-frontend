@@ -89,7 +89,9 @@ export const useStatePlugin: PluginHandler = (babel) => ({
         stateValue.name.charAt(0).toUpperCase() +
         stateValue.name.substring(1);
 
-      if (stateSetter.name !== setterNameByPattern) return;
+      const isCorrectSetterName = stateSetter.name === setterNameByPattern;
+
+      if (!isCorrectSetterName) return;
 
       const variableIdentifier = t.identifier(stateValue.name);
       path.replaceWith(variableIdentifier);
