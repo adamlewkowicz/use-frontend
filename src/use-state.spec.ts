@@ -28,6 +28,11 @@ describe('useState Plugin', () => {
       expect(result).toEqual(`counter + 1;`);
     });
 
+    it.todo(
+      'should handle "setState" calls with arrow function as an argument, ' + 
+      'eg. "setCounter(counter => counter + 1)"'
+    );
+
   });
 
 });

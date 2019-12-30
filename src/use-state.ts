@@ -79,7 +79,8 @@ let result = babel.transform(
 
     setCounter(counter + 1);
 
-    // unable to handle this sort of calls (can't detect variable that it relies on)
+    // Unable to handle this sort of calls (can't detect variable that it relies on).
+    // Check React's hooks eslint plugin to check how it detects hooks code.
     setCounter(counter => counter + 1);
   `,
   { plugins: [useStatePlugin] }
