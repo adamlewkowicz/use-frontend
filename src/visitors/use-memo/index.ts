@@ -14,9 +14,9 @@ export const useMemoPlugin: PluginHandler = (babel) => ({
 
       if (!t.isArrowFunctionExpression(callbackToMemoize)) return;
 
-      const newCalee = t.identifier(VUE_COMPUTED);
+      const newIdentifier = t.identifier(VUE_COMPUTED);
 
-      path.replaceWith(t.callExpression(newCalee, [callbackToMemoize]));
+      path.replaceWith(t.callExpression(newIdentifier, [callbackToMemoize]));
     }
   }
 });

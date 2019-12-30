@@ -3,6 +3,7 @@ import { Expression, Identifier } from 'babel-types';
 import {
   REACT_USE_MEMO,
   REACT_USE_CALLBACK,
+  REACT_USE_EFFECT,
 } from './consts';
 
 /** useMemo(...) */
@@ -10,3 +11,6 @@ export const isUseMemoFunc = (exp: Expression): exp is Identifier => t.isIdentif
 
 /** useCallback(...) */
 export const isUseCallbackFunc = (exp: Expression): exp is Identifier => t.isIdentifier(exp) && exp.name === REACT_USE_CALLBACK;
+
+/** useEffect(...) */
+export const isUseEffectFunc = (exp: Expression): exp is Identifier => t.isIdentifier(exp) && exp.name === REACT_USE_EFFECT;
