@@ -1,5 +1,5 @@
 import * as babel from '@babel/core';
-import { PluginPartial } from './types';
+import { VisitorHandler } from './types';
 import { Visitor } from 'babel-traverse';
 
 export const mountPluginTester = (
@@ -17,55 +17,55 @@ export const mountPluginTester = (
 }
 
 type VisitorMap = {
-  [K in keyof Visitor]: Visitor[K][]
+  [K in keyof Visitor]: VisitorHandler[]
 }
 
 type VisitorEntry = [keyof Visitor, Visitor[keyof Visitor]];
 
-const createVisitorMap = (...visitors: PluginPartial[]): VisitorMap => {
-  return visitors.reduce<VisitorMap>((visitorMap, visitor) => {
+const createVisitorMap = (
+  ...visitorHandlers: VisitorHandler[]
+): VisitorMap => {
+  return visitorHandlers.reduce<VisitorMap>((visitorMap, visitor) => {
+    const entries = Object.entries(visitor) as VisitorEntry[];
 
-    const visitorEntries = Object.entries(visitor) as VisitorEntry[];
-
-    visitorEntries.map(([name, handler]) => {
-
-    });
-
-    visitorEntries.forEach(([name, handler]: VisitorEntry) => {
-      if (visitorMap[name]) {
-        // visitorMap[name] = [];
+    entries.forEach(([property, handler]) => {
+      if (!visitorMap[property]) {
+        visitorMap[property] = [];
       }
-      
+      visitorMap[property]?.push(handler as any);
     });
 
-    return {
-      ...visitorMap,
-    }
+    return visitorMap;
   }, {});
 }
 
-export const combinePartials = (
-  ...pluginPartials: PluginPartial[]
+export const combineVisitors = (
+  ...visitors: VisitorHandler[]
 ): Visitor => {
-  const groupedVisitorFunctions = () => {}
+  const visitorMap = createVisitorMap(...visitors);
+  const visitorMapEntries = Object.entries(visitorMap) as [keyof Visitor, Visitor[keyof Visitor][]][];
 
-  return pluginPartials.reduce<Visitor>((combinedVisitor, pluginPartial) => {
-    const functions = Object.entries(pluginPartial) as [keyof Visitor, Visitor[keyof Visitor]][];
-
-    // for (const [name, fn] of functions) {
-    //   if (!combinedVisitor[name]) {}
-    // }
-
-
-    type x = keyof Visitor
-
-    const visitor: Visitor = {
-      ...combinedVisitor,
-      [name as keyof Visitor]: (path: babel.NodePath<unknown>) => {
-        
+  const rootVisitor = visitorMapEntries.reduce<Visitor>(
+    (rootVisitor, [property, handlers]) => {
+      
+      function rootPropertyHandler(
+        path: unknown,
+        state: unknown
+      ) {
+        handlers.forEach((handler: any) => {
+          if (typeof handler === 'function') {
+            handler(path, state);
+          }
+        });
       }
-    }
 
-    return visitor;
-  }, {});
+      return {
+        ...rootVisitor,
+        [property]: rootPropertyHandler
+      }
+    },
+    {}
+  );
+
+  return rootVisitor;
 }
