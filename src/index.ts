@@ -13,6 +13,8 @@ interface Babel {
 export type PluginHandler = (babel: Babel) => {
   name?: string
   visitor: Visitor
+  pre?: (state: unknown) => void
+  post?: (state: unknown) => void
 }
 
 result = babylon.parse(`
