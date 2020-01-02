@@ -1,5 +1,5 @@
 import { mountPluginTester } from '../../utils';
-import { useCallbackPlugin } from '.';
+import { useCallbackPlugin } from '../use-callback';
 
 describe('useCallback Visitor', () => {
 

@@ -1,5 +1,5 @@
 import { mountPluginTester } from '../../utils'
-import { useRefPlugin } from '.'
+import { useRefPlugin } from '../use-ref'
 
 describe('useRef Visitor', () => {
 

@@ -1,5 +1,5 @@
 import { mountPluginTester } from '../../utils';
-import { useMemoPlugin } from '.';
+import { useMemoPlugin } from '../use-memo';
 
 describe('useMemo Visitor', () => {
 
