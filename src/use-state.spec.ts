@@ -28,11 +28,23 @@ describe('useState Plugin', () => {
       expect(result).toEqual(`counter + 1;`);
     });
 
-    it.todo(
+    it(
       'should handle "setState" calls with arrow function as an argument, ' + 
       'eg. "setCounter(counter => counter + 1)"'
-    );
+    , () => {
+      const result = pluginTester(`
+        const [counter, setCounter] = useState(0);
+        setCounter(c => c * 2);
+      `);
+
+      expect(result).toEqual(`
+        const counter = reactive(0);
+        counter * 2;
+      `);
+    });
 
   });
+
+  it.todo('should convert primitive values eg. "useState(0)" to reactive object');
 
 });

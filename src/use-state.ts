@@ -54,6 +54,12 @@ const transformUseStateDeclaration: PluginPartial = (babel) => ({
   },
 });
 
+interface StateValueName extends String {}
+interface StateSetterName extends String {}
+
+let stateDeclarationsSet = new Set<StateValueName>();
+let stateDeclarationsMap = new Map<StateSetterName, StateValueName>();
+
 export const useStatePlugin: PluginHandler = (babel) => ({
   visitor: {
     CallExpression(path) {
@@ -64,8 +70,17 @@ export const useStatePlugin: PluginHandler = (babel) => ({
         if (setStateArg.type === 'BinaryExpression') {
           path.replaceWith(setStateArg);
         } else if (setStateArg.type === 'ArrowFunctionExpression') {
-          // TODO
-          path.replaceWith(setStateArg.body);
+          return;
+          // const stateValueName = stateDeclarationsMap.get(callee.name as StateSetterName);
+          // const [stateValueParam] = setStateArg.params;
+          // const isStateSetterDeclared = stateValueName === undefined;
+
+          // if (stateValueName === undefined) return;
+          // if (!t.isIdentifier(stateValueParam)) return;
+
+          // stateValueParam.name = 'abc';
+
+          // path.replaceWith(setStateArg.body);
         }
       }
     },
@@ -92,6 +107,13 @@ export const useStatePlugin: PluginHandler = (babel) => ({
       const isCorrectSetterName = stateSetter.name === setterNameByPattern;
 
       if (!isCorrectSetterName) return;
+
+      // track state delcarations
+      stateDeclarationsSet.add(stateValue.name as StateValueName);
+      stateDeclarationsMap.set(
+        stateSetter.name as StateSetterName,
+        stateValue.name as StateValueName
+      );
 
       const variableIdentifier = t.identifier(stateValue.name);
       path.replaceWith(variableIdentifier);
