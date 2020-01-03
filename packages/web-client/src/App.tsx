@@ -7,6 +7,9 @@ import * as babel from '@babel/core';
 import { split } from 'react-ace';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-textmate';
+import { useWebWorker } from './hooks/use-web-worker';
+// @ts-ignore
+import WorkerModule from './web-worker/babel-transform.worker.js';
 
 const SplitEditor = split  as any;
 
@@ -22,6 +25,11 @@ function useCounter() {
 
 export function App() {
   const [reactCode, setReactCode] = useState(defaultCode);
+  const webWorker = useWebWorker<string>(WorkerModule);
+
+  const handleCodeTransform = (code: string) => {
+    webWorker.postMessage(code);
+  }
 
   // const transformedCode = babel.transform(code, {
   //   plugins: [babelHooksToCompositionPlugin],
@@ -38,6 +46,7 @@ export function App() {
         value={[reactCode, reactCode]}
         onChange={([reactCode]: any) => {
           setReactCode(reactCode);
+          handleCodeTransform(reactCode);
         }}
         style={{ width: '80vw', height: '80vh', margin: '50px auto' }}
         enableBasicAutocompletion      
