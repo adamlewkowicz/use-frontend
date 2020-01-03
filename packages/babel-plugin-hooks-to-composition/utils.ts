@@ -16,17 +16,13 @@ export const mountPluginTester = (
   return result.code;
 }
 
-type VisitorMap = {
-  [K in keyof Visitor]: VisitorHandler[]
-}
-
-type VisitorEntry = [keyof Visitor, Visitor[keyof Visitor]];
+const BABEL_PLACEHOLDER: any = null; // TODO: provide babel arg
 
 const createVisitorMap = (
   ...visitorHandlers: VisitorHandler[]
 ): VisitorMap => {
   return visitorHandlers.reduce<VisitorMap>((visitorMap, visitor) => {
-    const entries = Object.entries(visitor) as VisitorEntry[];
+    const entries = Object.entries(visitor(BABEL_PLACEHOLDER)) as VisitorEntry[];
 
     entries.forEach(([property, handler]) => {
       if (!visitorMap[property]) {
@@ -43,7 +39,7 @@ export const combineVisitors = (
   ...visitors: VisitorHandler[]
 ): Visitor => {
   const visitorMap = createVisitorMap(...visitors);
-  const visitorMapEntries = Object.entries(visitorMap) as [keyof Visitor, Visitor[keyof Visitor][]][];
+  const visitorMapEntries = Object.entries(visitorMap) as VisitorMapEntries;
 
   const rootVisitor = visitorMapEntries.reduce<Visitor>(
     (rootVisitor, [property, handlers]) => {
@@ -53,8 +49,16 @@ export const combineVisitors = (
         state: unknown
       ) {
         handlers.forEach((handler: any) => {
-          if (typeof handler === 'function') {
-            handler(path, state);
+          const handlerType = typeof handler;
+
+          if (handlerType === 'function') {
+            return handler(path, state);
+          } else {
+            throw new Error(
+              'Visitor entries may only be a type of function, ' + 
+              'when using with "combine visitors" utility. \n' + 
+              `Current type: "${handlerType}".`
+            );
           }
         });
       }
@@ -69,3 +73,11 @@ export const combineVisitors = (
 
   return rootVisitor;
 }
+
+type VisitorMap = {
+  [K in keyof Visitor]: VisitorHandler[]
+}
+
+type VisitorEntry = [keyof Visitor, Visitor[keyof Visitor]];
+
+type VisitorMapEntries = [keyof Visitor, Visitor[keyof Visitor][]][];
