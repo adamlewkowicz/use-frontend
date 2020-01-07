@@ -8,6 +8,7 @@ import {
   REACT_STATE_FUNC_NAME,
   REACT_STATE_SETTER_PREFIX,
 } from '../../consts';
+import { Visitor } from 'babel-traverse';
 
 /** useState(...) */
 const isUseStateFunc = (node: Node<Identifier>): boolean => node.name === REACT_STATE_FUNC_NAME;
@@ -28,31 +29,6 @@ const isUseStateDestructuring = (node: Node<ArrayPattern>): boolean => {
 
   return true;
 }
-
-/**
- * Transforms React's `useState` to Vue's `reactive` state declaration:
- * `const [counter, setCounter] = useState(0);` transforms into
- * `const counter = reactive(0);`
- */
-const transformUseStateDeclaration: PluginPartial = (babel) => ({
-  Identifier(path) {
-    if (path.node.name === 'useState') {
-      const useRefIdentifier = babel.types.identifier('reactive');
-      path.replaceWith(useRefIdentifier);
-    }
-  },
-  ArrayPattern(path) {
-    if (path.node.elements.length === 2) {
-      const [firstExpression] = path.node.elements;
-      if (firstExpression.type === 'Identifier') {
-        // TODO: check if a second destructured variable starts with 'set___'
-        // to make sure that it's set's state array 
-        const variableIdentifier = t.identifier(firstExpression.name);
-        path.replaceWith(variableIdentifier);
-      }
-    }
-  },
-});
 
 interface StateValueName extends String {}
 interface StateSetterName extends String {}
@@ -121,24 +97,31 @@ export const useStatePlugin: PluginHandler = (babel) => ({
   }
 });
 
-/* POC
-const plugin = combinePartials(
-  transformUseStateDeclaration,
-  ...
-)
-*/
+/**
+ * Transforms React's `useState` to Vue's `reactive` state declaration:
+ * `const [counter, setCounter] = useState(0);` transforms into
+ * `const counter = reactive(0);`
+ */
+const replaceUseStateWithReactive = (): Visitor => ({
+  Identifier(path) {
+    if (path.node.name === 'useState') {
+      const useRefIdentifier = t.identifier('reactive');
+      path.replaceWith(useRefIdentifier);
+    }
+  },
+  ArrayPattern(path) {
+    if (path.node.elements.length === 2) {
+      const [firstExpression] = path.node.elements;
+      if (firstExpression.type === 'Identifier') {
+        // TODO: check if a second destructured variable starts with 'set___'
+        // to make sure that it's set's state array 
+        const variableIdentifier = t.identifier(firstExpression.name);
+        path.replaceWith(variableIdentifier);
+      }
+    }
+  },
+});
 
-let result = transform(
-  `
-    const [counter, setCounter] = useState(0);
-
-    setCounter(counter + 1);
-
-    // Unable to handle this sort of calls (can't detect variable that it relies on).
-    // Check React's hooks eslint plugin to check how it detects hooks code.
-    setCounter(counter => counter + 1);
-  `,
-  { plugins: [useStatePlugin] }
-);
-
-console.log(result?.code);
+export const useStateVisitors = [
+  replaceUseStateWithReactive,
+];
