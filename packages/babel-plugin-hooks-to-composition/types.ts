@@ -14,4 +14,4 @@ export type PluginHandler = (babel: Babel) => {
 export type PluginPartial = (babel: Babel) => Visitor;
 export { PluginPartial as VisitorHandler };
 
-export type Node<N> = NodePath<N>['node'];
+export type Node<N = BabelTypes.Node> = NodePath<N>['node'];

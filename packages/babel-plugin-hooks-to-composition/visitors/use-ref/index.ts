@@ -9,7 +9,7 @@ import {
 import { combineVisitors } from '../../utils';
 import { Visitor } from 'babel-traverse';
 
-let refSet = new Set();
+export let refSet = new Set();
 
 /** useRef() -> ref() */
 const replaceUseRefWithRef = (): Visitor => ({

@@ -10,7 +10,8 @@ import {
   REACT_USE_STATE,
 } from '../../consts';
 import { Visitor } from 'babel-traverse';
-import { createVueRef, createReactUseRef, createVueReactive } from '../../helpers';
+import { createVueRef, createReactUseRef, createVueReactive, isSetStateCallback } from '../../helpers';
+import { refSet } from '../use-ref';
 
 /** useState(...) */
 const isUseStateFunc = (node: Node<Identifier>): boolean => node.name === REACT_STATE_FUNC_NAME;
@@ -127,6 +128,25 @@ const replaceUseStateWithReactiveOrRef = (): Visitor => ({
     }
   },
 });
+
+// setState(c => c + 1)
+const replaceSetStateWithRawExpression = (): Visitor => ({
+  CallExpression(path) {
+    const { callee, arguments: args } = path.node;
+    const [setStateArg] = args;
+
+    // setState(1) or setState(c => c + 1)
+    const [setStateValueOrCallback] = args;
+
+    if (isSetStateCallback(setStateValueOrCallback)) {
+      const { body } = setStateValueOrCallback;
+
+      if (!t.isBinaryExpression(body)) return;
+      if (!t.isIdentifier(body.left)) return;
+
+    }
+  },
+})
 
 /**
  * Transforms React's `useState` to Vue's `reactive` state declaration:
