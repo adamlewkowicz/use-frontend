@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 // @ts-ignore
 import logo from './logo.svg';
 import './App.css';
-import * as babelHooksToCompositionPlugin from 'babel-plugin-hooks-to-composition';
+import { hooksToCompositionPlugin } from 'babel-plugin-hooks-to-composition';
 import * as babel from '@babel/core';
 import { split } from 'react-ace';
 import 'ace-builds/src-noconflict/mode-javascript';
@@ -25,16 +25,16 @@ function useCounter() {
 
 export function App() {
   const [reactCode, setReactCode] = useState(defaultCode);
-  const webWorker = useWebWorker<string>(WorkerModule);
+  // const webWorker = useWebWorker<string>(WorkerModule);
 
   const handleCodeTransform = (code: string) => {
-    webWorker.postMessage(code);
+    // webWorker.postMessage(code);
   }
 
-  // const transformedCode = babel.transform(code, {
-  //   plugins: [babelHooksToCompositionPlugin],
-  //   retainLines: true
-  // });
+  const transformedCode = babel.transform('', {
+    plugins: [hooksToCompositionPlugin],
+    retainLines: true
+  });
 
   return (
     <div className="App">

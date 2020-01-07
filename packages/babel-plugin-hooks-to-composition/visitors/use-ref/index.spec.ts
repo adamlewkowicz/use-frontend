@@ -1,9 +1,9 @@
-import { mountPluginTester } from '../../utils'
-import { useRefPlugin } from '../use-ref'
+import { testVisitors } from '../../utils'
+import { useRefVisitors } from '../use-ref'
 
 describe('useRef Visitor', () => {
 
-  const pluginTester = mountPluginTester(useRefPlugin);
+  const pluginTester = testVisitors(useRefVisitors);
 
   it('should change "useRef" function to "ref" ', () => {
     const result = pluginTester(

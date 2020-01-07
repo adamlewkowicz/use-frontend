@@ -3,7 +3,9 @@ import traverse, { Visitor } from 'babel-traverse';
 import * as babel from '@babel/core';
 import { declare } from '@babel/helper-plugin-utils';
 import * as BabelTypes from 'babel-types';
+import { rootVisitor } from './visitors';
 
+/*
 let result;
 
 interface Babel {
@@ -21,12 +23,6 @@ result = babylon.parse(`
   const a = 4;
 `);
 
-/**
- * @example
-*     onUnmounted(() => {
-        window.removeEventListener('mousemove', update)
-      })
- */
 const useEffectPlugin: PluginHandler = (babel) => ({
   visitor: {
     CallExpression(path) {
@@ -78,3 +74,9 @@ result = babel.transform(
   `,
   { plugins: [useEffectPlugin] }
 );
+*/
+
+export const hooksToCompositionPlugin = () => ({
+  name: 'hooks-to-composition',
+  visitor: rootVisitor
+});

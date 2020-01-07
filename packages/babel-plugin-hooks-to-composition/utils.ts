@@ -16,6 +16,16 @@ export const mountPluginTester = (
   return result.code;
 }
 
+export const testVisitors = (...visitors: VisitorHandler[]) => {
+  const plugin = {
+    visitor: combineVisitors(...visitors)
+  }
+
+  const pluginTester = mountPluginTester(plugin);
+
+  return (code: string): string => pluginTester(code);
+}
+
 const BABEL_PLACEHOLDER: any = null; // TODO: provide babel arg
 
 const createVisitorMap = (

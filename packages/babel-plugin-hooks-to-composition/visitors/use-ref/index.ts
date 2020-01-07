@@ -53,9 +53,11 @@ const replaceCurrentWithValue = (): Visitor => ({
   }
 });
 
+export const useRefVisitors = [
+  replaceUseRefWithRef,
+  replaceCurrentWithValue,
+];
+
 export const useRefPlugin = {
-  visitor: combineVisitors(
-    replaceUseRefWithRef,
-    replaceCurrentWithValue,
-  )
+  visitor: combineVisitors(...useRefVisitors)
 }
