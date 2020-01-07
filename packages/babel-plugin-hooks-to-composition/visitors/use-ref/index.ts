@@ -27,7 +27,7 @@ const replaceUseRefWithRef = (): Visitor => ({
 });
 
 /** foo.current -> foo.value */
-const replaceCurrentWithValue = (): Visitor => ({
+const replaceDotCurrentWithDotValue = (): Visitor => ({
   MemberExpression(path) {
     const { object, property } = path.node;
 
@@ -49,13 +49,17 @@ const replaceCurrentWithValue = (): Visitor => ({
     if (!t.isCallExpression(path.node.init)) return;
     if (!isUseRefFunc(path.node.init.callee)) return;
 
-    refSet.add(path.node.id.name);
+    const { name } = path.node.id;
+
+    if (!refSet.has(name)) {
+      refSet.add(name);
+    }
   }
 });
 
 export const useRefVisitors = [
   replaceUseRefWithRef,
-  replaceCurrentWithValue,
+  replaceDotCurrentWithDotValue,
 ];
 
 export const useRefPlugin = {

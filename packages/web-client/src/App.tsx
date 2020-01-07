@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 // @ts-ignore
 import logo from './logo.svg';
 import './App.css';
@@ -11,6 +11,7 @@ import { useWebWorker } from './hooks/use-web-worker';
 // @ts-ignore
 import WorkerModule from './web-worker/babel-transform.worker.js';
 import { transformCode } from './utils';
+import { useBabel } from './hooks/use-babel';
 
 const SplitEditor = split  as any;
 
@@ -22,25 +23,33 @@ function useCounter() {
   
   return { counter, increment };
 }
+
+
+function useInputFocus() {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (inputRef.current != null) {
+      inputRef.current.focus();
+    }
+  }, []);
+
+  return inputRef;
+}
 `.trim();
+
+const babelPlugins = [
+  hooksToCompositionPlugin,
+];
 
 export function App() {
   const [reactCode, setReactCode] = useState<string>(defaultCode);
-  const [vueCode, setVueCode] = useState<string>(() => transformCode(defaultCode) || '');
-  const [error, setError] = useState(null);
+  const { transform, error, code: vueCode } = useBabel(babelPlugins);
   // const webWorker = useWebWorker<string>(WorkerModule);
 
-  const handleCodeTransform = () => {
-    try {
-      const transformedCode = transformCode(reactCode);
-
-      if (transformedCode !== null) {
-        setVueCode(transformedCode);
-      }
-    } catch(error) {
-      setError(error);
-    }
-  }
+  useEffect(() => {
+    transform(reactCode);
+  }, [reactCode]);
 
   return (
     <div className="App">
@@ -50,16 +59,18 @@ export function App() {
         theme="textmate"
         fontSize={14}
         value={[reactCode, vueCode]}
-        onChange={([reactCode]: any) => {
+        onChange={([reactCode]: [string, string]) => {
           setReactCode(reactCode);
-          handleCodeTransform();
         }}
         style={{ width: '80vw', height: '80vh', margin: '50px auto' }}
         enableBasicAutocompletion      
       />
-      <button onClick={handleCodeTransform}>
-        Transform code
-      </button>
+      {error && (
+        <>
+          <h2>Error</h2>
+          <p>{error.message}</p>
+        </>
+      )}
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
