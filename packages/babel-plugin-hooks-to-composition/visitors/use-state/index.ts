@@ -7,8 +7,10 @@ import {
   VUE_STATE_FUNC_NAME,
   REACT_STATE_FUNC_NAME,
   REACT_STATE_SETTER_PREFIX,
+  REACT_USE_STATE,
 } from '../../consts';
 import { Visitor } from 'babel-traverse';
+import { createVueRef, createReactUseRef, createVueReactive } from '../../helpers';
 
 /** useState(...) */
 const isUseStateFunc = (node: Node<Identifier>): boolean => node.name === REACT_STATE_FUNC_NAME;
@@ -97,18 +99,41 @@ export const useStatePlugin: PluginHandler = (babel) => ({
   }
 });
 
+const replaceUseStateWithReactiveOrRef = (): Visitor => ({
+  CallExpression(path) {
+    const isUseStateFunc = t.isIdentifier(path.node.callee)
+      && path.node.callee.name === REACT_USE_STATE;
+
+    if (!isUseStateFunc) return;
+
+    if (t.isIdentifier(path.node.callee)) {
+      // useState(initialState)
+      const [initialState] = path.node.arguments;
+
+      const isStateObjectType =
+        t.isObjectExpression(initialState) ||
+        t.isArrayExpression(initialState);
+      
+      if (isStateObjectType) {
+        const vueReactive = createVueReactive(initialState);
+        path.replaceWith(vueReactive);
+      } else {
+        const vueRef = createVueRef(initialState);
+        const reactUseState = createReactUseRef(initialState);
+        // TRACK: vue ref declaration
+        // refSet.set(path.node.)
+        path.replaceWith(reactUseState);
+      }
+    }
+  },
+});
+
 /**
  * Transforms React's `useState` to Vue's `reactive` state declaration:
  * `const [counter, setCounter] = useState(0);` transforms into
  * `const counter = reactive(0);`
  */
 const replaceUseStateWithReactive = (): Visitor => ({
-  Identifier(path) {
-    if (path.node.name === 'useState') {
-      const useRefIdentifier = t.identifier('reactive');
-      path.replaceWith(useRefIdentifier);
-    }
-  },
   ArrayPattern(path) {
     if (path.node.elements.length === 2) {
       const [firstExpression] = path.node.elements;
@@ -124,4 +149,5 @@ const replaceUseStateWithReactive = (): Visitor => ({
 
 export const useStateVisitors = [
   replaceUseStateWithReactive,
+  replaceUseStateWithReactiveOrRef,
 ];

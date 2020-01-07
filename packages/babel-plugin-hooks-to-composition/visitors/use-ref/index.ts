@@ -21,7 +21,7 @@ const replaceUseRefWithRef = (): Visitor => ({
       t.identifier(VUE_REF),
       path.node.arguments
     );
-  
+
     path.replaceWith(newFuncDeclaration);
   }
 });
@@ -53,6 +53,14 @@ const replaceDotCurrentWithDotValue = (): Visitor => ({
 
     if (!refSet.has(name)) {
       refSet.add(name);
+    }
+  }
+});
+
+// TODO
+const replaceSingleIdentifiersWithDotValue = (): Visitor => ({
+  Identifier(path) {
+    if (refSet.has(path.node.name)) {
     }
   }
 });

@@ -18,10 +18,13 @@ const SplitEditor = split  as any;
 const defaultCode = `
 function useCounter() {
   const [counter, setCounter] = useState(0);
+  const [abc, setAbc] = useState({ container: true });
+
+  const doubledCounter = useMemo(() => counter * 2, [counter]);
   
   const increment = () => setCounter(c => c + 1);
   
-  return { counter, increment };
+  return { counter, doubledCounter, increment };
 }
 
 
