@@ -1,4 +1,4 @@
-import { PluginHandler } from '../..';
+import { PluginHandler } from '../../types';
 import { isUseCallbackFunc } from '../../helpers';
 import * as t from 'babel-types';
 import { VUE_COMPUTED } from '../../consts';

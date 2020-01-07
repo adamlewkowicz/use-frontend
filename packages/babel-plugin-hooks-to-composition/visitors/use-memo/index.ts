@@ -1,4 +1,4 @@
-import { PluginHandler } from '../..';
+import { PluginHandler } from '../../types';
 import * as t from 'babel-types';
 import { isUseMemoFunc } from '../../helpers';
 import { VUE_COMPUTED } from '../../consts';

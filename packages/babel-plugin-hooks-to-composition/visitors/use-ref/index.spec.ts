@@ -3,7 +3,8 @@ import { useRefVisitors } from '../use-ref'
 
 describe('useRef Visitor', () => {
 
-  const pluginTester = testVisitors(useRefVisitors);
+  // TODO:
+  const pluginTester = testVisitors(useRefVisitors as any);
 
   it('should change "useRef" function to "ref" ', () => {
     const result = pluginTester(

@@ -1,5 +1,5 @@
 import { transform } from '@babel/core';
-import { PluginHandler } from '.';
+import { PluginHandler } from './types';
 import { PluginPartial, Node } from './types';
 import { Identifier, ArrayPattern, Expression } from 'babel-types';
 import * as t from 'babel-types';

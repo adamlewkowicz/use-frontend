@@ -1,4 +1,4 @@
-import { PluginHandler } from '../..';
+import { PluginHandler } from '../../types';
 import { isUseEffectFunc } from '../../helpers';
 import * as t from 'babel-types';
 
