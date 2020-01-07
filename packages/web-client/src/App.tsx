@@ -10,6 +10,7 @@ import 'ace-builds/src-noconflict/theme-textmate';
 import { useWebWorker } from './hooks/use-web-worker';
 // @ts-ignore
 import WorkerModule from './web-worker/babel-transform.worker.js';
+import { transformCode } from './utils';
 
 const SplitEditor = split  as any;
 
@@ -24,17 +25,22 @@ function useCounter() {
 `.trim();
 
 export function App() {
-  const [reactCode, setReactCode] = useState(defaultCode);
+  const [reactCode, setReactCode] = useState<string>(defaultCode);
+  const [vueCode, setVueCode] = useState<string>(() => transformCode(defaultCode) || '');
+  const [error, setError] = useState(null);
   // const webWorker = useWebWorker<string>(WorkerModule);
 
-  const handleCodeTransform = (code: string) => {
-    // webWorker.postMessage(code);
-  }
+  const handleCodeTransform = () => {
+    try {
+      const transformedCode = transformCode(reactCode);
 
-  const transformedCode = babel.transform('', {
-    plugins: [hooksToCompositionPlugin],
-    retainLines: true
-  });
+      if (transformedCode !== null) {
+        setVueCode(transformedCode);
+      }
+    } catch(error) {
+      setError(error);
+    }
+  }
 
   return (
     <div className="App">
@@ -43,14 +49,17 @@ export function App() {
         splits={2}
         theme="textmate"
         fontSize={14}
-        value={[reactCode, reactCode]}
+        value={[reactCode, vueCode]}
         onChange={([reactCode]: any) => {
           setReactCode(reactCode);
-          handleCodeTransform(reactCode);
+          handleCodeTransform();
         }}
         style={{ width: '80vw', height: '80vh', margin: '50px auto' }}
         enableBasicAutocompletion      
       />
+      <button onClick={handleCodeTransform}>
+        Transform code
+      </button>
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
