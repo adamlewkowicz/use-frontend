@@ -1,22 +1,24 @@
-import { PluginHandler } from '../../types';
 import * as t from 'babel-types';
 import { isUseMemoFunc } from '../../helpers';
 import { VUE_COMPUTED } from '../../consts';
+import { Visitor } from 'babel-traverse';
 
-export const useMemoPlugin: PluginHandler = (babel) => ({
-  visitor: {
-    CallExpression(path) {
-      const { node } = path;
+const replaceUseMemoWithComputed = (): Visitor => ({
+  CallExpression(path) {
+    const { node } = path;
 
-      if (!isUseMemoFunc(node.callee)) return;
+    if (!isUseMemoFunc(node.callee)) return;
 
-      const [callbackToMemoize] = node.arguments;
+    const [callbackToMemoize] = node.arguments;
 
-      if (!t.isArrowFunctionExpression(callbackToMemoize)) return;
+    if (!t.isArrowFunctionExpression(callbackToMemoize)) return;
 
-      const newIdentifier = t.identifier(VUE_COMPUTED);
+    const newIdentifier = t.identifier(VUE_COMPUTED);
 
-      path.replaceWith(t.callExpression(newIdentifier, [callbackToMemoize]));
-    }
+    path.replaceWith(t.callExpression(newIdentifier, [callbackToMemoize]));
   }
 });
+
+export const useMemoVisitors = [
+  replaceUseMemoWithComputed,
+];
