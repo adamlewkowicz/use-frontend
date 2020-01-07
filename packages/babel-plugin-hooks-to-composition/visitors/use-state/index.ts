@@ -1,13 +1,13 @@
 import { transform } from '@babel/core';
-import { PluginHandler } from './types';
-import { PluginPartial, Node } from './types';
+import { PluginHandler } from '../../types';
+import { PluginPartial, Node } from '../../types';
 import { Identifier, ArrayPattern, Expression } from 'babel-types';
 import * as t from 'babel-types';
 import {
   VUE_STATE_FUNC_NAME,
   REACT_STATE_FUNC_NAME,
   REACT_STATE_SETTER_PREFIX,
-} from './consts';
+} from '../../consts';
 
 /** useState(...) */
 const isUseStateFunc = (node: Node<Identifier>): boolean => node.name === REACT_STATE_FUNC_NAME;

@@ -1,5 +1,5 @@
-import { useStatePlugin } from './use-state';
-import { mountPluginTester } from './utils';
+import { useStatePlugin } from '.';
+import { mountPluginTester } from '../../utils';
 
 describe('useState Plugin', () => {
 
