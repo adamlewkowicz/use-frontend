@@ -1,4 +1,10 @@
-import { isUseEffectFunc } from '../../helpers';
+import {
+  isUseEffectFunc,
+  createVueOnUpdated,
+  createVueOnMounted,
+  createVueOnUnmounted,
+  createVueWatch,
+} from '../../helpers';
 import * as t from 'babel-types';
 import { Visitor } from 'babel-traverse';
 
@@ -8,15 +14,41 @@ const replaceUseEffectWithWatch = (): Visitor => ({
 
     if (!isUseEffectFunc(node.callee)) return;
 
+    // useEffect(callback, dependencies)
     const [callback, dependencies] = node.arguments;
 
     if (!t.isArrowFunctionExpression(callback)) return;
+    if (!t.isBlock(callback.body)) return;
 
-    if (
-      t.isArrayExpression(dependencies) &&
-      dependencies.elements.length !== 0
-    ) {
-      
+    if (t.isArrayExpression(dependencies)) {
+      if (dependencies.elements.length) {
+        // has dependencies, replace with watch
+        const vueWatch = createVueWatch(dependencies.elements, callback);
+        path.replaceWith(vueWatch);
+      } else {
+        // empty array, replace with onMounted
+        const vueOnMounted = createVueOnMounted(callback);
+
+        const returnStatement = callback.body.body.find(
+          (statement): statement is t.ReturnStatement => t.isReturnStatement(statement)
+        );
+
+        const cleanupCallback = returnStatement?.argument;
+
+        if (t.isArrowFunctionExpression(cleanupCallback)) {
+          // returns cleanup callback; add additional onUnmounted cleanup lifecycle
+          path.replaceExpressionWithStatements([
+            createVueOnMounted(callback),
+            createVueOnUnmounted(cleanupCallback)
+          ]);
+        } else {
+          path.replaceWith(vueOnMounted);
+        }
+      }
+    } else {
+      // no dependencies, replace with onUpdated
+      const vueOnUpdated = createVueOnUpdated(callback);
+      path.replaceWith(vueOnUpdated);
     }
   }
 });

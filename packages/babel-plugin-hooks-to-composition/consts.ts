@@ -15,3 +15,7 @@ export const VUE_COMPUTED = 'computed' as const;
 export const VUE_REF = 'ref' as const;
 export const VUE_REF_PROPERTY = 'value' as const;
 export const VUE_REACTIVE = 'reactive' as const;
+export const VUE_ON_UPDATED = 'onUpdated' as const;
+export const VUE_ON_MOUNTED = 'onMounted' as const;
+export const VUE_ON_UNMOUNTED = 'onUnmounted' as const;
+export const VUE_WATCH = 'watch' as const;

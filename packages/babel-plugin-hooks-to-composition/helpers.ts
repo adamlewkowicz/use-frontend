@@ -3,7 +3,6 @@ import {
   Expression,
   Identifier,
   ArrowFunctionExpression,
-  Node
 } from 'babel-types';
 import {
   REACT_USE_MEMO,
@@ -12,6 +11,10 @@ import {
   REACT_USE_REF,
   VUE_REF,
   VUE_REACTIVE,
+  VUE_ON_UPDATED,
+  VUE_ON_MOUNTED,
+  VUE_ON_UNMOUNTED,
+  VUE_WATCH,
 } from './consts';
 import { Node } from './types';
 
@@ -52,4 +55,43 @@ export const createReactUseRef = (
 ): t.CallExpression => t.callExpression(
   t.identifier(REACT_USE_REF),
   [initialState],
+);
+
+/** functionName(callback); */
+const createFunctionWithCallback = (functionName: string) => (
+  callback: t.ArrowFunctionExpression
+) => t.callExpression(
+  t.identifier(functionName),
+  [callback]
+);
+
+export const createVueOnUnmounted = createFunctionWithCallback(VUE_ON_UNMOUNTED);
+
+export const createVueWatch = (
+  dependencies: any[],
+  callback: t.ArrowFunctionExpression
+) => {
+  const callbackWithArgs = t.arrowFunctionExpression(
+    [t.arrayPattern(dependencies)],
+    callback.body
+  );
+
+  return t.callExpression(
+    t.identifier(VUE_WATCH),
+    [t.arrayExpression(dependencies), callbackWithArgs]
+  );
+}
+
+export const createVueOnUpdated = (
+  callback: t.ArrowFunctionExpression
+) => t.callExpression(
+  t.identifier(VUE_ON_UPDATED),
+  [callback]
+);
+
+export const createVueOnMounted = (
+  callback: t.ArrowFunctionExpression
+) => t.callExpression(
+  t.identifier(VUE_ON_MOUNTED),
+  [callback]
 );
