@@ -62,13 +62,16 @@ const babelPlugins = [
   hooksToCompositionPlugin,
 ];
 
+const storageKey = 'r_code';
+
 export function App() {
-  const [reactCode, setReactCode] = useState<string>(defaultCode);
+  const [reactCode, setReactCode] = useState<string>(() => localStorage.getItem(storageKey) || defaultCode);
   const { transform, error, code: vueCode } = useBabel(babelPlugins);
   // const webWorker = useWebWorker<string>(WorkerModule);
 
   useEffect(() => {
     transform(reactCode);
+    localStorage.setItem(storageKey, reactCode);
   }, [reactCode]);
 
   return (
