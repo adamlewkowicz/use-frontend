@@ -28,6 +28,9 @@ function useCounter() {
 }
 
 
+
+
+
 function useInputFocus() {
   const inputRef = useRef(null);
 
@@ -38,6 +41,20 @@ function useInputFocus() {
   }, []);
 
   return inputRef;
+}
+
+
+
+
+
+function useTheme() {
+  const theme = useContext(ThemeContext);
+
+  if (theme == null) {
+    throw new Error('Theme has not been provided');
+  }
+
+  return theme;
 }
 `.trim();
 
