@@ -1,9 +1,10 @@
-import { useStatePlugin } from '.';
-import { mountPluginTester } from '../../utils';
+import { useStatePlugin, useStateVisitors } from '.';
+import { mountPluginTester, testVisitors } from '../../utils';
 
 describe('useState Plugin', () => {
 
   const pluginTester = mountPluginTester(useStatePlugin);
+  const transform = testVisitors(...useStateVisitors);
 
   describe('state declaration', () => {
 

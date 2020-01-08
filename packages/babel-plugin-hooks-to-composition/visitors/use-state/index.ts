@@ -10,7 +10,13 @@ import {
   REACT_USE_STATE,
 } from '../../consts';
 import { Visitor } from 'babel-traverse';
-import { createVueRef, createReactUseRef, createVueReactive, isSetStateCallback } from '../../helpers';
+import {
+  createVueRef,
+  createReactUseRef,
+  createVueReactive,
+  isSetStateCallback,
+  isCorrectStateSetterName,
+} from '../../helpers';
 import { refSet } from '../use-ref';
 
 /** useState(...) */
@@ -102,8 +108,9 @@ export const useStatePlugin: PluginHandler = (babel) => ({
 
 const replaceUseStateWithReactiveOrRef = (): Visitor => ({
   CallExpression(path) {
-    const isUseStateFunc = t.isIdentifier(path.node.callee)
-      && path.node.callee.name === REACT_USE_STATE;
+    const isUseStateFunc =
+      t.isIdentifier(path.node.callee) &&
+      path.node.callee.name === REACT_USE_STATE;
 
     if (!isUseStateFunc) return;
 
@@ -129,21 +136,59 @@ const replaceUseStateWithReactiveOrRef = (): Visitor => ({
   },
 });
 
-// setState(c => c + 1)
-const replaceSetStateWithRawExpression = (): Visitor => ({
+const trackStateDeclarations = (): Visitor => ({
+  VariableDeclarator(path) {
+    const { id } = path.node;
+
+    if (!t.isArrayPattern(id)) return;
+
+    const [stateValue, stateSetter] = id.elements;
+
+    if (!t.isIdentifier(stateValue)) return;
+    if (!t.isIdentifier(stateSetter)) return;
+    if (!isCorrectStateSetterName(stateSetter.name)) return;
+
+    stateDeclarationsMap.set(stateSetter.name, stateValue.name);
+
+    console.log(stateDeclarationsMap);
+  }
+});
+
+/**
+ * Replaces `setState(c => c + 1)` with `counter + 1`
+ */
+const replaceSetStateCallWithRawExpression = (): Visitor => ({
   CallExpression(path) {
     const { callee, arguments: args } = path.node;
-    const [setStateArg] = args;
+
+    if (!t.isIdentifier(callee)) return;
+    if (!isCorrectStateSetterName(callee.name)) return;
+    if (!stateDeclarationsMap.has(callee.name)) return;
 
     // setState(1) or setState(c => c + 1)
-    const [setStateValueOrCallback] = args;
+    const [setStateExpressionOrCallback] = args;
 
-    if (isSetStateCallback(setStateValueOrCallback)) {
-      const { body } = setStateValueOrCallback;
+    if (isSetStateCallback(setStateExpressionOrCallback)) {
+      const { body } = setStateExpressionOrCallback;
+      const stateValueName = stateDeclarationsMap.get(callee.name);
 
+      if (!stateValueName) return;
       if (!t.isBinaryExpression(body)) return;
       if (!t.isIdentifier(body.left)) return;
 
+      if (t.isBinaryExpression(body)) {
+        // changed name of variable to delcared by state
+        const updatedBinaryExpression = t.binaryExpression(
+          body.operator,
+          t.identifier(stateValueName as string),
+          body.right
+        );
+  
+        path.replaceWith(updatedBinaryExpression);
+      }
+    } else if (t.isBinaryExpression(setStateExpressionOrCallback)) {
+      // just a binary expression, can be simply replaced
+      path.replaceWith(setStateExpressionOrCallback);
     }
   },
 })
@@ -170,4 +215,6 @@ const replaceUseStateWithReactive = (): Visitor => ({
 export const useStateVisitors = [
   replaceUseStateWithReactive,
   replaceUseStateWithReactiveOrRef,
+  replaceSetStateCallWithRawExpression,
+  trackStateDeclarations,
 ];

@@ -17,6 +17,7 @@ import {
   VUE_WATCH,
   REACT_USE_CONTEXT,
   VUE_INJECT,
+  REACT_STATE_SETTER_PREFIX,
 } from './consts';
 import { Node } from './types';
 
@@ -107,3 +108,5 @@ export const createVueInject = (
   t.identifier(VUE_INJECT),
   args
 );
+
+export const isCorrectStateSetterName = (name: string): boolean => name.startsWith(REACT_STATE_SETTER_PREFIX); 
