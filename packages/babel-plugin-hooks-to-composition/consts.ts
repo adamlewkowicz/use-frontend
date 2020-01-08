@@ -8,6 +8,7 @@ export const REACT_USE_CALLBACK = 'useCallback' as const;
 export const REACT_USE_EFFECT = 'useEffect' as const;
 export const REACT_USE_REF = 'useRef' as const;
 export const REACT_REF_PROPERTY = 'current' as const;
+export const REACT_USE_CONTEXT = 'useContext' as const;
 
 // Vue
 export const VUE_STATE_FUNC_NAME = 'reactive' as const;
@@ -19,3 +20,4 @@ export const VUE_ON_UPDATED = 'onUpdated' as const;
 export const VUE_ON_MOUNTED = 'onMounted' as const;
 export const VUE_ON_UNMOUNTED = 'onUnmounted' as const;
 export const VUE_WATCH = 'watch' as const;
+export const VUE_INJECT = 'inject' as const;

@@ -15,6 +15,8 @@ import {
   VUE_ON_MOUNTED,
   VUE_ON_UNMOUNTED,
   VUE_WATCH,
+  REACT_USE_CONTEXT,
+  VUE_INJECT,
 } from './consts';
 import { Node } from './types';
 
@@ -34,6 +36,9 @@ export const isUseRefFunc = (exp: Expression): exp is Identifier => t.isIdentifi
 
 /** setState(c => c + 1) */
 export const isSetStateCallback = (node: Node): node is ArrowFunctionExpression => t.isArrowFunctionExpression(node) && t.isBinaryExpression(node.body);
+
+/** useContext(...) */
+export const isUseContextFunc = (exp: Expression): exp is Identifier => t.isIdentifier(exp) && exp.name === REACT_USE_CONTEXT;
 
 /** ref(initialState); */
 export const createVueRef = (
@@ -94,4 +99,11 @@ export const createVueOnMounted = (
 ) => t.callExpression(
   t.identifier(VUE_ON_MOUNTED),
   [callback]
+);
+
+export const createVueInject = (
+  args: t.CallExpression['arguments']
+): t.CallExpression => t.callExpression(
+  t.identifier(VUE_INJECT),
+  args
 );
