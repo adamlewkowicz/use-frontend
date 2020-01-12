@@ -4,7 +4,7 @@ import logo from './logo.svg';
 import './App.css';
 import { hooksToCompositionPlugin } from 'babel-plugin-hooks-to-composition';
 import * as babel from '@babel/core';
-import { split } from 'react-ace';
+import { split, diff } from 'react-ace';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-textmate';
 import { useWebWorker } from './hooks/use-web-worker';
@@ -15,8 +15,11 @@ import { useBabel } from './hooks/use-babel';
 import { default as DiffViewer_ } from 'react-diff-viewer';
 import { Modal } from './components/Modal';
 import { DiffViewer } from './components/DiffViewer';
+import css from './components/App.module.css';
+import vueLogo from './assets/images/vue-logo.svg';
 
 const SplitEditor = split  as any;
+const DiffEditor = diff as any;
 // var DiffViewer = DiffViewer_ as any;
 
 const defaultCode = `
@@ -81,6 +84,11 @@ export function App() {
 
   return (
     <div className="App">
+      <p>Transform React.js Hooks to Vue.js Composition Api</p>
+      <div className={css.logo_container}>
+        <img src={logo} alt="React.js icon" className={css.react_logo} />
+        <img src={vueLogo} alt="Vue.js icon" className={css.vue_logo} />
+      </div>
       <SplitEditor
         mode="javascript"
         splits={2}
@@ -90,8 +98,8 @@ export function App() {
         onChange={([reactCode]: [string, string]) => {
           setReactCode(reactCode);
         }}
-        style={{ width: '80vw', height: '80vh', margin: '50px auto' }}
-        enableBasicAutocompletion      
+        style={{ width: '80vw', height: '80vh', margin: '0 auto' }}
+        enableBasicAutocompletion
       />
       {error && (
         <>
@@ -110,20 +118,6 @@ export function App() {
           />
         </Modal>
       )}
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
     </div>
   );
 }
