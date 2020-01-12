@@ -12,8 +12,11 @@ import { useWebWorker } from './hooks/use-web-worker';
 import WorkerModule from './web-worker/babel-transform.worker.js';
 import { transformCode } from './utils';
 import { useBabel } from './hooks/use-babel';
+import { default as DiffViewer_ } from 'react-diff-viewer';
+import { Modal } from './components/Modal';
 
 const SplitEditor = split  as any;
+var DiffViewer = DiffViewer_ as any;
 
 const defaultCode = `
 function useCounter() {
@@ -67,12 +70,13 @@ const storageKey = 'r_code';
 export function App() {
   const [reactCode, setReactCode] = useState<string>(() => localStorage.getItem(storageKey) || defaultCode);
   const { transform, error, code: vueCode } = useBabel(babelPlugins);
+  const [isShowDiff, setIsShowDiff] = useState<boolean>(false);
   // const webWorker = useWebWorker<string>(WorkerModule);
 
   useEffect(() => {
     transform(reactCode);
     localStorage.setItem(storageKey, reactCode);
-  }, [reactCode]);
+  }, [reactCode, transform]);
 
   return (
     <div className="App">
@@ -93,6 +97,17 @@ export function App() {
           <h2>Error</h2>
           <p>{error.message}</p>
         </>
+      )}
+      <button onClick={() => setIsShowDiff(diff => !diff)}>
+        Show differences
+      </button>
+      {isShowDiff && (
+        <Modal>
+          <DiffViewer
+            oldValue={reactCode}
+            newValue={vueCode}
+          />
+        </Modal>
       )}
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
