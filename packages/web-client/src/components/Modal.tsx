@@ -65,3 +65,5 @@ const Content = styled.div`
   margin: 0 auto;
   overflow-y: auto;
 `
+
+export default Modal;
