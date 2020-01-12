@@ -15,7 +15,7 @@ export const useBabel = (plugins?: babel.PluginItem[]) => {
       });
   
       if (transformedCode?.code != null) {
-        setCode(transformedCode?.code);
+        setCode(transformedCode.code);
       }
     } catch(error) {
       setError(error);

@@ -17,12 +17,13 @@ import { Modal } from './components/Modal';
 import { DiffViewer } from './components/DiffViewer';
 import css from './components/App.module.css';
 import vueLogo from './assets/images/vue-logo.svg';
+import { SplitEditor as CustomSplitEditor } from './components/SplitEditor';
 
 const SplitEditor = split  as any;
 const DiffEditor = diff as any;
 // var DiffViewer = DiffViewer_ as any;
 
-const defaultCode = `
+export const defaultCode = `
 function useCounter() {
   const [counter, setCounter] = useState(0);
   const [abc, setAbc] = useState({ container: true });
@@ -33,9 +34,6 @@ function useCounter() {
   
   return { counter, doubledCounter, increment };
 }
-
-
-
 
 
 function useInputFocus() {
@@ -49,9 +47,6 @@ function useInputFocus() {
 
   return inputRef;
 }
-
-
-
 
 
 function useTheme() {
@@ -89,6 +84,7 @@ export function App() {
         <img src={logo} alt="React.js icon" className={css.react_logo} />
         <img src={vueLogo} alt="Vue.js icon" className={css.vue_logo} />
       </div>
+      <CustomSplitEditor />
       <SplitEditor
         mode="javascript"
         splits={2}
