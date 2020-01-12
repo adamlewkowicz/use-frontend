@@ -14,9 +14,10 @@ import { transformCode } from './utils';
 import { useBabel } from './hooks/use-babel';
 import { default as DiffViewer_ } from 'react-diff-viewer';
 import { Modal } from './components/Modal';
+import { DiffViewer } from './components/DiffViewer';
 
 const SplitEditor = split  as any;
-var DiffViewer = DiffViewer_ as any;
+// var DiffViewer = DiffViewer_ as any;
 
 const defaultCode = `
 function useCounter() {
@@ -77,7 +78,7 @@ export function App() {
     transform(reactCode);
     localStorage.setItem(storageKey, reactCode);
   }, [reactCode, transform]);
-
+  
   return (
     <div className="App">
       <SplitEditor
