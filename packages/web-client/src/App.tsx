@@ -78,7 +78,7 @@ export function App() {
     transform(reactCode);
     localStorage.setItem(storageKey, reactCode);
   }, [reactCode, transform]);
-  
+
   return (
     <div className="App">
       <SplitEditor
@@ -103,7 +103,7 @@ export function App() {
         Show differences
       </button>
       {isShowDiff && (
-        <Modal>
+        <Modal onClose={() => setIsShowDiff(false)}>
           <DiffViewer
             oldValue={reactCode}
             newValue={vueCode}
