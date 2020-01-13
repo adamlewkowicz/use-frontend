@@ -18,6 +18,7 @@ import { DiffViewer } from './components/DiffViewer';
 import css from './components/App.module.css';
 import vueLogo from './assets/images/vue-logo.svg';
 import { SplitEditor as CustomSplitEditor } from './components/SplitEditor';
+import { useModal } from './hooks/use-modal';
 
 const SplitEditor = split  as any;
 const DiffEditor = diff as any;
@@ -69,7 +70,7 @@ const storageKey = 'r_code';
 export function App() {
   const [reactCode, setReactCode] = useState<string>(() => localStorage.getItem(storageKey) || defaultCode);
   const { transform, error, code: vueCode } = useBabel(babelPlugins);
-  const [isShowDiff, setIsShowDiff] = useState<boolean>(false);
+  const { Modal, ...modalContext } = useModal();
   // const webWorker = useWebWorker<string>(WorkerModule);
 
   useEffect(() => {
@@ -103,17 +104,15 @@ export function App() {
           <p>{error.message}</p>
         </>
       )}
-      <button onClick={() => setIsShowDiff(diff => !diff)}>
+      <button onClick={modalContext.open}>
         Show differences
       </button>
-      {isShowDiff && (
-        <Modal onClose={() => setIsShowDiff(false)}>
-          <DiffViewer
-            oldValue={reactCode}
-            newValue={vueCode}
-          />
-        </Modal>
-      )}
+      <Modal>
+        <DiffViewer
+          oldValue={reactCode}
+          newValue={vueCode}
+        />
+      </Modal>
     </div>
   );
 }
