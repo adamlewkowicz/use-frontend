@@ -119,19 +119,18 @@ const replaceUseStateWithReactiveOrRef = (): Visitor => ({
       // useState(initialState)
       const [initialState] = path.node.arguments;
 
-      const isStateObjectType =
+      const isStateNotPrimiviteType =
         t.isObjectExpression(initialState) ||
         t.isArrayExpression(initialState);
       
-      if (isStateObjectType) {
+      if (isStateNotPrimiviteType) {
         const vueReactive = createVueReactive(initialState);
-        path.replaceWith(vueReactive);
+        return path.replaceWith(vueReactive);
       } else {
-        const vueRef = createVueRef(initialState);
         const reactUseState = createReactUseRef(initialState);
         // TRACK: vue ref declaration
         // refSet.set(path.node.)
-        path.replaceWith(reactUseState);
+        return path.replaceWith(reactUseState);
       }
     }
   },

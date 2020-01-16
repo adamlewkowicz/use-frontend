@@ -5,7 +5,7 @@ import { Visitor } from 'babel-traverse';
 export const mountPluginTester = (
   ...plugins: babel.PluginItem[]
 ) => (code: string): string => {
-  const result = babel.transform(code, { plugins, retainLines: true });
+  const result = babel.transform(code.trim(), { plugins, retainLines: true });
 
   if (result?.code == null) {
     throw new Error(

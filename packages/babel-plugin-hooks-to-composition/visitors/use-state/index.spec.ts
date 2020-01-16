@@ -5,14 +5,14 @@ describe('useState Plugin', () => {
 
   const transform = testVisitors(...useStateVisitors);
 
-  describe('state declaration', () => {
+  describe.only('state declaration', () => {
 
-    it('should transform destructuring to single variable and change function name', () => {
-      const result = transform(
-        `const [counter, setCounter] = useState(0);`
-      );
+    it('should transform destructuring to single variable and update function name', () => {
+      const result = transform(`
+        const [counter, setCounter] = useState(0);
+      `);
   
-      expect(result).toEqual(`const counter = reactive(0);`);
+      expect(result).toEqual(`const counter = ref(0);`);
     });
 
   });
