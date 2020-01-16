@@ -1,9 +1,9 @@
-import { mountPluginTester } from '../../utils';
-import { useMemoPlugin } from '../use-memo';
+import { testVisitors } from '../../utils';
+import { useMemoVisitors } from './index';
 
-describe('useMemo Visitor', () => {
+describe('useMemo visitors', () => {
 
-  const pluginTester = mountPluginTester(useMemoPlugin);
+  const pluginTester = testVisitors(...useMemoVisitors);
 
   it('should transform useMemo to computed', () => {
     const result = pluginTester(

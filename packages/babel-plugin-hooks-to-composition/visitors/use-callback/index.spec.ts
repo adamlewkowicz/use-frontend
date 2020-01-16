@@ -1,9 +1,9 @@
-import { mountPluginTester } from '../../utils';
-import { useCallbackPlugin } from '../use-callback';
+import { testVisitors } from '../../utils';
+import { useCallbackVisitors } from '../use-callback';
 
 describe('useCallback Visitor', () => {
 
-  const pluginTester = mountPluginTester(useCallbackPlugin);
+  const pluginTester = testVisitors(...useCallbackVisitors);
 
   it('should transform useCallback to computed callback', () => {
     const result = pluginTester(

@@ -1,15 +1,14 @@
-import { useStatePlugin, useStateVisitors } from '.';
-import { mountPluginTester, testVisitors } from '../../utils';
+import { useStateVisitors } from '.';
+import { testVisitors } from '../../utils';
 
 describe('useState Plugin', () => {
 
-  const pluginTester = mountPluginTester(useStatePlugin);
   const transform = testVisitors(...useStateVisitors);
 
   describe('state declaration', () => {
 
     it('should transform destructuring to single variable and change function name', () => {
-      const result = pluginTester(
+      const result = transform(
         `const [counter, setCounter] = useState(0);`
       );
   
@@ -22,7 +21,7 @@ describe('useState Plugin', () => {
   describe('state update', () => {
 
     it('should remove "setState" function call', () => {
-      const result = pluginTester(
+      const result = transform(
         `setCounter(counter + 1);`
       );
 
@@ -33,7 +32,7 @@ describe('useState Plugin', () => {
       'should handle "setState" calls with arrow function as an argument, ' + 
       'eg. "setCounter(counter => counter + 1)"'
     , () => {
-      const result = pluginTester(`
+      const result = transform(`
         const [counter, setCounter] = useState(0);
         setCounter(c => c * 2);
       `);
@@ -47,5 +46,24 @@ describe('useState Plugin', () => {
   });
 
   it.todo('should convert primitive values eg. "useState(0)" to reactive object');
+
+  describe('"setState" calls', () => {
+
+    it('should replace "setState(variable)" calls with "state = variable" assignments', () => {
+      // state declaration only for plugin tracker purpose
+      const result = transform(`
+        const nextCounter = 1;
+        const [counter, setCounter] = useState(0); 
+        setCounter(nextCounter);
+      `);
+
+      expect(result).toEqual(`
+        const nextCounter = 1;
+        const counter = ref(0); 
+        counter.value = nextCounter;
+      `);
+    });
+
+  });
 
 });

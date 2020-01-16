@@ -24,7 +24,7 @@ const replaceUseEffectWithWatch = (): Visitor => ({
       if (dependencies.elements.length) {
         // has dependencies, replace with watch
         const vueWatch = createVueWatch(dependencies.elements, callback);
-        path.replaceWith(vueWatch);
+        return path.replaceWith(vueWatch);
       } else {
         // empty array, replace with onMounted
         const vueOnMounted = createVueOnMounted(callback);
@@ -36,19 +36,19 @@ const replaceUseEffectWithWatch = (): Visitor => ({
         const cleanupCallback = returnStatement?.argument;
 
         if (t.isArrowFunctionExpression(cleanupCallback)) {
-          // returns cleanup callback; add additional onUnmounted cleanup lifecycle
-          path.replaceExpressionWithStatements([
+          // returns cleanup callback and adds additional onUnmounted cleanup lifecycle
+          return path.replaceExpressionWithStatements([
             createVueOnMounted(callback),
             createVueOnUnmounted(cleanupCallback)
           ]);
         } else {
-          path.replaceWith(vueOnMounted);
+          return path.replaceWith(vueOnMounted);
         }
       }
     } else {
       // no dependencies, replace with onUpdated
       const vueOnUpdated = createVueOnUpdated(callback);
-      path.replaceWith(vueOnUpdated);
+      return path.replaceWith(vueOnUpdated);
     }
   }
 });

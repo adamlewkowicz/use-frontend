@@ -109,4 +109,13 @@ export const createVueInject = (
   args
 );
 
-export const isCorrectStateSetterName = (name: string): boolean => name.startsWith(REACT_STATE_SETTER_PREFIX); 
+export const isCorrectStateSetterName = (name: string): boolean => name.startsWith(REACT_STATE_SETTER_PREFIX);
+
+export const createAssignment = (
+  variableName: string,
+  assignmentValue: Identifier,
+): t.AssignmentExpression => t.assignmentExpression(
+  '=',
+  t.identifier(variableName),
+  t.identifier('_' + assignmentValue.name)
+);

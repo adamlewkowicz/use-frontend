@@ -23,7 +23,10 @@ export const testVisitors = (...visitors: VisitorHandler[]) => {
 
   const pluginTester = mountPluginTester(plugin);
 
-  return (code: string): string => pluginTester(code);
+  return (code: string, trimCode = true): string => {
+    const finalCode = trimCode ? code.trim() : code;
+    return pluginTester(finalCode);
+  }
 }
 
 const BABEL_PLACEHOLDER: any = null; // TODO: provide babel arg

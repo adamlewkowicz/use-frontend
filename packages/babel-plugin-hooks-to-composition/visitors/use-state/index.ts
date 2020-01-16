@@ -16,6 +16,7 @@ import {
   createVueReactive,
   isSetStateCallback,
   isCorrectStateSetterName,
+  createAssignment,
 } from '../../helpers';
 import { refSet } from '../use-ref';
 
@@ -165,12 +166,25 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
     if (!isCorrectStateSetterName(callee.name)) return;
     if (!stateDeclarationsMap.has(callee.name)) return;
 
-    // setState(1) or setState(c => c + 1)
-    const [setStateExpressionOrCallback] = args;
+    const stateValueName = stateDeclarationsMap.get(callee.name);
 
-    if (isSetStateCallback(setStateExpressionOrCallback)) {
-      const { body } = setStateExpressionOrCallback;
-      const stateValueName = stateDeclarationsMap.get(callee.name);
+    if (!stateValueName) return;
+
+    // setState(1) or setState(c => c + 1)
+    const [setStateArg] = args;
+
+    switch(setStateArg.type) {
+      // setState(variable)
+      case 'Identifier':
+        const stateAssignment = createAssignment(
+          stateValueName as string,
+          setStateArg,
+        );
+        return path.replaceWith(stateAssignment);
+    }
+
+    if (isSetStateCallback(setStateArg)) {
+      const { body } = setStateArg;
 
       if (!stateValueName) return;
       if (!t.isBinaryExpression(body)) return;
@@ -186,9 +200,9 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
   
         path.replaceWith(updatedBinaryExpression);
       }
-    } else if (t.isBinaryExpression(setStateExpressionOrCallback)) {
+    } else if (t.isBinaryExpression(setStateArg)) {
       // just a binary expression, can be simply replaced
-      path.replaceWith(setStateExpressionOrCallback);
+      path.replaceWith(setStateArg);
     }
   },
 })
@@ -213,7 +227,7 @@ const replaceUseStateWithReactive = (): Visitor => ({
 });
 
 export const useStateVisitors = [
-  replaceUseStateWithReactive,
+  // replaceUseStateWithReactive,
   replaceUseStateWithReactiveOrRef,
   replaceSetStateCallWithRawExpression,
   trackStateDeclarations,
