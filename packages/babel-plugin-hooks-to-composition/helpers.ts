@@ -18,10 +18,16 @@ import {
   REACT_USE_CONTEXT,
   VUE_INJECT,
   REACT_STATE_SETTER_PREFIX,
+  REACT_USE_STATE,
+  FALSY,
+  ASSERT_FALSE,
+  ASSERT_TRUE,
 } from './consts';
-import { Node } from './types';
+import { Node, DatafullAssert } from './types';
 
 type InitialState = t.Expression | t.SpreadElement;
+
+const isExpressionAFuncWithName = (functionName: string) => (exp: Expression): exp is Identifier => t.isIdentifier(exp) && exp.name === functionName;
 
 /** useMemo(...) */
 export const isUseMemoFunc = (exp: Expression): exp is Identifier => t.isIdentifier(exp) && exp.name === REACT_USE_MEMO;
@@ -40,6 +46,28 @@ export const isSetStateCallback = (node: Node): node is ArrowFunctionExpression 
 
 /** useContext(...) */
 export const isUseContextFunc = (exp: Expression): exp is Identifier => t.isIdentifier(exp) && exp.name === REACT_USE_CONTEXT;
+
+/** useState(...) */
+export const isUseStateFunc = () => {
+  isExpressionAFuncWithName(REACT_USE_STATE);
+}
+
+const _isUseStateFunc = (exp: t.Expression): DatafullAssert<{
+  initialStateValue: t.Expression | t.SpreadElement
+}> => {
+  if (!t.isCallExpression(exp)) return ASSERT_FALSE;
+  if (!t.isIdentifier(exp.callee)) return ASSERT_FALSE;
+
+  const [initialStateValue] = exp.arguments;
+
+  const isNotCalledUseState = exp.callee.name !== REACT_USE_STATE;
+  const isNoInitialStateValue = initialStateValue === undefined;
+
+  if (isNotCalledUseState) return ASSERT_FALSE;
+  if (isNoInitialStateValue) return ASSERT_FALSE;
+
+  return { result: true, initialStateValue };
+}
 
 /** ref(initialState); */
 export const createVueRef = (
@@ -69,6 +97,24 @@ const createFunctionWithCallback = (functionName: string) => (
 ) => t.callExpression(
   t.identifier(functionName),
   [callback]
+);
+
+/** const stateName = reactive(initialState); */
+export const createVueReactiveDeclarator = (
+  stateName: string,
+  initialState: InitialState,
+): t.VariableDeclarator => t.variableDeclarator(
+  t.identifier(stateName),
+  createVueReactive(initialState)
+);
+
+/** const stateName = useRef(initialState); */
+export const createReactUseRefDeclarator = (
+  variableName: string,
+  initialValue: InitialState
+): t.VariableDeclarator => t.variableDeclarator(
+  t.identifier(variableName),
+  createVueRef(initialValue)
 );
 
 export const createVueOnUnmounted = createFunctionWithCallback(VUE_ON_UNMOUNTED);
@@ -119,3 +165,42 @@ export const createAssignment = (
   t.identifier(variableName),
   t.identifier('_' + assignmentValue.name)
 );
+
+/** is `[counter, setCounter]` */
+const isReactStateDeclarationArray = (id: t.LVal): DatafullAssert<{
+  stateValue: t.Identifier,
+  stateSetter: t.Identifier,
+}> => {
+  if (!t.isArrayPattern(id)) return ASSERT_FALSE;
+
+  const [stateValue, stateSetter] = id.elements;
+
+  if (!t.isIdentifier(stateValue)) return ASSERT_FALSE;
+  if (!t.isIdentifier(stateSetter)) return ASSERT_FALSE;
+  if (!isCorrectStateSetterName(stateSetter.name)) return ASSERT_FALSE;
+
+  return { result: true, stateValue, stateSetter };
+}
+
+/** is `[counter, setCounter] = useState(0)` */
+export const isReactStateDeclarator = (declarator: t.VariableDeclarator): DatafullAssert<{
+  initialStateValue: t.Expression | t.SpreadElement,
+  stateValue: t.Identifier,
+  stateSetter: t.Identifier,
+}> => {
+  const arrayDeclarationInfo = isReactStateDeclarationArray(declarator.id);
+  const useStateInfo = _isUseStateFunc(declarator.init);
+
+  if (!useStateInfo.result) return ASSERT_FALSE;
+  if (!arrayDeclarationInfo.result) return ASSERT_FALSE;
+
+  const { initialStateValue } = useStateInfo;
+  const { stateSetter, stateValue } = arrayDeclarationInfo;
+
+  return {
+    result: true,
+    initialStateValue,
+    stateValue,
+    stateSetter,
+  };
+}

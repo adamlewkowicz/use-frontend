@@ -1,44 +1,27 @@
-import { transform } from '@babel/core';
 import { PluginHandler } from '../../types';
-import { PluginPartial, Node } from '../../types';
+import { Node } from '../../types';
 import { Identifier, ArrayPattern, Expression } from 'babel-types';
 import * as t from 'babel-types';
 import {
   VUE_STATE_FUNC_NAME,
   REACT_STATE_FUNC_NAME,
   REACT_STATE_SETTER_PREFIX,
-  REACT_USE_STATE,
 } from '../../consts';
 import { Visitor } from 'babel-traverse';
 import {
-  createVueRef,
-  createReactUseRef,
-  createVueReactive,
   isSetStateCallback,
   isCorrectStateSetterName,
   createAssignment,
+  isReactStateDeclarator,
+  createVueReactiveDeclarator,
+  createReactUseRefDeclarator,
 } from '../../helpers';
-import { refSet } from '../use-ref';
 
 /** useState(...) */
 const isUseStateFunc = (node: Node<Identifier>): boolean => node.name === REACT_STATE_FUNC_NAME;
 
 /** setCounter */
 const isUseStateSetter = (exp: Expression): exp is Identifier => t.isIdentifier(exp) && exp.name.startsWith(REACT_STATE_SETTER_PREFIX);
-
-/** [counter, setCounter] */
-const isUseStateDestructuring = (node: Node<ArrayPattern>): boolean => {
-  const hasTwoElements = node.elements.length === 2;
-  const [stateValue, stateSetter] = node.elements;
-
-  if (!hasTwoElements) return false;
-  if (!t.isIdentifier(stateValue)) return false;
-  if (!isUseStateSetter(stateSetter)) return false;
-
-  // stateSetter.name === `set${stateValue.name[0].toUpperCase() + stateValue.name.substring(-1)}`
-
-  return true;
-}
 
 interface StateValueName extends String {}
 interface StateSetterName extends String {}
@@ -108,50 +91,40 @@ export const useStatePlugin: PluginHandler = (babel) => ({
 });
 
 const replaceUseStateWithReactiveOrRef = (): Visitor => ({
-  CallExpression(path) {
-    const isUseStateFunc =
-      t.isIdentifier(path.node.callee) &&
-      path.node.callee.name === REACT_USE_STATE;
-
-    if (!isUseStateFunc) return;
-
-    if (t.isIdentifier(path.node.callee)) {
-      // useState(initialState)
-      const [initialState] = path.node.arguments;
-
-      const isStateNotPrimiviteType =
-        t.isObjectExpression(initialState) ||
-        t.isArrayExpression(initialState);
-      
-      if (isStateNotPrimiviteType) {
-        const vueReactive = createVueReactive(initialState);
-        return path.replaceWith(vueReactive);
-      } else {
-        const reactUseState = createReactUseRef(initialState);
-        // TRACK: vue ref declaration
-        // refSet.set(path.node.)
-        return path.replaceWith(reactUseState);
-      }
-    }
-  },
-});
-
-const trackStateDeclarations = (): Visitor => ({
+  // [counter, setCounter] = useState(0);
   VariableDeclarator(path) {
-    const { id } = path.node;
+    const stateDeclarationInfo = isReactStateDeclarator(path.node);
 
-    if (!t.isArrayPattern(id)) return;
+    if (!stateDeclarationInfo.result) return;
+    
+    const {
+      stateValue,
+      stateSetter,
+      initialStateValue,
+    } = stateDeclarationInfo;
 
-    const [stateValue, stateSetter] = id.elements;
-
-    if (!t.isIdentifier(stateValue)) return;
-    if (!t.isIdentifier(stateSetter)) return;
-    if (!isCorrectStateSetterName(stateSetter.name)) return;
-
+    // TRACK STATE DECLARATIONS
     stateDeclarationsMap.set(stateSetter.name, stateValue.name);
 
-    console.log(stateDeclarationsMap);
-  }
+    // state has primitive type
+    if (t.isLiteral(initialStateValue)) {
+      // replace with React's useRef to make use-ref visitors do the job
+      // with replacing .current to .value
+      const reactUseRefDeclarator = createReactUseRefDeclarator(
+        stateValue.name,
+        initialStateValue
+      );
+
+      return path.replaceWith(reactUseRefDeclarator);
+    } else {
+      const vueReactiveDeclarator = createVueReactiveDeclarator(
+        stateValue.name,
+        initialStateValue,
+      );
+
+      return path.replaceWith(vueReactiveDeclarator);
+    }
+  },
 });
 
 /**
@@ -206,28 +179,7 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
   },
 })
 
-/**
- * Transforms React's `useState` to Vue's `reactive` state declaration:
- * `const [counter, setCounter] = useState(0);` transforms into
- * `const counter = reactive(0);`
- */
-const replaceUseStateWithReactive = (): Visitor => ({
-  ArrayPattern(path) {
-    if (path.node.elements.length === 2) {
-      const [firstExpression] = path.node.elements;
-      if (firstExpression.type === 'Identifier') {
-        // TODO: check if a second destructured variable starts with 'set___'
-        // to make sure that it's set's state array 
-        const variableIdentifier = t.identifier(firstExpression.name);
-        path.replaceWith(variableIdentifier);
-      }
-    }
-  },
-});
-
 export const useStateVisitors = [
-  // replaceUseStateWithReactive,
   replaceUseStateWithReactiveOrRef,
   replaceSetStateCallWithRawExpression,
-  trackStateDeclarations,
 ];
