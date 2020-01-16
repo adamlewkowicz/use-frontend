@@ -19,9 +19,7 @@ import {
   VUE_INJECT,
   REACT_STATE_SETTER_PREFIX,
   REACT_USE_STATE,
-  FALSY,
   ASSERT_FALSE,
-  ASSERT_TRUE,
 } from './consts';
 import { Node, DatafullAssert } from './types';
 
@@ -47,12 +45,7 @@ export const isSetStateCallback = (node: Node): node is ArrowFunctionExpression 
 /** useContext(...) */
 export const isUseContextFunc = (exp: Expression): exp is Identifier => t.isIdentifier(exp) && exp.name === REACT_USE_CONTEXT;
 
-/** useState(...) */
-export const isUseStateFunc = () => {
-  isExpressionAFuncWithName(REACT_USE_STATE);
-}
-
-const _isUseStateFunc = (exp: t.Expression): DatafullAssert<{
+const isUseStateFunc = (exp: t.Expression): DatafullAssert<{
   initialStateValue: t.Expression | t.SpreadElement
 }> => {
   if (!t.isCallExpression(exp)) return ASSERT_FALSE;
@@ -189,7 +182,7 @@ export const isReactStateDeclarator = (declarator: t.VariableDeclarator): Datafu
   stateSetter: t.Identifier,
 }> => {
   const arrayDeclarationInfo = isReactStateDeclarationArray(declarator.id);
-  const useStateInfo = _isUseStateFunc(declarator.init);
+  const useStateInfo = isUseStateFunc(declarator.init);
 
   if (!useStateInfo.result) return ASSERT_FALSE;
   if (!arrayDeclarationInfo.result) return ASSERT_FALSE;
