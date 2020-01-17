@@ -2,12 +2,13 @@ import * as t from 'babel-types';
 import { DatafullAssert } from './types';
 import { isCorrectStateSetterName } from './helpers';
 import { ASSERT_FALSE } from './consts';
-import { stateDeclarationsMap } from './visitors/use-state';
+import { stateDeclarationsMap, StateDeclarationInfo } from './visitors/use-state';
 
 /** is `setCounter(5)` */
 export const isReactSetStateCall = (node: t.CallExpression): DatafullAssert<{
   stateValueName: string,
   setStateArg: t.Expression | t.SpreadElement
+  stateDeclarationInfo: StateDeclarationInfo
 }> => {
 
   if (!t.isIdentifier(node.callee)) return ASSERT_FALSE;
@@ -26,5 +27,6 @@ export const isReactSetStateCall = (node: t.CallExpression): DatafullAssert<{
     result: true,
     stateValueName: stateValueName as string,
     setStateArg,
+    stateDeclarationInfo,
   };
 }

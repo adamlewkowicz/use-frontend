@@ -5,13 +5,14 @@ import {
   isReactStateDeclarator,
   createVueReactiveDeclarator,
   createVueRefDeclarator,
+  createVueRefValueAssignment,
 } from '../../helpers';
 import { isReactSetStateCall } from '../../assert';
 
 interface StateValueName extends String {}
 interface StateSetterName extends String {}
 
-interface StateDeclarationInfo {
+export interface StateDeclarationInfo {
   type: 'vue_reactive' | 'vue_ref'
   stateValueName: StateValueName
 }
@@ -70,7 +71,11 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
 
     if (!isReactSetStateCallInfo.result) return;
 
-    const { setStateArg, stateValueName } = isReactSetStateCallInfo;
+    const { setStateArg, stateValueName, stateDeclarationInfo } = isReactSetStateCallInfo;
+
+    const createAssignmentHandler = stateDeclarationInfo.type === 'vue_ref'
+      ? createVueRefValueAssignment
+      : createAssignment;
 
     switch(setStateArg.type) {
       // setCounter(nextCounter / 4 / null / false / [...abc] / counter + 1)
@@ -80,9 +85,9 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
       case 'BooleanLiteral':
       case 'ArrayExpression':
       case 'BinaryExpression':
-        const stateValueAssignment = createAssignment(
+        const stateValueAssignment = createAssignmentHandler(
           stateValueName as string,
-          setStateArg,
+          setStateArg
         );
         return path.replaceWith(stateValueAssignment);
 
@@ -99,7 +104,7 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
           body.right
         );
 
-        const stateValueAssignment = createAssignment(
+        const stateValueAssignment = createAssignmentHandler(
           stateValueName as string,
           updatedBinaryExpression,
         );

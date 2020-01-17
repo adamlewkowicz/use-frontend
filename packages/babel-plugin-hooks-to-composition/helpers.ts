@@ -20,6 +20,7 @@ import {
   REACT_STATE_SETTER_PREFIX,
   REACT_USE_STATE,
   ASSERT_FALSE,
+  VUE_REF_PROPERTY,
 } from './consts';
 import { Node, DatafullAssert } from './types';
 
@@ -164,16 +165,32 @@ export const createAssignment = (
   variableName: string,
   expression: t.Expression,
 ): t.AssignmentExpression => {
-  const assignmentVal = t.isIdentifier(expression)
-    ? t.identifier(expression.name)
-    : expression;
-
   return t.assignmentExpression(
     '=',
     t.identifier(variableName),
     expression
   );
 }
+
+/** variableName.{value} */
+const createVueRefMember = (
+  variableName: string
+): t.MemberExpression => t.memberExpression(
+  t.identifier(variableName),
+  t.identifier(VUE_REF_PROPERTY)
+);
+
+/** variableName.value = expression;
+ * Adds .value as variable property.
+ */
+export const createVueRefValueAssignment = (
+  variableName: string,
+  expression: t.Expression
+): t.AssignmentExpression => t.assignmentExpression(
+  '=',
+  createVueRefMember(variableName),
+  expression
+);
 
 /** is `[counter, setCounter]` */
 const isReactStateDeclarationArray = (id: t.LVal): DatafullAssert<{
