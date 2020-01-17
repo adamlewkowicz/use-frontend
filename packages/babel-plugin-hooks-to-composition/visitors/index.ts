@@ -5,6 +5,7 @@ import { useCallbackVisitors } from './use-callback';
 import { useEffectVisitors } from './use-effect';
 import { useStateVisitors } from './use-state';
 import { useContextVisitors } from './use-context';
+import { useLayoutEffectVisitors } from './use-layout-effect';
 
 export const rootVisitor = combineVisitors(
   ...useRefVisitors,
@@ -13,4 +14,5 @@ export const rootVisitor = combineVisitors(
   ...useEffectVisitors,
   ...useStateVisitors,
   ...useContextVisitors,
+  ...useLayoutEffectVisitors,
 );
