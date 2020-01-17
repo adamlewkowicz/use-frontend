@@ -63,7 +63,7 @@ const isUseStateFunc = (exp: t.Expression): DatafullAssert<{
 }
 
 /** ref(initialState); */
-export const createVueRef = (
+export const createVueRefCall = (
   initialState: InitialState
 ): t.CallExpression => t.callExpression(
   t.identifier(VUE_REF),
@@ -77,7 +77,7 @@ export const createVueReactive = (
   [initialState],
 );
 
-export const createReactUseRef = (
+export const createReactUseRefCall = (
   initialState: InitialState
 ): t.CallExpression => t.callExpression(
   t.identifier(REACT_USE_REF),
@@ -101,13 +101,22 @@ export const createVueReactiveDeclarator = (
   createVueReactive(initialState)
 );
 
+/** const stateName = ref(initialState); */
+export const createVueRefDeclarator = (
+  variableName: string,
+  initialValue: InitialState
+): t.VariableDeclarator => t.variableDeclarator(
+  t.identifier(variableName),
+  createVueRefCall(initialValue)
+);
+
 /** const stateName = useRef(initialState); */
 export const createReactUseRefDeclarator = (
   variableName: string,
   initialValue: InitialState
 ): t.VariableDeclarator => t.variableDeclarator(
   t.identifier(variableName),
-  createVueRef(initialValue)
+  createReactUseRefCall(initialValue)
 );
 
 export const createVueOnUnmounted = createFunctionWithCallback(VUE_ON_UNMOUNTED);

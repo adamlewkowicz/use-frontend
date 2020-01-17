@@ -12,12 +12,13 @@ export const isReactSetStateCall = (node: t.CallExpression): DatafullAssert<{
 
   if (!t.isIdentifier(node.callee)) return ASSERT_FALSE;
 
-  const stateValueName = stateDeclarationsMap.get(node.callee.name);
+  const stateDeclarationInfo = stateDeclarationsMap.get(node.callee.name);
 
-  if (!stateValueName) return ASSERT_FALSE;
+  if (!stateDeclarationInfo) return ASSERT_FALSE;
   if (!isCorrectStateSetterName(node.callee.name)) return ASSERT_FALSE;
 
   const [setStateArg] = node.arguments;
+  const { stateValueName } = stateDeclarationInfo;
 
   if (!setStateArg) return ASSERT_FALSE;
 

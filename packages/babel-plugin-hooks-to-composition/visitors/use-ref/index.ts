@@ -57,14 +57,6 @@ const replaceDotCurrentWithDotValue = (): Visitor => ({
   }
 });
 
-// TODO
-const replaceSingleIdentifiersWithDotValue = (): Visitor => ({
-  Identifier(path) {
-    if (refSet.has(path.node.name)) {
-    }
-  }
-});
-
 export const useRefVisitors = [
   replaceUseRefWithRef,
   replaceDotCurrentWithDotValue,

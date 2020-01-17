@@ -1,19 +1,22 @@
 import * as t from 'babel-types';
 import { Visitor } from 'babel-traverse';
 import {
-  isSetStateCallback,
-  isCorrectStateSetterName,
   createAssignment,
   isReactStateDeclarator,
   createVueReactiveDeclarator,
-  createReactUseRefDeclarator,
+  createVueRefDeclarator,
 } from '../../helpers';
 import { isReactSetStateCall } from '../../assert';
 
 interface StateValueName extends String {}
 interface StateSetterName extends String {}
 
-export const stateDeclarationsMap = new Map<StateSetterName, StateValueName>();
+interface StateDeclarationInfo {
+  type: 'vue_reactive' | 'vue_ref'
+  stateValueName: StateValueName
+}
+
+export const stateDeclarationsMap = new Map<StateSetterName, StateDeclarationInfo>();
 
 const replaceUseStateWithReactiveOrRef = (): Visitor => ({
   
@@ -29,24 +32,29 @@ const replaceUseStateWithReactiveOrRef = (): Visitor => ({
       initialStateValue,
     } = stateDeclarationInfo;
 
-    // TRACK STATE DECLARATIONS
-    stateDeclarationsMap.set(stateSetter.name, stateValue.name);
+    const stateValueName = stateValue.name;
+    const stateSetterName = stateSetter.name;
 
     // state has primitive type
     if (t.isLiteral(initialStateValue)) {
       // replace with React's useRef to make use-ref visitors do the job
       // with replacing .current to .value
-      const reactUseRefDeclarator = createReactUseRefDeclarator(
-        stateValue.name,
+      const vueRefDeclarator = createVueRefDeclarator(
+        stateValueName,
         initialStateValue
       );
 
-      return path.replaceWith(reactUseRefDeclarator);
+      stateDeclarationsMap.set(stateSetterName, { type: 'vue_ref', stateValueName });
+
+      return path.replaceWith(vueRefDeclarator);
+
     } else {
       const vueReactiveDeclarator = createVueReactiveDeclarator(
-        stateValue.name,
+        stateValueName,
         initialStateValue,
       );
+
+      stateDeclarationsMap.set(stateSetterName, { type: 'vue_reactive', stateValueName });
 
       return path.replaceWith(vueReactiveDeclarator);
     }
