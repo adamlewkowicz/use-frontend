@@ -78,5 +78,49 @@ describe("useState", () => {
         `);
       });
     });
+
+    it("should handle all received values correctly", () => {
+      const result = transform(`
+        const [any, setAny] = useState(null);
+        const anyVar = 8;
+
+        setAny(anyVar);
+
+        setAny('');
+        setAny(1);
+        setAny(false);
+        setAny(null);
+        setAny(undefined);
+
+        setAny(1 + 1);
+        setAny('a' + 'b');
+
+        setAny({});
+        setAny([...any, anyVar, 10]);
+
+        setAny(c => c + 'a');
+      `);
+
+      expect(result).toMatchInlineSnapshot(`
+        "const any = ref(null);
+        const anyVar = 8;
+
+        any.value = anyVar;
+
+        any.value = '';
+        any.value = 1;
+        any.value = false;
+        any.value = null;
+        any.value = undefined;
+
+        any.value = 1 + 1;
+        any.value = 'a' + 'b';
+
+        any.value = {};
+        any.value = [...any, anyVar, 10];
+
+        any.value = any + 'a';"
+      `);
+    });
   });
 });
