@@ -1,4 +1,4 @@
-import { Visitor } from '@babel/traverse';
+import { Visitor } from 'babel-traverse';
 
 const replaceUseLayoutEffectWithOnBeforeMount = (): Visitor => ({
   CallExpression(path) {
