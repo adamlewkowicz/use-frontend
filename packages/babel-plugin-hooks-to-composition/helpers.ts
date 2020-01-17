@@ -150,14 +150,21 @@ export const createVueInject = (
 
 export const isCorrectStateSetterName = (name: string): boolean => name.startsWith(REACT_STATE_SETTER_PREFIX);
 
+/** variableName = expression; */
 export const createAssignment = (
   variableName: string,
-  assignmentValue: Identifier,
-): t.AssignmentExpression => t.assignmentExpression(
-  '=',
-  t.identifier(variableName),
-  t.identifier('_' + assignmentValue.name)
-);
+  expression: t.Expression,
+): t.AssignmentExpression => {
+  const assignmentVal = t.isIdentifier(expression)
+    ? t.identifier(expression.name)
+    : expression;
+
+  return t.assignmentExpression(
+    '=',
+    t.identifier(variableName),
+    expression
+  );
+}
 
 /** is `[counter, setCounter]` */
 const isReactStateDeclarationArray = (id: t.LVal): DatafullAssert<{

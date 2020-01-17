@@ -8,11 +8,12 @@ import {
   createVueReactiveDeclarator,
   createReactUseRefDeclarator,
 } from '../../helpers';
+import { isReactSetStateCall } from '../../assert';
 
 interface StateValueName extends String {}
 interface StateSetterName extends String {}
 
-let stateDeclarationsMap = new Map<StateSetterName, StateValueName>();
+export const stateDeclarationsMap = new Map<StateSetterName, StateValueName>();
 
 const replaceUseStateWithReactiveOrRef = (): Visitor => ({
   
@@ -57,49 +58,46 @@ const replaceUseStateWithReactiveOrRef = (): Visitor => ({
  */
 const replaceSetStateCallWithRawExpression = (): Visitor => ({
   CallExpression(path) {
-    const { callee, arguments: args } = path.node;
+    const isReactSetStateCallInfo = isReactSetStateCall(path.node);
 
-    if (!t.isIdentifier(callee)) return;
-    if (!isCorrectStateSetterName(callee.name)) return;
-    if (!stateDeclarationsMap.has(callee.name)) return;
+    if (!isReactSetStateCallInfo.result) return;
 
-    const stateValueName = stateDeclarationsMap.get(callee.name);
-
-    if (!stateValueName) return;
-
-    // setState(1) or setState(c => c + 1)
-    const [setStateArg] = args;
+    const { setStateArg, stateValueName } = isReactSetStateCallInfo;
 
     switch(setStateArg.type) {
-      // setState(variable)
+      // setCounter(nextCounter / 4 / null / false / [...abc] / counter + 1)
       case 'Identifier':
-        const stateAssignment = createAssignment(
+      case 'NumericLiteral':
+      case 'NullLiteral':
+      case 'BooleanLiteral':
+      case 'ArrayExpression':
+      case 'BinaryExpression':
+        const stateValueAssignment = createAssignment(
           stateValueName as string,
           setStateArg,
         );
-        return path.replaceWith(stateAssignment);
-    }
+        return path.replaceWith(stateValueAssignment);
 
-    if (isSetStateCallback(setStateArg)) {
-      const { body } = setStateArg;
+      case 'ArrowFunctionExpression': {
+        const { body } = setStateArg;
 
-      if (!stateValueName) return;
-      if (!t.isBinaryExpression(body)) return;
-      if (!t.isIdentifier(body.left)) return;
+        if (!t.isBinaryExpression(body)) return;
+        if (!t.isIdentifier(body.left)) return;
 
-      if (t.isBinaryExpression(body)) {
         // changed name of variable to delcared by state
         const updatedBinaryExpression = t.binaryExpression(
           body.operator,
           t.identifier(stateValueName as string),
           body.right
         );
+
+        const stateValueAssignment = createAssignment(
+          stateValueName as string,
+          updatedBinaryExpression,
+        );
   
-        path.replaceWith(updatedBinaryExpression);
+        return path.replaceWith(stateValueAssignment);
       }
-    } else if (t.isBinaryExpression(setStateArg)) {
-      // just a binary expression, can be simply replaced
-      path.replaceWith(setStateArg);
     }
   },
 })
