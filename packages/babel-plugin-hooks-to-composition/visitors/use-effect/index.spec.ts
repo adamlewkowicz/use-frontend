@@ -29,18 +29,52 @@ describe("useEffect visitors", () => {
   });
 
   describe('when "useEffect" returns cleanup callback', () => {
-    it("should create two lifecycle methods", () => {
-      const result = transform(`
-        useEffect(() => {
-          return () => {};
-        }, []);
-      `);
+    describe('when "useEffect" has empty dependencies', () => {
+      it('should create "onMounted" and "onUnmounted" lifecycle methods', () => {
+        const result = transform(`
+          useEffect(() => {
+            return () => {};
+          }, []);
+        `);
 
-      expect(result).toMatchInlineSnapshot(`
-        "onMounted(() => {
-          return () => {};
-        }), onUnmounted(() => {});"
-      `);
+        expect(result).toMatchInlineSnapshot(`
+          "onMounted(() => {
+            return () => {};
+          }), onUnmounted(() => {});"
+        `);
+      });
+    });
+
+    describe('when "useEffect" has no dependencies', () => {
+      it('should replace "useEffect" with "onUpdated" and "onUnmounted"', () => {
+        const result = transform(`
+          useEffect(() => {
+            return () => a;
+          });
+        `);
+
+        expect(result).toMatchInlineSnapshot(`
+          "onUpdated(() => {
+            return () => a;
+          });"
+        `);
+      });
+    });
+
+    describe('when "useEffect" has dependencies', () => {
+      it('should replace "useEffect" with "watch"', () => {
+        const result = transform(`
+          useEffect(() => {
+            return () => a;
+          }, [a]);
+        `);
+
+        expect(result).toMatchInlineSnapshot(`
+          "watch([
+
+          a], ([a]) => {return () => a;});"
+        `);
+      });
     });
   });
 });

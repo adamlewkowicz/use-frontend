@@ -157,7 +157,11 @@ export const createVueWatchCallExp = (
 }
 
 type VueWatchOptions = {
-  immediate?: boolean
+  lazy?: boolean
+  flush?: 'pre' | 'post' | 'sync'
+  deep?: boolean
+  onTrack?: (event: unknown) => void
+  onTrigger?: (event: unknown) => void
 }
 
 export const createVueOnUpdated = (
