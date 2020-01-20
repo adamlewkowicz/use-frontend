@@ -1,7 +1,7 @@
 import * as t from 'babel-types';
 import { DatafullAssert } from './types';
 import { isCorrectStateSetterName, isUseEffectFunc } from './helpers';
-import { ASSERT_FALSE } from './consts';
+import { ASSERT_FALSE, REACT_USE_LAYOUT_EFFECT } from './consts';
 import { stateDeclarationsMap, StateDeclarationInfo } from './visitors/use-state';
 
 /** is `useLayoutEffect(callback, dependencies)` */
@@ -50,49 +50,76 @@ export const isReactSetStateCall = (node: t.CallExpression): DatafullAssert<{
   };
 }
 
-const isExpressionsOfType = <T extends t.Expression, K extends t.Expression['type']>(
-  expressions: T[],
-  expressionType: K
-): expressions is T[] => {
-  return expressions.some(exp => exp.type !== expressionType);
-}
+const isExpressionsOfType = <T extends t.Expression>(
+  expressions: (t.Expression | null | t.SpreadElement)[],
+  expressionType: T['type']
+): expressions is T[] => expressions.some(exp => exp === null || exp.type !== expressionType);
 
-const isReactDependenciesArray = (dependecies: t.Expression[]) => {
-  isExpressionsOfType(dependecies, 'Identifier');
+const isExpressionsOfIdentifier = (
+  expressions: (t.Expression | null | t.SpreadElement)[]
+): expressions is t.Identifier[] => isExpressionsOfType(expressions, 'Identifier');
 
-  if (isExpressionsOfType(dependecies, 'Identifier')) {
-    dependecies
-  } else {
-    dependecies
-  }
-}
-
-const isReactUseEffectCallback = (callback: t.ArrowFunctionExpression
-): DatafullAssert<{
-
+/** is `[a, b]` - array of identifiers */
+const isArrayOfIdentifiers = (node: t.Expression | t.SpreadElement): DatafullAssert<{
+  elements: t.Identifier[]
 }> => {
+  if (!t.isArrayExpression(node)) return ASSERT_FALSE;
+  if (!isExpressionsOfIdentifier(node.elements)) return ASSERT_FALSE;
 
   return {
-    result: true
+    result: true,
+    elements: node.elements,
+  };
+}
+
+const isReactUseEffectCallback = (callback: t.Expression | t.SpreadElement): DatafullAssert<{
+  cleanupCallback: null | t.ArrowFunctionExpression
+}> => {
+  if (!t.isArrowFunctionExpression(callback)) return ASSERT_FALSE;
+  if (!t.isBlock(callback.body)) return ASSERT_FALSE;
+
+  const returnStatement = callback.body.body.find(
+    (element): element is t.ReturnStatement => t.isReturnStatement(element)
+  );
+
+  if (returnStatement) {
+    if (t.isArrowFunctionExpression(returnStatement.argument)) {
+      const cleanupCallback = returnStatement.argument;
+
+      return {
+        result: true,
+        cleanupCallback,
+      }
+    }
+  }
+
+  return {
+    result: true,
+    cleanupCallback: null,
   }
 }
 
 /** is `useEffect(() => {}, []);` */
 export const isReactUseEffect = (node: t.CallExpression): DatafullAssert<{
   dependencies: t.Identifier[]
-  cleanupCallback?: t.ArrowFunctionExpression
-
+  cleanupCallback: t.ArrowFunctionExpression | null
 }> => {
-
   if (!isUseEffectFunc(node.callee)) return ASSERT_FALSE;
 
-  const [callback, dependencies] = node.arguments;
+  const [callback, deps] = node.arguments;
 
-  if (!t.isArrowFunctionExpression(callback)) return ASSERT_FALSE;
-  if (!t.isBlock(callback.body)) return ASSERT_FALSE;
+  const isReactUseEffectCallbackInfo = isReactUseEffectCallback(callback);
+  const isArrayOfIdentifiersInfo = isArrayOfIdentifiers(deps);
+
+  if (!isReactUseEffectCallbackInfo.result) return ASSERT_FALSE;
+  if (!isArrayOfIdentifiersInfo.result) return ASSERT_FALSE;
+
+  const { cleanupCallback } = isReactUseEffectCallbackInfo;
+  const { elements: dependencies } = isArrayOfIdentifiersInfo;
 
   return {
     result: true,
-    dependencies: [],
+    dependencies,
+    cleanupCallback,
   };
 }
