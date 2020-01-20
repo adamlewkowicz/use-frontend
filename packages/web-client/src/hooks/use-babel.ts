@@ -1,7 +1,8 @@
 import * as babel from '@babel/core';
 import { useState } from 'react';
+import { prettierFormat } from '../utils';
 
-export const useBabel = (plugins?: babel.PluginItem[]) => {
+export const useBabel = (plugins?: babel.PluginItem[], usePrettier = true) => {
   const [code, setCode] = useState<string>('');
   const [error, setError] = useState<null | Error>(null);
 
@@ -9,13 +10,20 @@ export const useBabel = (plugins?: babel.PluginItem[]) => {
     try {
       if (error) setError(null);
 
-      const transformedCode = babel.transform(codeToTransform, {
+      const transformedOutput = babel.transform(codeToTransform, {
         retainLines: true,
         plugins,
       });
-  
-      if (transformedCode?.code != null) {
-        setCode(transformedCode.code);
+
+      if (transformedOutput?.code != null) {
+        const { code } = transformedOutput;
+        
+        if (usePrettier) {
+          const prettifiedCode = prettierFormat(code);
+          setCode(prettifiedCode);
+        } else {
+          setCode(code);
+        }
       }
     } catch(error) {
       setError(error);

@@ -19,6 +19,8 @@ import css from './components/App.module.css';
 import vueLogo from './assets/images/vue-logo.svg';
 import { SplitEditor as CustomSplitEditor } from './components/SplitEditor';
 import { useModal } from './hooks/use-modal';
+import { useMountedEffect } from './hooks/use-mounted-effect';
+import { useReactToVue } from './hooks/use-react-to-vue';
 
 const SplitEditor = split  as any;
 const DiffEditor = diff as any;
@@ -69,14 +71,15 @@ const storageKey = 'r_code';
 
 export function App() {
   const [reactCode, setReactCode] = useState<string>(() => localStorage.getItem(storageKey) || defaultCode);
-  const { transform, error, code: vueCode } = useBabel(babelPlugins);
+  // const { transform, error, code: vueCode } = useBabel(babelPlugins);
+  const { transformReactCode, vueError, vueCode } = useReactToVue();
   const { Modal, ...modalContext } = useModal();
   // const webWorker = useWebWorker<string>(WorkerModule);
 
   useEffect(() => {
-    transform(reactCode);
+    transformReactCode(reactCode);
     localStorage.setItem(storageKey, reactCode);
-  }, [reactCode, transform]);
+  }, [reactCode]);
 
   return (
     <div className="App">
@@ -98,10 +101,10 @@ export function App() {
         style={{ width: '80vw', height: '80vh', margin: '0 auto' }}
         enableBasicAutocompletion
       />
-      {error && (
+      {vueError && (
         <>
           <h2>Error</h2>
-          <p>{error.message}</p>
+          <p>{vueError.message}</p>
         </>
       )}
       <button onClick={modalContext.open}>

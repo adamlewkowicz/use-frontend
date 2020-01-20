@@ -1,6 +1,7 @@
 import { hooksToCompositionPlugin } from 'babel-plugin-hooks-to-composition';
 import * as babel from '@babel/core';
-import prettier from 'prettier';
+import { format as prettierFormatNative } from 'prettier/standalone';
+import prettierBabylon from 'prettier/parser-babylon';
 
 export const transformCode = (code: string): string | null => {
   const transformedCode = babel.transform(code, {
@@ -15,7 +16,8 @@ export const transformCode = (code: string): string | null => {
   return transformedCode?.code;
 }
 
-export const prettierFormat = (code: string) => prettier.format(code, {
+export const prettierFormat = (code: string): string => prettierFormatNative(code, {
   parser: 'babel',
+  plugins: [prettierBabylon],
   semi: true,
 });

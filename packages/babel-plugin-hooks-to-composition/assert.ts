@@ -4,6 +4,25 @@ import { isCorrectStateSetterName, isUseEffectFunc } from './helpers';
 import { ASSERT_FALSE } from './consts';
 import { stateDeclarationsMap, StateDeclarationInfo } from './visitors/use-state';
 
+/** is `useLayoutEffect(callback, dependencies)` */
+const isReactUseLayoutEffect = (node: t.CallExpression): DatafullAssert => {
+  if (!t.isIdentifier(node.callee)) return ASSERT_FALSE;
+  if (node.callee.name !== REACT_USE_LAYOUT_EFFECT) return ASSERT_FALSE;
+
+  const [callback, dependencies] = node.arguments;
+
+  if (!t.isArrowFunctionExpression(callback)) return ASSERT_FALSE;
+
+  if (t.isArrayExpression(dependencies)) {
+    // TODO: handle dependencies
+
+  } else { // no dependencies
+
+  }
+
+  return { result: true };
+}
+
 /** is `setCounter(5)` */
 export const isReactSetStateCall = (node: t.CallExpression): DatafullAssert<{
   stateValueName: string,
