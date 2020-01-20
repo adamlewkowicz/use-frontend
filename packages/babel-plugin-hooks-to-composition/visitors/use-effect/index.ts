@@ -3,7 +3,7 @@ import {
   createVueOnUpdated,
   createVueOnMounted,
   createVueOnUnmounted,
-  createVueWatch,
+  createVueWatchCallExp,
 } from '../../helpers';
 import * as t from 'babel-types';
 import { Visitor } from 'babel-traverse';
@@ -23,7 +23,7 @@ const replaceUseEffectWithWatch = (): Visitor => ({
     if (t.isArrayExpression(dependencies)) {
       if (dependencies.elements.length) {
         // has dependencies, replace with watch
-        const vueWatch = createVueWatch(dependencies.elements, callback);
+        const vueWatch = createVueWatchCallExp(dependencies.elements, callback);
         return path.replaceWith(vueWatch);
       } else {
         // empty array, replace with onMounted

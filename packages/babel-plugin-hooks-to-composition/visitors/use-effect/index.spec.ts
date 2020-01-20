@@ -5,14 +5,16 @@ describe('useEffect visitors', () => {
 
   const transform = testVisitors(...useEffectVisitors);
 
-  it.todo('', () => {
-    const result = transform(
-      ``
-    );
+  describe('when "useEffect" has no dependencies', () => {
 
-    expect(result).toEqual(
-      ``
-    );
+    it('should replace "useEffect" with "onMounted"', () => {
+      const result = transform(`useEffect(() => {}, []);`);
+
+      expect(result).toEqual(`onMounted(() => {});`);
+    });
+
   });
+
+  it.todo('should transform "useEffect" to "watch"');
 
 });
