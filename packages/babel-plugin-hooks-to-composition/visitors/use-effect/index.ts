@@ -7,48 +7,38 @@ import {
 } from '../../helpers';
 import * as t from 'babel-types';
 import { Visitor } from 'babel-traverse';
+import { isReactUseEffectCallExp } from '../../assert';
 
 const replaceUseEffectWithWatch = (): Visitor => ({
   CallExpression(path) {
-    const { node } = path;
+    const isReactUseEffectCallExpInfo = isReactUseEffectCallExp(path.node);
 
-    if (!isUseEffectFunc(node.callee)) return;
+    if (!isReactUseEffectCallExpInfo.result) return;
 
-    // useEffect(callback, dependencies)
-    const [callback, dependencies] = node.arguments;
+    const { dependencies, originalCallback, cleanupCallback } = isReactUseEffectCallExpInfo;
 
-    if (!t.isArrowFunctionExpression(callback)) return;
-    if (!t.isBlock(callback.body)) return;
-
-    if (t.isArrayExpression(dependencies)) {
-      if (dependencies.elements.length) {
-        // has dependencies, replace with watch
-        const vueWatch = createVueWatchCallExp(dependencies.elements, callback);
-        return path.replaceWith(vueWatch);
-      } else {
-        // empty array, replace with onMounted
-        const vueOnMounted = createVueOnMounted(callback);
-
-        const returnStatement = callback.body.body.find(
-          (statement): statement is t.ReturnStatement => t.isReturnStatement(statement)
-        );
-
-        const cleanupCallback = returnStatement?.argument;
-
-        if (t.isArrowFunctionExpression(cleanupCallback)) {
-          // returns cleanup callback and adds additional onUnmounted cleanup lifecycle
-          return path.replaceExpressionWithStatements([
-            createVueOnMounted(callback),
-            createVueOnUnmounted(cleanupCallback)
-          ]);
-        } else {
-          return path.replaceWith(vueOnMounted);
-        }
-      }
-    } else {
+    if (dependencies === null) {
+      // TODO:
       // no dependencies, replace with onUpdated
-      const vueOnUpdated = createVueOnUpdated(callback);
+      const vueOnUpdated = createVueOnUpdated(originalCallback);
       return path.replaceWith(vueOnUpdated);
+    } else if (dependencies.length) {
+      // has dependencies, replace with watch
+      const vueWatch = createVueWatchCallExp(dependencies, originalCallback);
+      return path.replaceWith(vueWatch);
+    } else {
+      // empty array, replace with onMounted
+      const vueOnMounted = createVueOnMounted(originalCallback);
+
+      // cleanup callback, add additional onUnmounted cleanup lifecycle
+      if (cleanupCallback) {
+        return path.replaceExpressionWithStatements([
+          createVueOnMounted(originalCallback),
+          createVueOnUnmounted(cleanupCallback)
+        ]);
+      }
+
+      return path.replaceWith(vueOnMounted);
     }
   }
 });
