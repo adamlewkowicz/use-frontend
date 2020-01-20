@@ -23,6 +23,7 @@ import {
   VUE_REF_PROPERTY,
 } from '../consts';
 import { Node, DatafullAssert } from '../types';
+import { createObjectExpression } from './base';
 
 type InitialState = t.Expression | t.SpreadElement;
 
@@ -122,63 +123,41 @@ export const createReactUseRefDeclarator = (
 
 export const createVueOnUnmounted = createFunctionWithCallback(VUE_ON_UNMOUNTED);
 
-type Literal = number | string | boolean | null;
-
-const createLiteral = <T extends Literal>(literal: T) => {
-  if (literal === null) {
-    return t.nullLiteral();
-  }
-
-  switch (typeof literal) {
-    case 'number':
-      return t.numericLiteral(literal);
-    case 'string':
-      return t.stringLiteral(literal);
-    case 'boolean':
-      return t.booleanLiteral(literal);
-    default:
-      throw new Error(`Unhandled literal type ${literal}`);
-  }
-}
-
-const createObjectProperty = <T extends Literal>(
-  propertyName: string,
-  value: T
-): t.ObjectProperty => t.objectProperty(
-  t.identifier(propertyName),
-  createLiteral(value),
+/** functionName(...deps) */
+const createCallExp = (
+  functionName: string,
+  args: (t.Expression | t.SpreadElement)[]
+): t.CallExpression => t.callExpression(
+  t.identifier(functionName),
+  args
 );
 
-const createObjectExpression = <T extends {
-  [key: string]: Literal
-}>(obj: T): t.ObjectExpression => {
-
-  const objectProperties = Object
-    .entries(obj)
-    .map(([property, value]) => createObjectProperty(property, value));
-
-  const objectExpression = t.objectExpression(objectProperties);
-
-  return objectExpression;
-}
-
-createObjectExpression({
-  watch: true
-})
-
-export const createVueWatch = (
+export const createVueWatchCallExp = (
   dependencies: any[],
-  callback: t.ArrowFunctionExpression
-) => {
+  callback: t.ArrowFunctionExpression,
+  watchOptions?: VueWatchOptions
+): t.CallExpression => {
   const callbackWithArgs = t.arrowFunctionExpression(
     [t.arrayPattern(dependencies)],
     callback.body
   );
 
-  return t.callExpression(
-    t.identifier(VUE_WATCH),
-    [t.arrayExpression(dependencies), callbackWithArgs]
-  );
+  const baseArgs =  [
+    t.arrayExpression(dependencies),
+    callbackWithArgs,
+  ];
+
+  if (watchOptions) {
+    const optionsObjectExpression = createObjectExpression(watchOptions);
+    
+    return createCallExp(VUE_WATCH, [...baseArgs, optionsObjectExpression]);
+  }
+  
+  return createCallExp(VUE_WATCH, baseArgs);
+}
+
+type VueWatchOptions = {
+  immediate?: boolean
 }
 
 export const createVueOnUpdated = (

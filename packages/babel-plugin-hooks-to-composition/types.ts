@@ -6,6 +6,8 @@ interface Babel {
   types: typeof BabelTypes;
 }
 
+export type Literal = number | string | boolean | null;
+
 export type PluginHandler = (babel: Babel) => {
   name?: string
   visitor: Visitor
@@ -23,10 +25,10 @@ export interface DatafullAssertFalsy extends DatafullAssertBase {
   result: false
 }
 
-// interface DatafullAssertTruthy<B extends DatafullAssertBase> extends B {
-//   result: true
-// }
-
 export type DatafullAssertTruthy<T extends object = {}> = { result: true } & T; 
 
 export type DatafullAssert<T extends object = {}> = DatafullAssertFalsy | DatafullAssertTruthy<T>;
+
+export interface LiteralObject {
+  [key: string]: Literal | undefined
+}
