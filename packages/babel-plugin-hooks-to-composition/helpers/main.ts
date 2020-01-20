@@ -21,8 +21,8 @@ import {
   REACT_USE_STATE,
   ASSERT_FALSE,
   VUE_REF_PROPERTY,
-} from './consts';
-import { Node, DatafullAssert } from './types';
+} from '../consts';
+import { Node, DatafullAssert } from '../types';
 
 type InitialState = t.Expression | t.SpreadElement;
 
