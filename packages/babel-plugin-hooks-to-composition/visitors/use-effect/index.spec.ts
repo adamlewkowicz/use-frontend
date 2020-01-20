@@ -27,4 +27,20 @@ describe("useEffect visitors", () => {
       expect(result).toMatchInlineSnapshot(`"watch([a], ([a]) => {});"`);
     });
   });
+
+  describe('when "useEffect" returns cleanup callback', () => {
+    it("should create two lifecycle methods", () => {
+      const result = transform(`
+        useEffect(() => {
+          return () => {};
+        }, []);
+      `);
+
+      expect(result).toMatchInlineSnapshot(`
+        "onMounted(() => {
+          return () => {};
+        }), onUnmounted(() => {});"
+      `);
+    });
+  });
 });
