@@ -160,8 +160,8 @@ type VueWatchOptions = {
   lazy?: boolean
   flush?: 'pre' | 'post' | 'sync'
   deep?: boolean
-  onTrack?: (event: unknown) => void
-  onTrigger?: (event: unknown) => void
+  // onTrack?: (event: unknown) => void
+  // onTrigger?: (event: unknown) => void
 }
 
 export const createVueOnUpdated = (

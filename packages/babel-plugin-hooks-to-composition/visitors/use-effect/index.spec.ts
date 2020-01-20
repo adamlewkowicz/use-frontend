@@ -33,14 +33,14 @@ describe("useEffect visitors", () => {
       it('should create "onMounted" and "onUnmounted" lifecycle methods', () => {
         const result = transform(`
           useEffect(() => {
-            return () => {};
+            return () => a;
           }, []);
         `);
 
         expect(result).toMatchInlineSnapshot(`
           "onMounted(() => {
-            return () => {};
-          }), onUnmounted(() => {});"
+            return () => a;
+          }), onUnmounted(() => a);"
         `);
       });
     });
