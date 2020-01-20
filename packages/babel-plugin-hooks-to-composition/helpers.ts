@@ -122,6 +122,50 @@ export const createReactUseRefDeclarator = (
 
 export const createVueOnUnmounted = createFunctionWithCallback(VUE_ON_UNMOUNTED);
 
+type Literal = number | string | boolean | null;
+
+const createLiteral = <T extends Literal>(literal: T) => {
+  if (literal === null) {
+    return t.nullLiteral();
+  }
+
+  switch (typeof literal) {
+    case 'number':
+      return t.numericLiteral(literal);
+    case 'string':
+      return t.stringLiteral(literal);
+    case 'boolean':
+      return t.booleanLiteral(literal);
+    default:
+      throw new Error(`Unhandled literal type ${literal}`);
+  }
+}
+
+const createObjectProperty = <T extends Literal>(
+  propertyName: string,
+  value: T
+): t.ObjectProperty => t.objectProperty(
+  t.identifier(propertyName),
+  createLiteral(value),
+);
+
+const createObjectExpression = <T extends {
+  [key: string]: Literal
+}>(obj: T): t.ObjectExpression => {
+
+  const objectProperties = Object
+    .entries(obj)
+    .map(([property, value]) => createObjectProperty(property, value));
+
+  const objectExpression = t.objectExpression(objectProperties);
+
+  return objectExpression;
+}
+
+createObjectExpression({
+  watch: true
+})
+
 export const createVueWatch = (
   dependencies: any[],
   callback: t.ArrowFunctionExpression
