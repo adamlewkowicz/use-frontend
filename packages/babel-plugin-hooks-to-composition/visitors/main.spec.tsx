@@ -1,6 +1,8 @@
 import { mountPluginTester } from "../utils";
 import { hooksToCompositionPlugin } from "../index";
 
+const transform = mountPluginTester(hooksToCompositionPlugin);
+
 describe("useState", () => {
   const transform = mountPluginTester(hooksToCompositionPlugin);
 
@@ -120,6 +122,24 @@ describe("useState", () => {
         any.value = [...any, anyVar, 10];
 
         any.value = any + 'a';"
+      `);
+    });
+  });
+});
+
+describe("useLayoutEffect", () => {
+  describe('when "useLayoutEffect" has dependencies', () => {
+    it('should replace "useLayoutEffect" with synchronous "watch"', () => {
+      const result = transform(`
+        useLayoutEffect(() => {
+
+        }, [a]);
+      `);
+
+      expect(result).toMatchInlineSnapshot(`
+        "watch(() => {
+
+        }, [a]);"
       `);
     });
   });

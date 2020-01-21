@@ -4,23 +4,38 @@ import { isCorrectStateSetterName, isUseEffectFunc } from './helpers';
 import { ASSERT_FALSE, REACT_USE_LAYOUT_EFFECT } from './consts';
 import { stateDeclarationsMap, StateDeclarationInfo } from './visitors/use-state';
 
+type ReactDependencies = t.Identifier[] | null;
+
 /** is `useLayoutEffect(callback, dependencies)` */
-const isReactUseLayoutEffect = (node: t.CallExpression): DatafullAssert => {
+export const isReactUseLayoutEffect = (node: t.CallExpression): DatafullAssert<{
+  // dependencies: ReactDependencies
+}> => {
   if (!t.isIdentifier(node.callee)) return ASSERT_FALSE;
   if (node.callee.name !== REACT_USE_LAYOUT_EFFECT) return ASSERT_FALSE;
 
-  const [callback, dependencies] = node.arguments;
+  const [callback, deps] = node.arguments;
 
   if (!t.isArrowFunctionExpression(callback)) return ASSERT_FALSE;
+
+  const isArrayOfIdentifiersInfo = isArrayOfIdentifiers(deps);
+
+  if (!isArrayOfIdentifiersInfo.result) return ASSERT_FALSE;
+
+  const { elements: dependencies } = isArrayOfIdentifiersInfo;
+
 
   if (t.isArrayExpression(dependencies)) {
     // TODO: handle dependencies
 
   } else { // no dependencies
 
+    return {
+      result: true,
+      // dependencies: null,
+    }
   }
 
-  return { result: true };
+  return ASSERT_FALSE;
 }
 
 /** is `setCounter(5)` */
@@ -104,7 +119,7 @@ const isReactUseEffectCallback = (callback: t.Expression | t.SpreadElement): Dat
 
 /** is `useEffect(() => {}, []);` */
 export const isReactUseEffectCallExp = (node: t.CallExpression): DatafullAssert<{
-  dependencies: t.Identifier[] | null
+  dependencies: ReactDependencies
   cleanupCallback: t.ArrowFunctionExpression | null
   originalCallback: t.ArrowFunctionExpression
 }> => {
