@@ -147,25 +147,59 @@ const updateBodyOfBlockStatement = (
   );
 }
 
-const removeReturnStatementFromBlockStatement = (
-  blockStatement: t.BlockStatement
-): t.BlockStatement => updateBodyOfBlockStatement(
-  blockStatement,
-  statements => statements.filter(statement => statement.type !== 'ReturnStatement')
-);
-
-const updateArrowFunctionBody = (
-  func: t.ArrowFunctionExpression,
+const updateArrowFunctionBody = <T extends t.ArrowFunctionExpression | t.FunctionExpression>(
+  func: T,
   callback: (statements: t.Statement[]) => t.Statement[]
-): t.ArrowFunctionExpression => {
+): T => {
   if (!t.isBlockStatement(func.body)) {
     throw new Error;
   }
   return t.arrowFunctionExpression(
     func.params,
     updateBodyOfBlockStatement(func.body, callback),
-  );
+  ) as T;
 }
+
+type AnyFunctionExpression = t.FunctionExpression | t.ArrowFunctionExpression;
+
+const removeStatementFromFunction = <
+  S extends t.Statement,
+  T extends AnyFunctionExpression,
+>(
+  func: T,
+  statementType: S['type'],
+): {
+  updatedFunction: T,
+  removedStatement?: S
+} => {
+  let removedStatement: S | undefined;
+
+  // TODO: refactor to pure function
+  const updatedFunction = updateArrowFunctionBody(func, (statements) => {
+    removedStatement = statements.find(
+      (statement): statement is S => statement.type === statementType
+    );
+
+    if (removedStatement) {
+      return statements.filter(
+        statement => statement.type !== statementType
+      );
+    }
+    return statements;
+  });
+
+  return {
+    updatedFunction,
+    removedStatement,
+  }
+}
+
+const removeReturnStatementFromFunction = <T extends AnyFunctionExpression>(
+  func: T
+): {
+  updatedFunction: T,
+  removedStatement?: t.ReturnStatement,
+} => removeStatementFromFunction<t.ReturnStatement, T>(func, 'ReturnStatement');
 
 const createVueWatchCallbackWithCleanup = (
   watchCallback: t.ArrowFunctionExpression,
