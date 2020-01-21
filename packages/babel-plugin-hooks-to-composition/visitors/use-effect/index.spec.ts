@@ -72,7 +72,7 @@ describe("useEffect visitors", () => {
         expect(result).toMatchInlineSnapshot(`
           "watch([
 
-          a], ([a]) => {return () => a;});"
+          a], ([a], prev, onCleanup) => {return () => a;});"
         `);
       });
     });

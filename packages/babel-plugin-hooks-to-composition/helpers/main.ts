@@ -21,6 +21,7 @@ import {
   REACT_USE_STATE,
   ASSERT_FALSE,
   VUE_REF_PROPERTY,
+  VUE_ON_CLEANUP,
 } from '../consts';
 import { Node, DatafullAssert } from '../types';
 import { createObjectExpression } from './base';
@@ -132,28 +133,39 @@ const createCallExp = (
   args
 );
 
-export const createVueWatchCallExp = (
+interface VueWatchCallExpOptions {
   dependencies: any[],
-  callback: t.ArrowFunctionExpression,
+  callback: t.ArrowFunctionExpression
   watchOptions?: VueWatchOptions
-): t.CallExpression => {
-  const callbackWithArgs = t.arrowFunctionExpression(
-    [t.arrayPattern(dependencies)],
-    callback.body
-  );
+  cleanupCallback?: t.ArrowFunctionExpression | null
+}
 
-  const baseArgs =  [
+export const createVueWatchCallExp = ({
+  dependencies,
+  callback,
+  watchOptions,
+  cleanupCallback,
+}: VueWatchCallExpOptions): t.CallExpression => {
+  const depsArrayPattern = t.arrayPattern(dependencies);
+
+  const callbackParams = cleanupCallback
+    ? [depsArrayPattern, t.identifier('prev'), t.identifier(VUE_ON_CLEANUP)]
+    : [depsArrayPattern];
+
+  const watchCallback = t.arrowFunctionExpression(callbackParams, callback.body);
+
+  const args: any = [
     t.arrayExpression(dependencies),
-    callbackWithArgs,
+    watchCallback,
   ];
 
   if (watchOptions) {
     const optionsObjectExpression = createObjectExpression(watchOptions);
-    
-    return createCallExp(VUE_WATCH, [...baseArgs, optionsObjectExpression]);
+    args.push(optionsObjectExpression);
+    // return createCallExp(VUE_WATCH, [...args, optionsObjectExpression]);
   }
   
-  return createCallExp(VUE_WATCH, baseArgs);
+  return createCallExp(VUE_WATCH, args);
 }
 
 type VueWatchOptions = {

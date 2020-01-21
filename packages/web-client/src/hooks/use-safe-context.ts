@@ -1,6 +1,7 @@
 import { Context, useContext } from 'react'
 
-export const useSafeContext = <T>(context: Context<T>): T => {
+/** Type-safe alternative for *useContext* that throws error if context value is *null* or *undefined*. */
+export const useSafeContext = <T>(context: Context<T | null>): T => {
   const contextValue = useContext(context);
 
   if (contextValue === null || contextValue === undefined) {
@@ -9,5 +10,5 @@ export const useSafeContext = <T>(context: Context<T>): T => {
     );
   }
 
-  return contextValue;
+  return contextValue as T;
 }

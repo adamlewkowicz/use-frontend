@@ -24,7 +24,12 @@ const replaceUseEffectWithWatch = (): Visitor => ({
       return path.replaceWith(vueOnUpdated);
     } else if (dependencies.length) {
       // has dependencies, replace with watch
-      const vueWatch = createVueWatchCallExp(dependencies, originalCallback);
+      const vueWatch = createVueWatchCallExp({
+        callback: originalCallback,
+        dependencies,
+        cleanupCallback
+      });
+
       return path.replaceWith(vueWatch);
     } else {
       // empty array, replace with onMounted
