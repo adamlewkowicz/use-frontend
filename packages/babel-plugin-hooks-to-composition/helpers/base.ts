@@ -1,7 +1,7 @@
 import * as t from 'babel-types';
-import { Literal, LiteralObject } from '../types';
+import { Primitive, PrimitiveObject } from '../types';
 
-const createLiteral = <T extends Literal>(literal: T): BabelLiteral => {
+const createLiteral = <T extends Primitive>(literal: T): BabelLiteral => {
   if (literal === null) {
     return t.nullLiteral();
   }
@@ -18,7 +18,7 @@ const createLiteral = <T extends Literal>(literal: T): BabelLiteral => {
   }
 }
 
-const createObjectProperty = <T extends Literal>(
+const createObjectProperty = <T extends Primitive>(
   propertyName: string,
   value: T
 ): t.ObjectProperty => t.objectProperty(
@@ -26,13 +26,13 @@ const createObjectProperty = <T extends Literal>(
   createLiteral(value),
 );
 
-export const createObjectExpression = <T extends LiteralObject>(
+export const createObjectExpression = <T extends PrimitiveObject>(
   obj: T
 ): t.ObjectExpression => {
 
   const objectProperties = Object
     .entries(obj)
-    .filter((entry): entry is [string, Literal] => {
+    .filter((entry): entry is [string, Primitive] => {
       const [property, value] = entry;
       return value !== undefined;
     })
