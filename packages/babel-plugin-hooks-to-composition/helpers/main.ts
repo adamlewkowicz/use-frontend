@@ -133,6 +133,61 @@ const createCallExp = (
   args
 );
 
+const createVueOnCleanupCallExp = (
+  callback: t.ArrowFunctionExpression
+): t.CallExpression => createCallExp(VUE_ON_CLEANUP, [callback]);
+
+const updateBodyOfBlockStatement = (
+  blockStatement: t.BlockStatement,
+  callback: (statements: t.BlockStatement['body']) => t.BlockStatement['body']
+): t.BlockStatement => {
+  return t.blockStatement(
+    callback(blockStatement.body),
+    blockStatement.directives
+  );
+}
+
+const removeReturnStatementFromBlockStatement = (
+  blockStatement: t.BlockStatement
+): t.BlockStatement => updateBodyOfBlockStatement(
+  blockStatement,
+  statements => statements.filter(statement => statement.type !== 'ReturnStatement')
+);
+
+const updateArrowFunctionBody = (
+  func: t.ArrowFunctionExpression,
+  callback: (statements: t.Statement[]) => t.Statement[]
+): t.ArrowFunctionExpression => {
+  if (!t.isBlockStatement(func.body)) {
+    throw new Error;
+  }
+  return t.arrowFunctionExpression(
+    func.params,
+    updateBodyOfBlockStatement(func.body, callback),
+  );
+}
+
+const createVueWatchCallbackWithCleanup = (
+  watchCallback: t.ArrowFunctionExpression,
+  cleanupCallback: t.ArrowFunctionExpression
+): t.ArrowFunctionExpression => {
+  const vueOnCleanup = createVueOnCleanupCallExp(cleanupCallback);
+
+  const watchCallbackWithCleanup = updateArrowFunctionBody(watchCallback, (statements) => {
+    const statementsWithoutReturn = statements.filter(
+      statement => statement.type !== 'ReturnStatement'
+    );
+    const statementsWithCleanupCallback = [
+      ...statementsWithoutReturn,
+      t.expressionStatement(vueOnCleanup)
+    ];
+
+    return statementsWithCleanupCallback;
+  });
+
+  return watchCallbackWithCleanup;
+}
+
 interface VueWatchCallExpOptions {
   dependencies: any[],
   callback: t.ArrowFunctionExpression
@@ -147,6 +202,8 @@ export const createVueWatchCallExp = ({
   cleanupCallback,
 }: VueWatchCallExpOptions): t.CallExpression => {
   const depsArrayPattern = t.arrayPattern(dependencies);
+  const depsArrayExp = t.arrayExpression(dependencies);
+  const watchOptionsArr = watchOptions ? [createObjectExpression(watchOptions)] : [];
 
   const callbackParams = cleanupCallback
     ? [depsArrayPattern, t.identifier('prev'), t.identifier(VUE_ON_CLEANUP)]
@@ -154,18 +211,16 @@ export const createVueWatchCallExp = ({
 
   const watchCallback = t.arrowFunctionExpression(callbackParams, callback.body);
 
-  const args: any = [
-    t.arrayExpression(dependencies),
-    watchCallback,
-  ];
+  if (cleanupCallback) {
+    const watchCallbackWithCleanup = createVueWatchCallbackWithCleanup(
+      watchCallback,
+      cleanupCallback
+    );
 
-  if (watchOptions) {
-    const optionsObjectExpression = createObjectExpression(watchOptions);
-    args.push(optionsObjectExpression);
-    // return createCallExp(VUE_WATCH, [...args, optionsObjectExpression]);
+    return createCallExp(VUE_WATCH, [depsArrayExp, watchCallbackWithCleanup, ...watchOptionsArr]);
   }
   
-  return createCallExp(VUE_WATCH, args);
+  return createCallExp(VUE_WATCH, [depsArrayExp, watchCallback, ...watchOptionsArr]);
 }
 
 type VueWatchOptions = {
