@@ -21,6 +21,7 @@ import { SplitEditor as CustomSplitEditor } from './components/SplitEditor';
 import { useModal } from './hooks/use-modal';
 import { useMountedEffect } from './hooks/use-mounted-effect';
 import { useReactToVue } from './hooks/use-react-to-vue';
+import { hookExamples } from './examples';
 
 const SplitEditor = split  as any;
 const DiffEditor = diff as any;
@@ -84,6 +85,14 @@ export function App() {
   return (
     <div className="App">
       <p>Transform React.js Hooks to Vue.js Composition Api</p>
+      {hookExamples.map(example => (
+        <button
+          key={example.name}
+          onClick={() => setReactCode(example.code)}
+        >
+          {example.name}
+        </button>
+      ))}
       <div className={css.logo_container}>
         <img src={logo} alt="React.js icon" className={css.react_logo} />
         <img src={vueLogo} alt="Vue.js icon" className={css.vue_logo} />

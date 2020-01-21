@@ -64,6 +64,13 @@ describe("useState", () => {
             list = [...list, 5];"
           `);
         });
+
+        describe('when "setState" call received callback', () => {
+
+          // setTodos(t => [...t, todoName])
+          it.todo('should extract callback\'s body and create assignment');
+
+        });
       });
     });
 
