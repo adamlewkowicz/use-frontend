@@ -4,7 +4,6 @@ import { hooksToCompositionPlugin } from "../index";
 const transform = mountPluginTester(hooksToCompositionPlugin);
 
 describe("useState", () => {
-  const transform = mountPluginTester(hooksToCompositionPlugin);
 
   describe("state declaration", () => {
     it("should destructure state declaration to single variable and change function name", () => {
@@ -66,10 +65,8 @@ describe("useState", () => {
         });
 
         describe('when "setState" call received callback', () => {
-
           // setTodos(t => [...t, todoName])
-          it.todo('should extract callback\'s body and create assignment');
-
+          it.todo("should extract callback's body and create assignment");
         });
       });
     });
@@ -108,6 +105,7 @@ describe("useState", () => {
         setAny([...any, anyVar, 10]);
 
         setAny(c => c + 'a');
+        setAny(c.toString());
       `);
 
       expect(result).toMatchInlineSnapshot(`
@@ -128,7 +126,8 @@ describe("useState", () => {
         any.value = {};
         any.value = [...any, anyVar, 10];
 
-        any.value = any + 'a';"
+        any.value = any + 'a';
+        any.value = c.toString();"
       `);
     });
   });
