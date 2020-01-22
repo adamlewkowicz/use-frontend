@@ -1,31 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
-// @ts-ignore
+import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { hooksToCompositionPlugin } from 'babel-plugin-hooks-to-composition';
-import * as babel from '@babel/core';
-import { split, diff } from 'react-ace';
+import { split } from 'react-ace';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-textmate';
-import { useWebWorker } from './hooks/use-web-worker';
-// @ts-ignore
-import WorkerModule from './web-worker/babel-transform.worker.js';
-import { transformCode } from './utils';
-import { useBabel } from './hooks/use-babel';
-import { default as DiffViewer_ } from 'react-diff-viewer';
-import { Modal } from './components/Modal';
 import { DiffViewer } from './components/DiffViewer';
 import css from './components/App.module.css';
 import vueLogo from './assets/images/vue-logo.svg';
 import { SplitEditor as CustomSplitEditor } from './components/SplitEditor';
 import { useModal } from './hooks/use-modal';
-import { useMountedEffect } from './hooks/use-mounted-effect';
 import { useReactToVue } from './hooks/use-react-to-vue';
 import { hookExamples } from './examples';
 
-const SplitEditor = split  as any;
-const DiffEditor = diff as any;
-// var DiffViewer = DiffViewer_ as any;
+const SplitEditor = split as any;
 
 export const defaultCode = `
 function useCounter() {
@@ -64,23 +51,14 @@ function useTheme() {
 }
 `.trim();
 
-const babelPlugins = [
-  hooksToCompositionPlugin,
-];
-
-const storageKey = 'r_code';
-
 export function App() {
-  const [reactCode, setReactCode] = useState<string>(() => localStorage.getItem(storageKey) || defaultCode);
-  // const { transform, error, code: vueCode } = useBabel(babelPlugins);
-  const { transformReactCode, vueError, vueCode } = useReactToVue();
+  const {
+    reactCode,
+    setReactCode,
+    vueError,
+    vueCode,
+  } = useReactToVue();
   const { Modal, ...modalContext } = useModal();
-  // const webWorker = useWebWorker<string>(WorkerModule);
-
-  useEffect(() => {
-    transformReactCode(reactCode);
-    localStorage.setItem(storageKey, reactCode);
-  }, [reactCode]);
 
   return (
     <div className="App">

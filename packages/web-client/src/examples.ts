@@ -97,3 +97,7 @@ export const hookExamples = [
     `
   }
 ] as const;
+
+const [{ code: defaultCode }] = hookExamples;
+
+export { defaultCode };
