@@ -11,6 +11,7 @@ import { SplitEditor as CustomSplitEditor } from './components/SplitEditor';
 import { useModal } from './hooks/use-modal';
 import { useReactToVue } from './hooks/use-react-to-vue';
 import { hookExamples } from './examples';
+import { ControlledEditor as MonacoEditor } from '@monaco-editor/react';
 
 const SplitEditor = split as any;
 
@@ -39,6 +40,12 @@ export function App() {
         <img src={logo} alt="React.js icon" className={css.react_logo} />
         <img src={vueLogo} alt="Vue.js icon" className={css.vue_logo} />
       </div>
+      <MonacoEditor 
+        language="javascript"
+        value={reactCode}
+        height="500px"
+        onChange={(event, value) => value && setReactCode(value)}
+      />
       <CustomSplitEditor {...reactToVueContext} />
       <SplitEditor
         mode="javascript"
