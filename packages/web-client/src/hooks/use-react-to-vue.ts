@@ -30,7 +30,6 @@ export const useReactToVue = () => {
   }, [reactCode]);
 
   return {
-    transformReactCode,
     vueCode,
     reactError,
     reactCode,

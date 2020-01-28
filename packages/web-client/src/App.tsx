@@ -49,7 +49,7 @@ export function App() {
           },
           {
             value: vueCode,
-            onChange: () => {}
+            options: { readOnly: true } as any
           }
         ]}
       />
