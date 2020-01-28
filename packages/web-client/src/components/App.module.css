@@ -1,16 +1,5 @@
 
-.logo_container {
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  width: 100%;
-  margin: 10px 0;
-}
-
-.vue_logo {
-  height: 60px
-}
-
-.react_logo {
-  height: 75px;
+.vue_logo, .react_logo {
+  margin-bottom: 5px;
+  height: 60px;
 }

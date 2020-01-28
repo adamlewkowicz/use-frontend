@@ -15,6 +15,9 @@ import { MonacoSplitEditor } from '../src/components/MonacoSplitEditor';
 
 const SplitEditor = split as any;
 
+const ReactLogo = <img src={logo} alt="React.js logo" className={css.react_logo} />;
+const VueLogo = <img src={vueLogo} alt="Vue.js logo" className={css.vue_logo} />;
+
 export function App() {
   const reactToVueContext = useReactToVue();
   const {
@@ -36,20 +39,18 @@ export function App() {
           {example.name}
         </button>
       ))}
-      <div className={css.logo_container}>
-        <img src={logo} alt="React.js icon" className={css.react_logo} />
-        <img src={vueLogo} alt="Vue.js icon" className={css.vue_logo} />
-      </div>
       <MonacoSplitEditor
         editors={[
           {
             value: reactCode,
             onChange: setReactCode,
             error: reactError,
+            header: ReactLogo
           },
           {
             value: vueCode,
-            options: { readOnly: true } as any
+            options: { readOnly: true } as any,
+            header: VueLogo,
           }
         ]}
       />

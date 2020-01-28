@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, ReactNode } from 'react';
 import {
   ControlledEditor as NativeMonacoEditor,
   EditorDidMount,
@@ -7,6 +7,7 @@ import {
 import { NormalizedError } from '../../utils';
 import { monaco } from '@monaco-editor/react';
 import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
+import css from './index.module.css';
 
 const MARKER_NAME = 'custom_marker';
 
@@ -15,6 +16,7 @@ export interface MonacoEditorProps {
   onChange?: (value: string) => void
   error?: NormalizedError | null
   options?: Partial<Monaco['editor']['EditorOptions']>
+  header?: ReactNode
 }
 
 export const MonacoEditor = (props: MonacoEditorProps) => {
@@ -69,15 +71,18 @@ export const MonacoEditor = (props: MonacoEditorProps) => {
   }
 
   return (
-    <NativeMonacoEditor 
-      language="javascript"
-      value={props.value}
-      height="500px"
-      width="500px"
-      onChange={handleOnChange}
-      editorDidMount={handleEditorDidMount}
-      options={props.options as any}
-    />
+    <div className={css.container} data-x="xD">
+      {props.header}
+      <NativeMonacoEditor
+        language="javascript"
+        value={props.value}
+        height="500px"
+        width="500px"
+        onChange={handleOnChange}
+        editorDidMount={handleEditorDidMount}
+        options={props.options as any}
+      />
+    </div>
   );
 }
 
