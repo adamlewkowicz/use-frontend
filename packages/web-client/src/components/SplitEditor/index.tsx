@@ -1,47 +1,45 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { SingleEditor } from '../SingleEditor';
-import { hooksToCompositionPlugin } from 'babel-plugin-hooks-to-composition';
-import { useBabel } from '../../hooks/use-babel';
-import { defaultCode } from '../../App';
 import css from './index.module.css';
+import { useReactToVue } from '../../hooks/use-react-to-vue';
+import { NormalizedError } from '../../utils';
 
-const babelPlugins = [
-  hooksToCompositionPlugin,
-];
-
-interface SplitEditorProps {}
+interface SplitEditorProps {
+  reactCode: string
+  reactError: NormalizedError | null
+  setReactCode: (code: string) => void
+  vueCode: string
+  vueError?: NormalizedError
+  setVueCode?: (code: string) => void
+}
 
 export const SplitEditor = (props: SplitEditorProps) => {
-  const [reactCode, setReactCode] = useState<string>(
-    () => localStorage.getItem('r_code') || defaultCode
-  );
-  const {
-    transform: transformReactCode,
-    error: vueError,
-    code: vueCode,
-  } = useBabel(babelPlugins);
-
-  const handleReactCodeChange = (reactCode: string) => {
-    setReactCode(reactCode);
-    transformReactCode(reactCode);
-    localStorage.setItem('r_code', reactCode);
-  }
-
-  // TODO: remove; temp workaround
-  useEffect(() => {
-    transformReactCode(reactCode);
-  }, []);
+  // const {
+  //   reactCode,
+  //   setReactCode,
+  //   reactError,
+  //   vueCode,
+  // } = useReactToVue();
+  const reactAnnotations = props.reactError ? [props.reactError] : [];
 
   return (
     <div className={css.container}>
       <SingleEditor
-        value={reactCode}
-        onChange={handleReactCodeChange}
-        error={vueError}
+        value={props.reactCode}
+        onChange={props.setReactCode}
+        error={props.reactError}
+        annotations={[
+          {
+            row: 3, // must be 0 based
+            column: 4, // must be 0 based
+            text: "error.message", // text to show in tooltip
+            type: "error"
+          },
+        ]}
       />
       <SingleEditor
-        value={vueCode}
-        error={vueError}
+        value={props.vueCode}
+        error={null}
       />
     </div>
   );

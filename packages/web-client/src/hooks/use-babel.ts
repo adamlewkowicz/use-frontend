@@ -1,10 +1,10 @@
 import * as babel from '@babel/core';
 import { useState } from 'react';
-import { prettierFormat } from '../utils';
+import { prettierFormat, normalizeError, NormalizedError } from '../utils';
 
 export const useBabel = (plugins?: babel.PluginItem[], usePrettier = true) => {
   const [code, setCode] = useState<string>('');
-  const [error, setError] = useState<null | Error>(null);
+  const [error, setError] = useState<null | NormalizedError>(null);
 
   const transform = (codeToTransform: string) => {
     try {
@@ -26,7 +26,7 @@ export const useBabel = (plugins?: babel.PluginItem[], usePrettier = true) => {
         }
       }
     } catch(error) {
-      setError(error);
+      setError(normalizeError(error));
     }
   }
 

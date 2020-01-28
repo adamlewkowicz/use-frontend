@@ -21,3 +21,53 @@ export const prettierFormat = (code: string): string => prettierFormatNative(cod
   plugins: [prettierBabylon],
   semi: true,
 });
+
+export const normalizeError = (error: ParseError): NormalizedError => {
+  if (error !== null && 'loc' in error) {
+    const { message, loc: location } = error;
+
+    if ('line' in location) {
+      const { line, column } = location;
+      return { line, column, message };
+
+    } else if ('start' in location) {
+      const { line, column } = location.start;
+      return { line, column, message };
+    }
+  }
+
+  return {
+    line: 0,
+    column: 0,
+    message: error?.message || 'Unknown error'
+  }
+}
+
+export interface NormalizedError {
+  line: number
+  column: number
+  message: string
+}
+
+export type ParseError = PrettierParseError | BabelParseError | Error | null;
+
+interface PrettierParseError extends Error {
+  loc: {
+    start: {
+      line: 12
+      column: 16
+    }
+  }
+  codeFrame: string
+}
+
+interface BabelParseError extends Error {
+  code: 'BABEL_PARSE_ERROR'
+  pos: number
+  stack: string
+  message: string
+  loc: {
+    line: 11
+    column: 2
+  }
+}

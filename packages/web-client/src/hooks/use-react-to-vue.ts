@@ -6,16 +6,21 @@ import { prettierFormat } from '../utils';
 
 const STORAGE_KEY = 'react_code' as const;
 
+const getInitialCode = (): string => {
+  try {
+    const initialCode = localStorage.getItem(STORAGE_KEY) || defaultCode;
+    return prettierFormat(initialCode);
+  } catch {
+    return defaultCode;
+  }
+}
+
 export const useReactToVue = () => {
-  const [reactCode, setReactCode] = useState<string>(
-    () => prettierFormat(
-      localStorage.getItem(STORAGE_KEY) || defaultCode
-    )
-  );
+  const [reactCode, setReactCode] = useState<string>(getInitialCode);
   
   const {
     transform: transformReactCode,
-    error: vueError,
+    error: reactError,
     code: vueCode,
   } = useBabel([hooksToCompositionPlugin]);
 
@@ -27,7 +32,7 @@ export const useReactToVue = () => {
   return {
     transformReactCode,
     vueCode,
-    vueError,
+    reactError,
     reactCode,
     setReactCode,
   }
