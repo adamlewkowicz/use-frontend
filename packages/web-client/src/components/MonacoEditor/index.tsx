@@ -71,7 +71,7 @@ export const MonacoEditor = (props: MonacoEditorProps) => {
   }
 
   return (
-    <div className={css.container} data-x="xD">
+    <div className={css.container}>
       {props.header}
       <NativeMonacoEditor
         language="javascript"
