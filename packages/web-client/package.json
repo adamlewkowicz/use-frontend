@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@types/prettier": "^1.19.0",
-    "@types/styled-components": "^4.4.2"
+    "@types/styled-components": "^4.4.2",
+    "monaco-editor": "^0.19.3"
   }
 }

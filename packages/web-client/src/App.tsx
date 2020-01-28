@@ -44,7 +44,8 @@ export function App() {
         editors={[
           {
             value: reactCode,
-            onChange: setReactCode
+            onChange: setReactCode,
+            error: reactError,
           },
           {
             value: vueCode,

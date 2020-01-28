@@ -15,8 +15,7 @@ export const MonacoSplitEditor = <T extends readonly string[]>(props: MonacoSpli
       {props.editors.map((editorProps, index) => (
         <MonacoEditor
           key={index}
-          value={editorProps.value}
-          onChange={editorProps.onChange}
+          {...editorProps}
         />
       ))}
     </div>
