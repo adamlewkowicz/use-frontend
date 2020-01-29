@@ -15,7 +15,7 @@ export interface MonacoEditorProps {
   value: string
   onChange?: (value: string) => void
   error?: NormalizedError | null
-  options?: Partial<Monaco['editor']['EditorOptions']>
+  options?: Partial<MonacoEditor['EditorOptions']>
   header?: ReactNode
 }
 
