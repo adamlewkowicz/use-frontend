@@ -6,6 +6,7 @@ import {
   createVueReactiveDeclarator,
   createVueRefDeclarator,
   createVueRefValueAssignment,
+  createVueRefMember,
 } from '../../helpers';
 import { isReactSetStateCall } from '../../assert';
 
@@ -73,7 +74,10 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
 
     const { setStateArg, stateValueName, stateDeclarationInfo } = isReactSetStateCallInfo;
 
-    const createAssignmentHandler = stateDeclarationInfo.type === 'vue_ref'
+    const isVueRef = stateDeclarationInfo.type === 'vue_ref';
+    const createIdentifierOrMember = isVueRef ? createVueRefMember : t.identifier;
+
+    const createAssignmentHandler = isVueRef
       ? createVueRefValueAssignment
       : createAssignment;
 
@@ -97,13 +101,22 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
       case 'ArrowFunctionExpression': {
         const { body } = setStateArg;
 
+        // is setState(v => v)
+        if (t.isIdentifier(body)) {
+          const stateValueAssignment = createAssignmentHandler(
+            stateValueName as string,
+            createIdentifierOrMember(stateValueName)
+          );
+          return path.replaceWith(stateValueAssignment);
+        }
+
         if (!t.isBinaryExpression(body)) return;
         if (!t.isIdentifier(body.left)) return;
 
         // changed name of variable to delcared by state
         const updatedBinaryExpression = t.binaryExpression(
           body.operator,
-          t.identifier(stateValueName as string),
+          createIdentifierOrMember(stateValueName),
           body.right
         );
 

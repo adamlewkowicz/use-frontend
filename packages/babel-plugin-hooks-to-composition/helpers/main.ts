@@ -301,7 +301,7 @@ export const createAssignment = (
 }
 
 /** variableName.{value} */
-const createVueRefMember = (
+export const createVueRefMember = (
   variableName: string
 ): t.MemberExpression => t.memberExpression(
   t.identifier(variableName),

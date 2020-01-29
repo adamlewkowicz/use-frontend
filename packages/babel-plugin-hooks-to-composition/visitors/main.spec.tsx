@@ -4,7 +4,6 @@ import { hooksToCompositionPlugin } from "../index";
 const transform = mountPluginTester(hooksToCompositionPlugin);
 
 describe("useState", () => {
-
   describe("state declaration", () => {
     it("should destructure state declaration to single variable and change function name", () => {
       const result = transform(`
@@ -80,7 +79,7 @@ describe("useState", () => {
 
         expect(result).toMatchInlineSnapshot(`
           "const counterX = ref(0);
-          counterX.value = counterX + 1;"
+          counterX.value = counterX.value + 1;"
         `);
       });
     });
@@ -106,6 +105,7 @@ describe("useState", () => {
 
         setAny(c => c + 'a');
         setAny(c.toString());
+        setAny(c => c);
       `);
 
       expect(result).toMatchInlineSnapshot(`
@@ -126,8 +126,9 @@ describe("useState", () => {
         any.value = {};
         any.value = [...any, anyVar, 10];
 
-        any.value = any + 'a';
-        any.value = c.toString();"
+        any.value = any.value + 'a';
+        any.value = c.toString();
+        any.value = any.value;"
       `);
     });
   });
