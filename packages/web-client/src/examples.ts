@@ -33,21 +33,30 @@ export const hookExamples = [
   {
     name: 'Fetch',
     code: `
-      const [data, setData] = useState(null);
-      const [error, setError] = useState(null);
-      const [isLoading, setIsLoading] = useState(true);
-
-      useEffect(() => {
-          const { signal, abort } = new AbortController();
-
-          fetch('example', { signal })
-              .then(response => response.json())
-              .then(json => setData(json))
-              .catch(error => setError(error))
-              .finally(() => setIsLoading(true));
-              
-          return () => abort();
-      }, []);
+      const useApiData = () => {
+        const [data, setData] = useState(null);
+        const [error, setError] = useState(null);
+        const [isLoading, setIsLoading] = useState(true);
+        const abortController = useRef(new AbortController());
+      
+        useEffect(() => {
+          const { signal } = abortController.current;
+      
+          fetch("example.com", { signal })
+            .then(response => response.json())
+            .then(json => setData(json))
+            .catch(error => setError(error))
+            .finally(() => setIsLoading(true));
+      
+          return () => abortController.current.abort();
+        }, []);
+        
+        return {
+          data,
+          error,
+          isLoading
+        };
+      };
     `
   },
   {
@@ -55,7 +64,6 @@ export const hookExamples = [
     code: `
       function useCounter() {
         const [counter, setCounter] = useState(0);
-        const [abc, setAbc] = useState({ container: true });
       
         const doubledCounter = useMemo(() => counter * 2, [counter]);
         
