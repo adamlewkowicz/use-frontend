@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { split } from 'react-ace';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-textmate';
-import { DiffViewer } from './components/DiffViewer';
 import css from './components/App.module.css';
 import vueLogo from './assets/images/vue-logo.svg';
 import { SplitEditor as CustomSplitEditor } from './components/SplitEditor';
@@ -12,7 +11,12 @@ import { useModal } from './hooks/use-modal';
 import { useReactToVue } from './hooks/use-react-to-vue';
 import { hookExamples } from './examples';
 import { MonacoSplitEditor } from '../src/components/MonacoSplitEditor';
-import { prettierFormat } from './utils';
+import { prettierFormat, reactLazyNamed } from './utils';
+
+const DiffEditor = reactLazyNamed(
+  () => import('@monaco-editor/react'),
+  'DiffEditor'
+);
 
 const SplitEditor = split as any;
 
@@ -77,12 +81,16 @@ export function App() {
       <button onClick={modalContext.open}>
         Show differences
       </button>
-      <Modal>
-        <DiffViewer
-          oldValue={reactCode}
-          newValue={vueCode}
-        />
-      </Modal>
+      <Suspense fallback="Loading">
+        <Modal>
+          <DiffEditor
+            original={reactCode}
+            modified={vueCode}
+            language="javascript"
+            height="500px"
+          />
+        </Modal>
+      </Suspense>
     </div>
   );
 }

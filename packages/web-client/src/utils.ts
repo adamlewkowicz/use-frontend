@@ -2,6 +2,7 @@ import { hooksToCompositionPlugin } from 'babel-plugin-hooks-to-composition';
 import * as babel from '@babel/core';
 import { format as prettierFormatNative } from 'prettier/standalone';
 import prettierBabylon from 'prettier/parser-babylon';
+import React, { FunctionComponent } from 'react';
 
 export const transformCode = (code: string): string | null => {
   const transformedCode = babel.transform(code, {
@@ -43,6 +44,21 @@ export const normalizeError = (error: ParseError): NormalizedError => {
   }
 }
 
+export const reactLazyNamed = <T, I extends keyof T>(
+  importFactory: () => Promise<T>,
+  importName: I
+  // @ts-ignore
+): React.LazyExoticComponent<T[I]> => {
+  const defaultImportHandler = async () => {
+    const importedModuleObj = await importFactory();
+
+    return {
+      default: importedModuleObj[importName]
+    }
+  }
+
+  return React.lazy(defaultImportHandler as any) as any;
+}
 export interface NormalizedError {
   line: number
   column: number
