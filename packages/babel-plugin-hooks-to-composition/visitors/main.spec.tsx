@@ -106,6 +106,7 @@ describe("useState", () => {
         setAny(c => c + 'a');
         setAny(c.toString());
         setAny(c => c);
+        setAny(event.value);
       `);
 
       expect(result).toMatchInlineSnapshot(`

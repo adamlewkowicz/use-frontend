@@ -82,7 +82,7 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
       : createAssignment;
 
     switch(setStateArg.type) {
-      // setCounter(nextCounter / 4 / null / false / [...abc] / counter + 1 / 'abc' / abc.toString() / {})
+      // setCounter(nextCounter / 4 / null / false / [...abc] / counter + 1 / 'abc' / abc.toString() / {} / event.value)
       case 'Identifier':
       case 'NumericLiteral':
       case 'NullLiteral':
@@ -92,6 +92,7 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
       case 'StringLiteral':
       case 'CallExpression':
       case 'ObjectExpression':
+      case 'MemberExpression':
         const stateValueAssignment = createAssignmentHandler(
           stateValueName as string,
           setStateArg
