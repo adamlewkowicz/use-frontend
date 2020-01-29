@@ -1,11 +1,10 @@
 import {
-  isUseEffectFunc,
   createVueOnUpdated,
   createVueOnMounted,
   createVueOnUnmounted,
   createVueWatchCallExp,
+  removeReturnStatementFromFunction,
 } from '../../helpers';
-import * as t from 'babel-types';
 import { Visitor } from 'babel-traverse';
 import { isReactUseEffectCallExp } from '../../assert';
 
@@ -37,8 +36,12 @@ const replaceUseEffectWithWatch = (): Visitor => ({
 
       // cleanup callback, add additional onUnmounted cleanup lifecycle
       if (cleanupCallback) {
+        const {
+          updatedFunction: callbackWithoutCleanup
+        } = removeReturnStatementFromFunction(originalCallback);
+
         return path.replaceExpressionWithStatements([
-          createVueOnMounted(originalCallback),
+          createVueOnMounted(callbackWithoutCleanup),
           createVueOnUnmounted(cleanupCallback)
         ]);
       }

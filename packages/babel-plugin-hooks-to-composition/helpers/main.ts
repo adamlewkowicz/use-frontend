@@ -147,7 +147,7 @@ const updateBodyOfBlockStatement = (
   );
 }
 
-const updateArrowFunctionBody = <T extends t.ArrowFunctionExpression | t.FunctionExpression>(
+const updateArrowFunctionBody = <T extends AnyFunctionExpression>(
   func: T,
   callback: (statements: t.Statement[]) => t.Statement[]
 ): T => {
@@ -194,7 +194,7 @@ const removeStatementFromFunction = <
   }
 }
 
-const removeReturnStatementFromFunction = <T extends AnyFunctionExpression>(
+export const removeReturnStatementFromFunction = <T extends AnyFunctionExpression>(
   func: T
 ): {
   updatedFunction: T,
