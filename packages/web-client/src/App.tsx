@@ -12,6 +12,7 @@ import { useModal } from './hooks/use-modal';
 import { useReactToVue } from './hooks/use-react-to-vue';
 import { hookExamples } from './examples';
 import { MonacoSplitEditor } from '../src/components/MonacoSplitEditor';
+import { prettierFormat } from './utils';
 
 const SplitEditor = split as any;
 
@@ -34,7 +35,7 @@ export function App() {
       {hookExamples.map(example => (
         <button
           key={example.name}
-          onClick={() => setReactCode(example.code)}
+          onClick={() => setReactCode(prettierFormat(example.code))}
         >
           {example.name}
         </button>
