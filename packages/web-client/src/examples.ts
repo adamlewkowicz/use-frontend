@@ -9,6 +9,28 @@ export const hookExamples = [
     `
   },
   {
+    name: 'useMousePosition',
+    code: `
+      const useMousePosition = () => {
+        const [x, setX] = useState(0);
+        const [y, setY] = useState(0);
+      
+        function update(event) {
+          setX(event.pageX);
+          setY(event.pageY);
+        }
+      
+        useEffect(() => {
+          window.addEventListener("mousemove", update);
+      
+          return () => window.removeEventListener("mousemove", update);
+        }, []);
+        
+        return { x, y };
+      }
+    `
+  },
+  {
     name: 'Fetch',
     code: `
       const [data, setData] = useState(null);
