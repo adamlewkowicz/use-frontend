@@ -3,6 +3,34 @@ export const hookExamples = [
   {
     name: 'Basic example',
     code: `
+      const [counter, setCounter] = useState(0);
+
+      setCounter(v => v + 1);
+    `
+  },
+  {
+    name: 'Fetch',
+    code: `
+      const [data, setData] = useState(null);
+      const [error, setError] = useState(null);
+      const [isLoading, setIsLoading] = useState(true);
+
+      useEffect(() => {
+          const { signal, abort } = new AbortController();
+
+          fetch('example', { signal })
+              .then(response => response.json())
+              .then(json => setData(json))
+              .catch(error => setError(error))
+              .finally(() => setIsLoading(true));
+              
+          return () => abort();
+      }, []);
+    `
+  },
+  {
+    name: 'Basic hooks',
+    code: `
       function useCounter() {
         const [counter, setCounter] = useState(0);
         const [abc, setAbc] = useState({ container: true });
