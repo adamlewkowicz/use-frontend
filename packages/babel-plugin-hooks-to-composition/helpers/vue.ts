@@ -6,7 +6,7 @@ import {
   updateArrowFunctionBody,
   createInitialStateCallExp,
   createCallbackCallExp,
-} from './base';
+} from './generic';
 import {
   VUE_ON_CLEANUP,
   VUE_WATCH,
