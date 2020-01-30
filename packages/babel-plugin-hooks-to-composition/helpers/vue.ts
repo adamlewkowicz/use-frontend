@@ -4,8 +4,7 @@ import {
   createObjectExpression,
   createCallExp,
   updateArrowFunctionBody,
-  createInitialStateCallExp,
-  createCallbackCallExp,
+  createGenericCallExp,
 } from './generic';
 import {
   VUE_ON_CLEANUP,
@@ -20,22 +19,23 @@ import {
   VUE_PREV,
   VUE_COMPUTED,
 } from '../consts';
+import { AnyFunctionExpression, ExpOrSpread } from '../types';
 
-export const createVueOnMountedCallExp = createInitialStateCallExp(VUE_ON_MOUNTED);
+export const createVueOnMountedCallExp = createGenericCallExp(VUE_ON_MOUNTED);
 
-export const createVueOnUpdatedCallExp = createInitialStateCallExp(VUE_ON_UPDATED);
+export const createVueOnUpdatedCallExp = createGenericCallExp(VUE_ON_UPDATED);
 
-export const createVueInjectCallExp = (args: InitialState[]) => createCallExp(VUE_INJECT, args);
+export const createVueInjectCallExp = createGenericCallExp<ExpOrSpread[]>(VUE_INJECT);
 
-export const createVueOnUnmounted = createCallbackCallExp(VUE_ON_UNMOUNTED);
+export const createVueOnUnmounted = createGenericCallExp<AnyFunctionExpression>(VUE_ON_UNMOUNTED);
 
-export const createVueRefCallExp = createInitialStateCallExp(VUE_REF);
+export const createVueRefCallExp = createGenericCallExp(VUE_REF);
 
-export const createVueComputedCallExp = createCallbackCallExp(VUE_COMPUTED);
+export const createVueComputedCallExp = createGenericCallExp<AnyFunctionExpression>(VUE_COMPUTED);
 
-const createVueReactiveCallExp = createInitialStateCallExp(VUE_REACTIVE);
+const createVueReactiveCallExp = createGenericCallExp(VUE_REACTIVE);
 
-const createVueOnCleanupCallExp = createCallbackCallExp(VUE_ON_CLEANUP);
+const createVueOnCleanupCallExp = createGenericCallExp<AnyFunctionExpression>(VUE_ON_CLEANUP);
 
 const createVueWatchCallbackWithCleanup = (
   watchCallback: t.ArrowFunctionExpression,

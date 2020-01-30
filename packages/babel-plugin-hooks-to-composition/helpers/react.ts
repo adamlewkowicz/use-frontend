@@ -5,11 +5,11 @@ import { createInitialStateCallExp } from './generic';
 
 /** const stateName = useRef(initialState); */
 export const createReactUseRefDeclarator = (
-  variableName: string,
-  initialValue: InitialState
+  stateName: string,
+  initialState: InitialState
 ): t.VariableDeclarator => t.variableDeclarator(
-  t.identifier(variableName),
-  createReactUseRefCallExp(initialValue)
+  t.identifier(stateName),
+  createReactUseRefCallExp(initialState)
 );
 
 export const createReactUseRefCallExp = createInitialStateCallExp(REACT_USE_REF);

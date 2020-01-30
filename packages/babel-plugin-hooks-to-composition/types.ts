@@ -34,3 +34,5 @@ export type Literal<T extends Primitive> =
   unknown
 
 export type AnyFunctionExpression = t.FunctionExpression | t.ArrowFunctionExpression;
+
+export type ExpOrSpread = t.Expression | t.SpreadElement;

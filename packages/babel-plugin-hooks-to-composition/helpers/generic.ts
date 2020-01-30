@@ -1,5 +1,11 @@
 import * as t from 'babel-types';
-import { Primitive, PrimitiveObject, Literal, AnyFunctionExpression } from '../types';
+import {
+  Primitive,
+  PrimitiveObject,
+  Literal,
+  AnyFunctionExpression,
+  ExpOrSpread,
+} from '../types';
 import { InitialState } from './types';
 
 const createLiteral = <T extends Primitive>(literal: T): Literal<T> => {
@@ -47,11 +53,21 @@ export const createObjectExpression = <T extends PrimitiveObject>(
 /** functionName(...deps) */
 export const createCallExp = (
   functionName: string,
-  args: (t.Expression | t.SpreadElement)[]
+  args: ExpOrSpread[]
 ): t.CallExpression => t.callExpression(
   t.identifier(functionName),
   args
 );
+
+/** Higher order function for creating generic call expressions  */
+export const createGenericCallExp = <T extends ExpOrSpread | ExpOrSpread[] = ExpOrSpread>(
+  functionName: string,
+) => (
+  argOrArgs: T
+): t.CallExpression => {
+  const args = Array.isArray(argOrArgs) ? argOrArgs : [argOrArgs] as ExpOrSpread[];
+  return createCallExp(functionName, args);
+}
 
 export const createInitialStateCallExp = (
   functionName: string
