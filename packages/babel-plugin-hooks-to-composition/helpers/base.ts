@@ -43,6 +43,91 @@ export const createObjectExpression = <T extends PrimitiveObject>(
   return objectExpression;
 }
 
+/** functionName(...deps) */
+export const createCallExp = (
+  functionName: string,
+  args: (t.Expression | t.SpreadElement)[]
+): t.CallExpression => t.callExpression(
+  t.identifier(functionName),
+  args
+);
+
+export const updateArrowFunctionBody = <T extends AnyFunctionExpression>(
+  func: T,
+  callback: (statements: t.Statement[]) => t.Statement[]
+): T => {
+  if (!t.isBlockStatement(func.body)) {
+    throw new Error;
+  }
+  return t.arrowFunctionExpression(
+    func.params,
+    updateBodyOfBlockStatement(func.body, callback),
+  ) as T;
+}
+
+const updateBodyOfBlockStatement = (
+  blockStatement: t.BlockStatement,
+  callback: (statements: t.BlockStatement['body']) => t.BlockStatement['body']
+): t.BlockStatement => {
+  return t.blockStatement(
+    callback(blockStatement.body),
+    blockStatement.directives
+  );
+}
+
+const removeStatementFromFunction = <
+  S extends t.Statement,
+  T extends AnyFunctionExpression,
+>(
+  func: T,
+  statementType: S['type'],
+): {
+  updatedFunction: T,
+  removedStatement?: S
+} => {
+  let removedStatement: S | undefined;
+
+  // TODO: refactor to pure function
+  const updatedFunction = updateArrowFunctionBody(func, (statements) => {
+    removedStatement = statements.find(
+      (statement): statement is S => statement.type === statementType
+    );
+
+    if (removedStatement) {
+      return statements.filter(
+        statement => statement.type !== statementType
+      );
+    }
+    return statements;
+  });
+
+  return {
+    updatedFunction,
+    removedStatement,
+  }
+}
+
+export const removeReturnStatementFromFunction = <T extends AnyFunctionExpression>(
+  func: T
+): {
+  updatedFunction: T,
+  removedStatement?: t.ReturnStatement,
+} => removeStatementFromFunction<t.ReturnStatement, T>(func, 'ReturnStatement');
+
+/** variableName = expression; */
+export const createAssignment = (
+  variableName: string,
+  expression: t.Expression,
+): t.AssignmentExpression => {
+  return t.assignmentExpression(
+    '=',
+    t.identifier(variableName),
+    expression
+  );
+}
+
+type AnyFunctionExpression = t.FunctionExpression | t.ArrowFunctionExpression;
+
 type BabelLiteral =
   | t.BooleanLiteral 
   | t.NullLiteral 
