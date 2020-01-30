@@ -126,6 +126,14 @@ export const createAssignment = (
   );
 }
 
+/** functionName(callback); */
+export const createCallExpWithCallback = (functionName: string) => (
+  callback: t.ArrowFunctionExpression
+) => t.callExpression(
+  t.identifier(functionName),
+  [callback]
+);
+
 type AnyFunctionExpression = t.FunctionExpression | t.ArrowFunctionExpression;
 
 type BabelLiteral =

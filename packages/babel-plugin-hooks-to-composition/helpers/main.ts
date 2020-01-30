@@ -9,17 +9,12 @@ import {
   REACT_USE_CALLBACK,
   REACT_USE_EFFECT,
   REACT_USE_REF,
-  VUE_ON_UNMOUNTED,
   REACT_USE_CONTEXT,
-  VUE_INJECT,
   REACT_STATE_SETTER_PREFIX,
   REACT_USE_STATE,
   ASSERT_FALSE,
-  VUE_REF_PROPERTY,
-  VUE_ON_CLEANUP,
 } from '../consts';
 import { Node, DatafullAssert } from '../types';
-import { createObjectExpression } from './base';
 
 /** useMemo(...) */
 export const isUseMemoFunc = (exp: Expression): exp is Identifier => t.isIdentifier(exp) && exp.name === REACT_USE_MEMO;
@@ -55,32 +50,6 @@ const isUseStateFunc = (exp: t.Expression): DatafullAssert<{
 
   return { result: true, initialStateValue };
 }
-
-export const createReactUseRefCall = (
-  initialState: InitialState
-): t.CallExpression => t.callExpression(
-  t.identifier(REACT_USE_REF),
-  [initialState],
-);
-
-/** functionName(callback); */
-const createFunctionWithCallback = (functionName: string) => (
-  callback: t.ArrowFunctionExpression
-) => t.callExpression(
-  t.identifier(functionName),
-  [callback]
-);
-
-/** const stateName = useRef(initialState); */
-export const createReactUseRefDeclarator = (
-  variableName: string,
-  initialValue: InitialState
-): t.VariableDeclarator => t.variableDeclarator(
-  t.identifier(variableName),
-  createReactUseRefCall(initialValue)
-);
-
-export const createVueOnUnmounted = createFunctionWithCallback(VUE_ON_UNMOUNTED);
 
 export const isCorrectStateSetterName = (name: string): boolean => name.startsWith(REACT_STATE_SETTER_PREFIX);
 
@@ -122,5 +91,3 @@ export const isReactStateDeclarator = (declarator: t.VariableDeclarator): Datafu
     stateSetter,
   };
 }
-
-type InitialState = t.Expression | t.SpreadElement;

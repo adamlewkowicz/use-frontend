@@ -1,8 +1,10 @@
 import * as t from 'babel-types';
+import { InitialState } from './types';
 import {
   createObjectExpression,
   createCallExp,
   updateArrowFunctionBody,
+  createCallExpWithCallback,
 } from './base';
 import {
   VUE_ON_CLEANUP,
@@ -13,6 +15,7 @@ import {
   VUE_REF_PROPERTY,
   VUE_REF,
   VUE_REACTIVE,
+  VUE_ON_UNMOUNTED,
 } from '../consts';
 
 export const createVueWatchCallExp = ({
@@ -143,6 +146,8 @@ export const createVueReactive = (
   [initialState],
 );
 
+export const createVueOnUnmounted = createCallExpWithCallback(VUE_ON_UNMOUNTED);
+
 type VueWatchOptions = {
   lazy?: boolean
   flush?: 'pre' | 'post' | 'sync'
@@ -157,5 +162,3 @@ interface VueWatchCallExpOptions {
   watchOptions?: VueWatchOptions
   cleanupCallback?: t.ArrowFunctionExpression | null
 }
-
-type InitialState = t.Expression | t.SpreadElement;
