@@ -18,6 +18,7 @@ import {
   VUE_REACTIVE,
   VUE_ON_UNMOUNTED,
   VUE_PREV,
+  VUE_COMPUTED,
 } from '../consts';
 
 export const createVueOnMountedCallExp = createInitialStateCallExp(VUE_ON_MOUNTED);
@@ -29,6 +30,8 @@ export const createVueInjectCallExp = (args: InitialState[]) => createCallExp(VU
 export const createVueOnUnmounted = createCallbackCallExp(VUE_ON_UNMOUNTED);
 
 export const createVueRefCallExp = createInitialStateCallExp(VUE_REF);
+
+export const createVueComputedCallExp = createCallbackCallExp(VUE_COMPUTED);
 
 const createVueReactiveCallExp = createInitialStateCallExp(VUE_REACTIVE);
 

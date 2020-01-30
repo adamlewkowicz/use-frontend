@@ -1,16 +1,29 @@
 import * as t from 'babel-types';
 import { DatafullAssert } from '../types';
-import { isCorrectStateSetterName, isUseEffectFunc } from '../helpers';
+import { isCorrectReactStateSetterName } from '../helpers';
 import {
   ASSERT_FALSE,
   REACT_USE_LAYOUT_EFFECT,
   REACT_USE_REF,
+  REACT_USE_CONTEXT,
+  REACT_USE_MEMO,
+  REACT_USE_CALLBACK,
+  REACT_USE_EFFECT,
 } from '../consts';
 import { stateDeclarationsMap, StateDeclarationInfo } from '../visitors/use-state';
 import { isArrayOfIdentifiers, isCallExpWithName } from './generic';
 
 /** useRef(...) */
 export const isReactUseRefCallExp = isCallExpWithName(REACT_USE_REF);
+
+/** useContext(...) */
+export const isReactUseContextCallExp = isCallExpWithName(REACT_USE_CONTEXT);
+
+/** useMemo(...) */
+export const isReactUseMemoCallExp = isCallExpWithName(REACT_USE_MEMO);
+
+/** useCallback(...) */
+export const isReactUseCallbackCallExp = isCallExpWithName(REACT_USE_CALLBACK);
 
 /** is `useLayoutEffect(callback, dependencies)` */
 export const isReactUseLayoutEffect = (node: t.CallExpression): DatafullAssert<{
@@ -55,7 +68,7 @@ export const isReactSetStateCall = (node: t.CallExpression): DatafullAssert<{
   const stateDeclarationInfo = stateDeclarationsMap.get(node.callee.name);
 
   if (!stateDeclarationInfo) return ASSERT_FALSE;
-  if (!isCorrectStateSetterName(node.callee.name)) return ASSERT_FALSE;
+  if (!isCorrectReactStateSetterName(node.callee.name)) return ASSERT_FALSE;
 
   const [setStateArg] = node.arguments;
   const { stateValueName } = stateDeclarationInfo;
@@ -103,7 +116,9 @@ export const isReactUseEffectCallExp = (node: t.CallExpression): DatafullAssert<
   cleanupCallback: t.ArrowFunctionExpression | null
   originalCallback: t.ArrowFunctionExpression
 }> => {
-  if (!isUseEffectFunc(node.callee)) return ASSERT_FALSE;
+  const assertName = isCallExpWithName(REACT_USE_EFFECT);
+
+  if (!assertName(node)) return ASSERT_FALSE;
 
   const [callback, deps] = node.arguments;
 

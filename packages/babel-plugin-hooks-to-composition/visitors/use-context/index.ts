@@ -1,13 +1,14 @@
 import { Visitor } from 'babel-traverse';
-import { isUseContextFunc, createVueInjectCallExp } from '../../helpers';
+import { createVueInjectCallExp } from '../../helpers';
+import { isReactUseContextCallExp } from '../../assert';
 
 const replaceUseContextWithInject = (): Visitor => ({
   CallExpression(path) {
-    if (!isUseContextFunc(path.node.callee)) return;
+    if (!isReactUseContextCallExp(path.node)) return;
 
-    const vueInject = createVueInjectCallExp(path.node.arguments);
+    const vueInjectCallExp = createVueInjectCallExp(path.node.arguments);
 
-    path.replaceWith(vueInject);
+    path.replaceWith(vueInjectCallExp);
   }
 });
 

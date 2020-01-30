@@ -1,34 +1,10 @@
 import * as t from 'babel-types';
 import {
-  Expression,
-  Identifier,
-  ArrowFunctionExpression,
-} from 'babel-types';
-import {
-  REACT_USE_MEMO,
-  REACT_USE_CALLBACK,
-  REACT_USE_EFFECT,
-  REACT_USE_CONTEXT,
   REACT_STATE_SETTER_PREFIX,
   REACT_USE_STATE,
   ASSERT_FALSE,
 } from '../consts';
-import { Node, DatafullAssert } from '../types';
-
-/** useMemo(...) */
-export const isUseMemoFunc = (exp: Expression): exp is Identifier => t.isIdentifier(exp) && exp.name === REACT_USE_MEMO;
-
-/** useCallback(...) */
-export const isUseCallbackFunc = (exp: Expression): exp is Identifier => t.isIdentifier(exp) && exp.name === REACT_USE_CALLBACK;
-
-/** useEffect(...) */
-export const isUseEffectFunc = (exp: Expression): exp is Identifier => t.isIdentifier(exp) && exp.name === REACT_USE_EFFECT;
-
-/** setState(c => c + 1) */
-export const isSetStateCallback = (node: Node): node is ArrowFunctionExpression => t.isArrowFunctionExpression(node) && t.isBinaryExpression(node.body);
-
-/** useContext(...) */
-export const isUseContextFunc = (exp: Expression): exp is Identifier => t.isIdentifier(exp) && exp.name === REACT_USE_CONTEXT;
+import { DatafullAssert } from '../types';
 
 const isUseStateFunc = (exp: t.Expression): DatafullAssert<{
   initialStateValue: t.Expression | t.SpreadElement
@@ -47,7 +23,7 @@ const isUseStateFunc = (exp: t.Expression): DatafullAssert<{
   return { initialStateValue };
 }
 
-export const isCorrectStateSetterName = (name: string): boolean => name.startsWith(REACT_STATE_SETTER_PREFIX);
+export const isCorrectReactStateSetterName = (name: string): boolean => name.startsWith(REACT_STATE_SETTER_PREFIX);
 
 /** is `[counter, setCounter]` */
 const isReactStateDeclarationArray = (id: t.LVal): DatafullAssert<{
@@ -60,7 +36,7 @@ const isReactStateDeclarationArray = (id: t.LVal): DatafullAssert<{
 
   if (!t.isIdentifier(stateValue)) return ASSERT_FALSE;
   if (!t.isIdentifier(stateSetter)) return ASSERT_FALSE;
-  if (!isCorrectStateSetterName(stateSetter.name)) return ASSERT_FALSE;
+  if (!isCorrectReactStateSetterName(stateSetter.name)) return ASSERT_FALSE;
 
   return { stateValue, stateSetter };
 }
