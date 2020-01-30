@@ -23,6 +23,7 @@ export const VUE_WATCH = 'watch' as const;
 export const VUE_INJECT = 'inject' as const;
 export const VUE_ON_BEFORE_MOUNT = 'onBeforeMount' as const;
 export const VUE_ON_CLEANUP = 'onCleanup' as const;
+export const VUE_PREV = 'prev' as const;
 
 // common
 export const ASSERT_FALSE: DatafullAssertFalsy = false;

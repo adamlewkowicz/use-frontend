@@ -17,6 +17,7 @@ import {
   VUE_REF,
   VUE_REACTIVE,
   VUE_ON_UNMOUNTED,
+  VUE_PREV,
 } from '../consts';
 
 export const createVueOnMountedCallExp = createInitialStateCallExp(VUE_ON_MOUNTED);
@@ -103,7 +104,7 @@ export const createVueWatchCallExp = ({
   const watchOptionsArr = watchOptions ? [createObjectExpression(watchOptions)] : [];
 
   const callbackParams = cleanupCallback
-    ? [depsArrayPattern, t.identifier('prev'), t.identifier(VUE_ON_CLEANUP)]
+    ? [depsArrayPattern, t.identifier(VUE_PREV), t.identifier(VUE_ON_CLEANUP)]
     : [depsArrayPattern];
 
   const watchCallback = t.arrowFunctionExpression(callbackParams, callback.body);
