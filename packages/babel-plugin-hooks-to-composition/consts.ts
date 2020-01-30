@@ -1,8 +1,6 @@
 import { DatafullAssertFalsy, DatafullAssertTruthy } from './types';
 
 // React
-// legacy
-export const REACT_STATE_FUNC_NAME = 'useState' as const;
 export const REACT_STATE_SETTER_PREFIX = 'set' as const;
 export const REACT_USE_STATE = 'useState' as const;
 export const REACT_USE_MEMO = 'useMemo' as const;
@@ -14,8 +12,6 @@ export const REACT_USE_CONTEXT = 'useContext' as const;
 export const REACT_USE_LAYOUT_EFFECT = 'useLayoutEffect' as const;
 
 // Vue
-// legacy
-export const VUE_STATE_FUNC_NAME = 'reactive' as const;
 export const VUE_COMPUTED = 'computed' as const;
 export const VUE_REF = 'ref' as const;
 export const VUE_REF_PROPERTY = 'value' as const;
