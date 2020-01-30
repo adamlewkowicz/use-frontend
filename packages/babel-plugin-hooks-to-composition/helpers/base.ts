@@ -1,5 +1,6 @@
 import * as t from 'babel-types';
 import { Primitive, PrimitiveObject } from '../types';
+import { InitialState } from './types';
 
 const createLiteral = <T extends Primitive>(literal: T): BabelLiteral => {
   if (literal === null) {
@@ -51,6 +52,12 @@ export const createCallExp = (
   t.identifier(functionName),
   args
 );
+
+export const createInitialStateCallExp = (
+  functionName: string
+) => (
+  initialState: InitialState
+): t.CallExpression => createCallExp(functionName, [initialState]);
 
 export const updateArrowFunctionBody = <T extends AnyFunctionExpression>(
   func: T,

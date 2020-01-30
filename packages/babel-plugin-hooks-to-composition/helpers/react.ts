@@ -1,6 +1,7 @@
 import * as t from 'babel-types';
 import { REACT_USE_REF } from '../consts';
 import { InitialState } from './types';
+import { createInitialStateCallExp } from './base';
 
 /** const stateName = useRef(initialState); */
 export const createReactUseRefDeclarator = (
@@ -8,12 +9,7 @@ export const createReactUseRefDeclarator = (
   initialValue: InitialState
 ): t.VariableDeclarator => t.variableDeclarator(
   t.identifier(variableName),
-  createReactUseRefCall(initialValue)
+  createReactUseRefCallExp(initialValue)
 );
 
-export const createReactUseRefCall = (
-  initialState: InitialState
-): t.CallExpression => t.callExpression(
-  t.identifier(REACT_USE_REF),
-  [initialState],
-);
+export const createReactUseRefCallExp = createInitialStateCallExp(REACT_USE_REF);
