@@ -27,7 +27,7 @@ export const createVueInjectCallExp = (args: InitialState[]) => createCallExp(VU
 
 export const createVueOnUnmounted = createCallbackCallExp(VUE_ON_UNMOUNTED);
 
-const createVueRefCallExp = createInitialStateCallExp(VUE_REF);
+export const createVueRefCallExp = createInitialStateCallExp(VUE_REF);
 
 const createVueReactiveCallExp = createInitialStateCallExp(VUE_REACTIVE);
 

@@ -8,7 +8,6 @@ import {
   REACT_USE_MEMO,
   REACT_USE_CALLBACK,
   REACT_USE_EFFECT,
-  REACT_USE_REF,
   REACT_USE_CONTEXT,
   REACT_STATE_SETTER_PREFIX,
   REACT_USE_STATE,
@@ -24,9 +23,6 @@ export const isUseCallbackFunc = (exp: Expression): exp is Identifier => t.isIde
 
 /** useEffect(...) */
 export const isUseEffectFunc = (exp: Expression): exp is Identifier => t.isIdentifier(exp) && exp.name === REACT_USE_EFFECT;
-
-/** useRef(...) */
-export const isUseRefFunc = (exp: Expression): exp is Identifier => t.isIdentifier(exp) && exp.name === REACT_USE_REF;
 
 /** setState(c => c + 1) */
 export const isSetStateCallback = (node: Node): node is ArrowFunctionExpression => t.isArrowFunctionExpression(node) && t.isBinaryExpression(node.body);

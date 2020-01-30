@@ -23,3 +23,18 @@ export const isArrayOfIdentifiers = (node: t.Expression | t.SpreadElement): Data
     elements: node.elements,
   };
 }
+
+export const isCallExpWithName = (
+  functionName: string
+) => (node: t.Expression): DatafullAssert<{
+  callee: t.Identifier
+}> => {
+  if (!t.isCallExpression(node)) return ASSERT_FALSE;
+
+  const { callee } = node;
+
+  if (!t.isIdentifier(callee)) return ASSERT_FALSE;
+  if (callee.name !== functionName) return ASSERT_FALSE;
+
+  return { result: true, callee };
+}

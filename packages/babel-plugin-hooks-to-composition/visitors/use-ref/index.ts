@@ -1,11 +1,11 @@
 
-import { isUseRefFunc } from '../../helpers';
+import { createVueRefCallExp } from '../../helpers';
 import * as t from 'babel-types';
 import {
-  VUE_REF,
   REACT_REF_PROPERTY,
   VUE_REF_PROPERTY,
 } from '../../consts';
+import { isReactUseRefCallExp } from '../../assert'; 
 import { combineVisitors } from '../../utils';
 import { Visitor } from 'babel-traverse';
 
@@ -14,15 +14,11 @@ export let refSet = new Set();
 /** useRef() -> ref() */
 const replaceUseRefWithRef = (): Visitor => ({
   CallExpression(path) {
+    if (!isReactUseRefCallExp(path.node).result) return;
 
-    if (!isUseRefFunc(path.node.callee)) return;
+    const vueRefCallExp = createVueRefCallExp(path.node.arguments[0]);
 
-    const newFuncDeclaration = t.callExpression(
-      t.identifier(VUE_REF),
-      path.node.arguments
-    );
-
-    path.replaceWith(newFuncDeclaration);
+    return path.replaceWith(vueRefCallExp);
   }
 });
 
@@ -46,8 +42,7 @@ const replaceDotCurrentWithDotValue = (): Visitor => ({
   // tracks ".values" declarations
   VariableDeclarator(path) {
     if (!t.isIdentifier(path.node.id)) return;
-    if (!t.isCallExpression(path.node.init)) return;
-    if (!isUseRefFunc(path.node.init.callee)) return;
+    if (!isReactUseRefCallExp(path.node.init).result) return;
 
     const { name } = path.node.id;
 

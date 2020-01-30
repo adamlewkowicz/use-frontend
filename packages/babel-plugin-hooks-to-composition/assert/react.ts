@@ -1,9 +1,16 @@
 import * as t from 'babel-types';
 import { DatafullAssert } from '../types';
 import { isCorrectStateSetterName, isUseEffectFunc } from '../helpers';
-import { ASSERT_FALSE, REACT_USE_LAYOUT_EFFECT } from '../consts';
+import {
+  ASSERT_FALSE,
+  REACT_USE_LAYOUT_EFFECT,
+  REACT_USE_REF,
+} from '../consts';
 import { stateDeclarationsMap, StateDeclarationInfo } from '../visitors/use-state';
-import { isArrayOfIdentifiers } from './generic';
+import { isArrayOfIdentifiers, isCallExpWithName } from './generic';
+
+/** useRef(...) */
+export const isReactUseRefCallExp = isCallExpWithName(REACT_USE_REF);
 
 /** is `useLayoutEffect(callback, dependencies)` */
 export const isReactUseLayoutEffect = (node: t.CallExpression): DatafullAssert<{
