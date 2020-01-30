@@ -19,11 +19,11 @@ import {
   VUE_ON_UNMOUNTED,
 } from '../consts';
 
-export const createVueOnMountedCallExp = createInitialStateCallExp(VUE_ON_MOUNTED); 
+export const createVueOnMountedCallExp = createInitialStateCallExp(VUE_ON_MOUNTED);
 
 export const createVueOnUpdatedCallExp = createInitialStateCallExp(VUE_ON_UPDATED);
 
-export const createVueInjectCallExp = (args: t.CallExpression['arguments']) => createCallExp(VUE_INJECT, args);
+export const createVueInjectCallExp = (args: InitialState[]) => createCallExp(VUE_INJECT, args);
 
 export const createVueOnUnmounted = createCallbackCallExp(VUE_ON_UNMOUNTED);
 
