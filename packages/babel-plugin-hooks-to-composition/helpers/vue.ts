@@ -4,7 +4,8 @@ import {
   createObjectExpression,
   createCallExp,
   updateArrowFunctionBody,
-  createCallExpWithCallback,
+  createInitialStateCallExp,
+  createCallbackCallExp,
 } from './base';
 import {
   VUE_ON_CLEANUP,
@@ -17,6 +18,79 @@ import {
   VUE_REACTIVE,
   VUE_ON_UNMOUNTED,
 } from '../consts';
+
+export const createVueOnMountedCallExp = createInitialStateCallExp(VUE_ON_MOUNTED); 
+
+export const createVueOnUpdatedCallExp = createInitialStateCallExp(VUE_ON_UPDATED);
+
+export const createVueInjectCallExp = (args: t.CallExpression['arguments']) => createCallExp(VUE_INJECT, args);
+
+export const createVueOnUnmounted = createCallbackCallExp(VUE_ON_UNMOUNTED);
+
+const createVueRefCallExp = createInitialStateCallExp(VUE_REF);
+
+const createVueReactiveCallExp = createInitialStateCallExp(VUE_REACTIVE);
+
+const createVueOnCleanupCallExp = createCallbackCallExp(VUE_ON_CLEANUP);
+
+const createVueWatchCallbackWithCleanup = (
+  watchCallback: t.ArrowFunctionExpression,
+  cleanupCallback: t.ArrowFunctionExpression
+): t.ArrowFunctionExpression => {
+  const vueOnCleanup = createVueOnCleanupCallExp(cleanupCallback);
+
+  const watchCallbackWithCleanup = updateArrowFunctionBody(watchCallback, (statements) => {
+    const statementsWithoutReturn = statements.filter(
+      statement => statement.type !== 'ReturnStatement'
+    );
+    const statementsWithCleanupCallback = [
+      ...statementsWithoutReturn,
+      t.expressionStatement(vueOnCleanup)
+    ];
+
+    return statementsWithCleanupCallback;
+  });
+
+  return watchCallbackWithCleanup;
+}
+
+/** variableName.{value} */
+export const createVueRefMemberExp = (
+  variableName: string
+): t.MemberExpression => t.memberExpression(
+  t.identifier(variableName),
+  t.identifier(VUE_REF_PROPERTY)
+);
+
+/** variableName.value = expression;
+ * Adds .value as variable property.
+ */
+export const createVueRefValueAssignment = (
+  variableName: string,
+  expression: t.Expression
+): t.AssignmentExpression => t.assignmentExpression(
+  '=',
+  createVueRefMemberExp(variableName),
+  expression
+);
+
+/** const stateName = reactive(initialState); */
+export const createVueReactiveDeclarator = (
+  stateName: string,
+  initialState: InitialState,
+): t.VariableDeclarator => t.variableDeclarator(
+  t.identifier(stateName),
+  createVueReactiveCallExp(initialState)
+);
+
+/** const stateName = ref(initialState); */
+export const createVueRefDeclarator = (
+  stateName: string,
+  initialValue: InitialState
+): t.VariableDeclarator => t.variableDeclarator(
+  t.identifier(stateName),
+  createVueRefCallExp(initialValue)
+);
 
 export const createVueWatchCallExp = ({
   dependencies,
@@ -45,108 +119,6 @@ export const createVueWatchCallExp = ({
   
   return createCallExp(VUE_WATCH, [depsArrayExp, watchCallback, ...watchOptionsArr]);
 }
-
-const createVueOnCleanupCallExp = (
-  callback: t.ArrowFunctionExpression
-): t.CallExpression => createCallExp(VUE_ON_CLEANUP, [callback]);
-
-const createVueWatchCallbackWithCleanup = (
-  watchCallback: t.ArrowFunctionExpression,
-  cleanupCallback: t.ArrowFunctionExpression
-): t.ArrowFunctionExpression => {
-  const vueOnCleanup = createVueOnCleanupCallExp(cleanupCallback);
-
-  const watchCallbackWithCleanup = updateArrowFunctionBody(watchCallback, (statements) => {
-    const statementsWithoutReturn = statements.filter(
-      statement => statement.type !== 'ReturnStatement'
-    );
-    const statementsWithCleanupCallback = [
-      ...statementsWithoutReturn,
-      t.expressionStatement(vueOnCleanup)
-    ];
-
-    return statementsWithCleanupCallback;
-  });
-
-  return watchCallbackWithCleanup;
-}
-
-export const createVueOnUpdated = (
-  callback: t.ArrowFunctionExpression
-) => t.callExpression(
-  t.identifier(VUE_ON_UPDATED),
-  [callback]
-);
-
-export const createVueOnMounted = (
-  callback: t.ArrowFunctionExpression
-) => t.callExpression(
-  t.identifier(VUE_ON_MOUNTED),
-  [callback]
-);
-
-export const createVueInject = (
-  args: t.CallExpression['arguments']
-): t.CallExpression => t.callExpression(
-  t.identifier(VUE_INJECT),
-  args
-);
-
-
-/** variableName.{value} */
-export const createVueRefMember = (
-  variableName: string
-): t.MemberExpression => t.memberExpression(
-  t.identifier(variableName),
-  t.identifier(VUE_REF_PROPERTY)
-);
-
-/** variableName.value = expression;
- * Adds .value as variable property.
- */
-export const createVueRefValueAssignment = (
-  variableName: string,
-  expression: t.Expression
-): t.AssignmentExpression => t.assignmentExpression(
-  '=',
-  createVueRefMember(variableName),
-  expression
-);
-
-/** const stateName = reactive(initialState); */
-export const createVueReactiveDeclarator = (
-  stateName: string,
-  initialState: InitialState,
-): t.VariableDeclarator => t.variableDeclarator(
-  t.identifier(stateName),
-  createVueReactive(initialState)
-);
-
-/** const stateName = ref(initialState); */
-export const createVueRefDeclarator = (
-  variableName: string,
-  initialValue: InitialState
-): t.VariableDeclarator => t.variableDeclarator(
-  t.identifier(variableName),
-  createVueRefCall(initialValue)
-);
-
-/** ref(initialState); */
-export const createVueRefCall = (
-  initialState: InitialState
-): t.CallExpression => t.callExpression(
-  t.identifier(VUE_REF),
-  [initialState],
-);
-
-export const createVueReactive = (
-  initialState: InitialState
-): t.CallExpression => t.callExpression(
-  t.identifier(VUE_REACTIVE),
-  [initialState],
-);
-
-export const createVueOnUnmounted = createCallExpWithCallback(VUE_ON_UNMOUNTED);
 
 type VueWatchOptions = {
   lazy?: boolean

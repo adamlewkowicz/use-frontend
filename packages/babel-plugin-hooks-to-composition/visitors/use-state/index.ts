@@ -6,7 +6,7 @@ import {
   createVueReactiveDeclarator,
   createVueRefDeclarator,
   createVueRefValueAssignment,
-  createVueRefMember,
+  createVueRefMemberExp,
 } from '../../helpers';
 import { isReactSetStateCall } from '../../assert';
 
@@ -75,7 +75,7 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
     const { setStateArg, stateValueName, stateDeclarationInfo } = isReactSetStateCallInfo;
 
     const isVueRef = stateDeclarationInfo.type === 'vue_ref';
-    const createIdentifierOrMember = isVueRef ? createVueRefMember : t.identifier;
+    const createIdentifierOrMember = isVueRef ? createVueRefMemberExp : t.identifier;
 
     const createAssignmentHandler = isVueRef
       ? createVueRefValueAssignment

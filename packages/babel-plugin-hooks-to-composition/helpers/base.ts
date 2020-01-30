@@ -59,6 +59,12 @@ export const createInitialStateCallExp = (
   initialState: InitialState
 ): t.CallExpression => createCallExp(functionName, [initialState]);
 
+export const createCallbackCallExp = (
+  functionName: string
+) => (
+  callback: AnyFunctionExpression
+): t.CallExpression => createCallExp(functionName, [callback]);
+
 export const updateArrowFunctionBody = <T extends AnyFunctionExpression>(
   func: T,
   callback: (statements: t.Statement[]) => t.Statement[]
@@ -132,14 +138,6 @@ export const createAssignment = (
     expression
   );
 }
-
-/** functionName(callback); */
-export const createCallExpWithCallback = (functionName: string) => (
-  callback: t.ArrowFunctionExpression
-) => t.callExpression(
-  t.identifier(functionName),
-  [callback]
-);
 
 type AnyFunctionExpression = t.FunctionExpression | t.ArrowFunctionExpression;
 

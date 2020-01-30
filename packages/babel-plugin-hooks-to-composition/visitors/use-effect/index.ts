@@ -1,6 +1,6 @@
 import {
-  createVueOnUpdated,
-  createVueOnMounted,
+  createVueOnUpdatedCallExp,
+  createVueOnMountedCallExp,
   createVueOnUnmounted,
   createVueWatchCallExp,
   removeReturnStatementFromFunction,
@@ -19,7 +19,7 @@ const replaceUseEffectWithWatch = (): Visitor => ({
     if (dependencies === null) {
       // TODO:
       // no dependencies, replace with onUpdated
-      const vueOnUpdated = createVueOnUpdated(originalCallback);
+      const vueOnUpdated = createVueOnUpdatedCallExp(originalCallback);
       return path.replaceWith(vueOnUpdated);
     } else if (dependencies.length) {
       // has dependencies, replace with watch
@@ -32,7 +32,7 @@ const replaceUseEffectWithWatch = (): Visitor => ({
       return path.replaceWith(vueWatch);
     } else {
       // empty array, replace with onMounted
-      const vueOnMounted = createVueOnMounted(originalCallback);
+      const vueOnMounted = createVueOnMountedCallExp(originalCallback);
 
       // cleanup callback, add additional onUnmounted cleanup lifecycle
       if (cleanupCallback) {
@@ -41,7 +41,7 @@ const replaceUseEffectWithWatch = (): Visitor => ({
         } = removeReturnStatementFromFunction(originalCallback);
 
         return path.replaceExpressionWithStatements([
-          createVueOnMounted(callbackWithoutCleanup),
+          createVueOnMountedCallExp(callbackWithoutCleanup),
           createVueOnUnmounted(cleanupCallback)
         ]);
       }
