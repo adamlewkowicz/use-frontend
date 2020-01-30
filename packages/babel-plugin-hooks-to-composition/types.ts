@@ -18,16 +18,9 @@ export { PluginPartial as VisitorHandler };
 
 export type Node<N = t.Node> = NodePath<N>['node'];
 
-interface DatafullAssertBase {
-  result: boolean
-}
-export interface DatafullAssertFalsy extends DatafullAssertBase {
-  result: false
-}
+export type DatafullAssertFalsy = false;
 
-export type DatafullAssertTruthy<T extends object = {}> = { result: true } & T; 
-
-export type DatafullAssert<T extends object = {}> = DatafullAssertFalsy | DatafullAssertTruthy<T>;
+export type DatafullAssert<DatafullAssertTruthy extends object = {}> = DatafullAssertFalsy | DatafullAssertTruthy;
 
 export interface PrimitiveObject {
   [key: string]: Primitive | undefined

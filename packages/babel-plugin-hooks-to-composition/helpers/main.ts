@@ -44,7 +44,7 @@ const isUseStateFunc = (exp: t.Expression): DatafullAssert<{
   if (isNotCalledUseState) return ASSERT_FALSE;
   if (isNoInitialStateValue) return ASSERT_FALSE;
 
-  return { result: true, initialStateValue };
+  return { initialStateValue };
 }
 
 export const isCorrectStateSetterName = (name: string): boolean => name.startsWith(REACT_STATE_SETTER_PREFIX);
@@ -62,7 +62,7 @@ const isReactStateDeclarationArray = (id: t.LVal): DatafullAssert<{
   if (!t.isIdentifier(stateSetter)) return ASSERT_FALSE;
   if (!isCorrectStateSetterName(stateSetter.name)) return ASSERT_FALSE;
 
-  return { result: true, stateValue, stateSetter };
+  return { stateValue, stateSetter };
 }
 
 /** is `[counter, setCounter] = useState(0)` */
@@ -74,14 +74,13 @@ export const isReactStateDeclarator = (declarator: t.VariableDeclarator): Datafu
   const arrayDeclarationInfo = isReactStateDeclarationArray(declarator.id);
   const useStateInfo = isUseStateFunc(declarator.init);
 
-  if (!useStateInfo.result) return ASSERT_FALSE;
-  if (!arrayDeclarationInfo.result) return ASSERT_FALSE;
+  if (!useStateInfo) return ASSERT_FALSE;
+  if (!arrayDeclarationInfo) return ASSERT_FALSE;
 
   const { initialStateValue } = useStateInfo;
   const { stateSetter, stateValue } = arrayDeclarationInfo;
 
   return {
-    result: true,
     initialStateValue,
     stateValue,
     stateSetter,

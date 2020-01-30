@@ -25,7 +25,7 @@ export const isReactUseLayoutEffect = (node: t.CallExpression): DatafullAssert<{
 
   const isArrayOfIdentifiersInfo = isArrayOfIdentifiers(deps);
 
-  if (!isArrayOfIdentifiersInfo.result) return ASSERT_FALSE;
+  if (!isArrayOfIdentifiersInfo) return ASSERT_FALSE;
 
   const { elements: dependencies } = isArrayOfIdentifiersInfo;
 
@@ -36,7 +36,6 @@ export const isReactUseLayoutEffect = (node: t.CallExpression): DatafullAssert<{
   } else { // no dependencies
 
     return {
-      result: true,
       // dependencies: null,
     }
   }
@@ -64,7 +63,6 @@ export const isReactSetStateCall = (node: t.CallExpression): DatafullAssert<{
   if (!setStateArg) return ASSERT_FALSE;
 
   return {
-    result: true,
     stateValueName: stateValueName as string,
     setStateArg,
     stateDeclarationInfo,
@@ -87,7 +85,6 @@ const isReactUseEffectCallback = (callback: t.Expression | t.SpreadElement): Dat
       const cleanupCallback = returnStatement.argument;
 
       return {
-        result: true,
         cleanupCallback,
         callback,
       }
@@ -95,7 +92,6 @@ const isReactUseEffectCallback = (callback: t.Expression | t.SpreadElement): Dat
   }
 
   return {
-    result: true,
     cleanupCallback: null,
     callback,
   }
@@ -113,7 +109,7 @@ export const isReactUseEffectCallExp = (node: t.CallExpression): DatafullAssert<
 
   const isReactUseEffectCallbackInfo = isReactUseEffectCallback(callback);
   
-  if (!isReactUseEffectCallbackInfo.result) return ASSERT_FALSE;
+  if (!isReactUseEffectCallbackInfo) return ASSERT_FALSE;
 
   const {
     callback: originalCallback,
@@ -123,12 +119,11 @@ export const isReactUseEffectCallExp = (node: t.CallExpression): DatafullAssert<
   if (t.isArrayExpression(deps)) {
     const isArrayOfIdentifiersInfo = isArrayOfIdentifiers(deps);
 
-    if (!isArrayOfIdentifiersInfo.result) return ASSERT_FALSE;
+    if (!isArrayOfIdentifiersInfo) return ASSERT_FALSE;
 
     const { elements: dependencies } = isArrayOfIdentifiersInfo;
 
     return {
-      result: true,
       dependencies,
       originalCallback,
       cleanupCallback,
@@ -136,7 +131,6 @@ export const isReactUseEffectCallExp = (node: t.CallExpression): DatafullAssert<
   } else {
     // no dependencies
     return {
-      result: true,
       dependencies: null,
       originalCallback,
       cleanupCallback,

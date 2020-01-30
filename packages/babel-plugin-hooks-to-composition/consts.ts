@@ -1,4 +1,4 @@
-import { DatafullAssertFalsy, DatafullAssertTruthy } from './types';
+import { DatafullAssertFalsy } from './types';
 
 // React
 export const REACT_STATE_SETTER_PREFIX = 'set' as const;
@@ -24,6 +24,5 @@ export const VUE_INJECT = 'inject' as const;
 export const VUE_ON_BEFORE_MOUNT = 'onBeforeMount' as const;
 export const VUE_ON_CLEANUP = 'onCleanup' as const;
 
-
-export const ASSERT_FALSE: DatafullAssertFalsy = { result: false };
-export const ASSERT_TRUE: DatafullAssertTruthy = { result: true };
+// common
+export const ASSERT_FALSE: DatafullAssertFalsy = false;

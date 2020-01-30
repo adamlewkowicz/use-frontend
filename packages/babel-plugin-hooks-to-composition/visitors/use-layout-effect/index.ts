@@ -5,7 +5,7 @@ const replaceUseLayoutEffectWithOnBeforeMount = (): Visitor => ({
   CallExpression(path) {
     const isReactUseLayoutEffectInfo = isReactUseLayoutEffect(path.node);
 
-    if (!isReactUseLayoutEffectInfo.result) return;
+    if (!isReactUseLayoutEffectInfo) return;
 
     const {  } = isReactUseLayoutEffectInfo; 
   }

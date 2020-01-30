@@ -16,12 +16,12 @@ export const isArrayOfIdentifiers = (node: t.Expression | t.SpreadElement): Data
   elements: t.Identifier[]
 }> => {
   if (!t.isArrayExpression(node)) return ASSERT_FALSE;
-  if (!isExpressionsOfIdentifier(node.elements)) return ASSERT_FALSE;
+  
+  const { elements } = node;
+  
+  if (!isExpressionsOfIdentifier(elements)) return ASSERT_FALSE;
 
-  return {
-    result: true,
-    elements: node.elements,
-  };
+  return { elements };
 }
 
 export const isCallExpWithName = (
@@ -36,5 +36,5 @@ export const isCallExpWithName = (
   if (!t.isIdentifier(callee)) return ASSERT_FALSE;
   if (callee.name !== functionName) return ASSERT_FALSE;
 
-  return { result: true, callee };
+  return { callee };
 }

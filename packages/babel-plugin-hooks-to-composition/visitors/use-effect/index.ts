@@ -12,7 +12,7 @@ const replaceUseEffectWithWatch = (): Visitor => ({
   CallExpression(path) {
     const isReactUseEffectCallExpInfo = isReactUseEffectCallExp(path.node);
 
-    if (!isReactUseEffectCallExpInfo.result) return;
+    if (!isReactUseEffectCallExpInfo) return;
 
     const { dependencies, originalCallback, cleanupCallback } = isReactUseEffectCallExpInfo;
 

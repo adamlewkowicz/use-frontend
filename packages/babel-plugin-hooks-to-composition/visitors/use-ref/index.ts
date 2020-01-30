@@ -14,7 +14,7 @@ export let refSet = new Set();
 /** useRef() -> ref() */
 const replaceUseRefWithRef = (): Visitor => ({
   CallExpression(path) {
-    if (!isReactUseRefCallExp(path.node).result) return;
+    if (!isReactUseRefCallExp(path.node)) return;
 
     const vueRefCallExp = createVueRefCallExp(path.node.arguments[0]);
 
@@ -42,7 +42,7 @@ const replaceDotCurrentWithDotValue = (): Visitor => ({
   // tracks ".values" declarations
   VariableDeclarator(path) {
     if (!t.isIdentifier(path.node.id)) return;
-    if (!isReactUseRefCallExp(path.node.init).result) return;
+    if (!isReactUseRefCallExp(path.node.init)) return;
 
     const { name } = path.node.id;
 

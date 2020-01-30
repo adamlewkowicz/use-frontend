@@ -26,7 +26,7 @@ const replaceUseStateWithReactiveOrRef = (): Visitor => ({
   VariableDeclarator(path) {
     const stateDeclarationInfo = isReactStateDeclarator(path.node);
 
-    if (!stateDeclarationInfo.result) return;
+    if (!stateDeclarationInfo) return;
     
     const {
       stateValue,
@@ -70,7 +70,7 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
   CallExpression(path) {
     const isReactSetStateCallInfo = isReactSetStateCall(path.node);
 
-    if (!isReactSetStateCallInfo.result) return;
+    if (!isReactSetStateCallInfo) return;
 
     const { setStateArg, stateValueName, stateDeclarationInfo } = isReactSetStateCallInfo;
 
