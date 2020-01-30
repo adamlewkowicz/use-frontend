@@ -2,13 +2,12 @@ import * as t from 'babel-types';
 import { Visitor } from 'babel-traverse';
 import {
   createAssignment,
-  isReactStateDeclarator,
   createVueReactiveDeclarator,
   createVueRefDeclarator,
   createVueRefValueAssignment,
   createVueRefMemberExp,
 } from '../../helpers';
-import { isReactSetStateCall } from '../../assert';
+import { isReactSetStateCall, isReactStateDeclarator } from '../../assert';
 
 interface StateValueName extends String {}
 interface StateSetterName extends String {}

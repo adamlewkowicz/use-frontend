@@ -1,6 +1,5 @@
 import * as t from 'babel-types';
 import { DatafullAssert } from '../types';
-import { isCorrectReactStateSetterName } from '../helpers';
 import {
   ASSERT_FALSE,
   REACT_USE_LAYOUT_EFFECT,
@@ -9,6 +8,8 @@ import {
   REACT_USE_MEMO,
   REACT_USE_CALLBACK,
   REACT_USE_EFFECT,
+  REACT_USE_STATE,
+  REACT_STATE_SETTER_PREFIX,
 } from '../consts';
 import { stateDeclarationsMap, StateDeclarationInfo } from '../visitors/use-state';
 import { isArrayOfIdentifiers, isCallExpWithName } from './generic';
@@ -151,6 +152,63 @@ export const isReactUseEffectCallExp = (node: t.CallExpression): DatafullAssert<
       cleanupCallback,
     }
   }
+}
+
+const isUseStateFunc = (exp: t.Expression): DatafullAssert<{
+  initialStateValue: t.Expression | t.SpreadElement
+}> => {
+  if (!t.isCallExpression(exp)) return ASSERT_FALSE;
+  if (!t.isIdentifier(exp.callee)) return ASSERT_FALSE;
+
+  const [initialStateValue] = exp.arguments;
+
+  const isNotCalledUseState = exp.callee.name !== REACT_USE_STATE;
+  const isNoInitialStateValue = initialStateValue === undefined;
+
+  if (isNotCalledUseState) return ASSERT_FALSE;
+  if (isNoInitialStateValue) return ASSERT_FALSE;
+
+  return { initialStateValue };
+}
+
+export const isCorrectReactStateSetterName = (name: string): boolean => name.startsWith(REACT_STATE_SETTER_PREFIX);
+
+/** is `[counter, setCounter]` */
+const isReactStateDeclarationArray = (id: t.LVal): DatafullAssert<{
+  stateValue: t.Identifier,
+  stateSetter: t.Identifier,
+}> => {
+  if (!t.isArrayPattern(id)) return ASSERT_FALSE;
+
+  const [stateValue, stateSetter] = id.elements;
+
+  if (!t.isIdentifier(stateValue)) return ASSERT_FALSE;
+  if (!t.isIdentifier(stateSetter)) return ASSERT_FALSE;
+  if (!isCorrectReactStateSetterName(stateSetter.name)) return ASSERT_FALSE;
+
+  return { stateValue, stateSetter };
+}
+
+/** is `[counter, setCounter] = useState(0)` */
+export const isReactStateDeclarator = (declarator: t.VariableDeclarator): DatafullAssert<{
+  initialStateValue: t.Expression | t.SpreadElement,
+  stateValue: t.Identifier,
+  stateSetter: t.Identifier,
+}> => {
+  const arrayDeclarationInfo = isReactStateDeclarationArray(declarator.id);
+  const useStateInfo = isUseStateFunc(declarator.init);
+
+  if (!useStateInfo) return ASSERT_FALSE;
+  if (!arrayDeclarationInfo) return ASSERT_FALSE;
+
+  const { initialStateValue } = useStateInfo;
+  const { stateSetter, stateValue } = arrayDeclarationInfo;
+
+  return {
+    initialStateValue,
+    stateValue,
+    stateSetter,
+  };
 }
 
 type ReactDependencies = t.Identifier[] | null;
