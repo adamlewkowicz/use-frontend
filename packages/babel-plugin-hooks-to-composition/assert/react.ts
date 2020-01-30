@@ -1,8 +1,8 @@
 import * as t from 'babel-types';
-import { DatafullAssert } from './types';
-import { isCorrectStateSetterName, isUseEffectFunc } from './helpers';
-import { ASSERT_FALSE, REACT_USE_LAYOUT_EFFECT } from './consts';
-import { stateDeclarationsMap, StateDeclarationInfo } from './visitors/use-state';
+import { DatafullAssert } from '../types';
+import { isCorrectStateSetterName, isUseEffectFunc } from '../helpers';
+import { ASSERT_FALSE, REACT_USE_LAYOUT_EFFECT } from '../consts';
+import { stateDeclarationsMap, StateDeclarationInfo } from '../visitors/use-state';
 
 type ReactDependencies = t.Identifier[] | null;
 
