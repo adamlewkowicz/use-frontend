@@ -3,8 +3,7 @@ import { DatafullAssert } from '../types';
 import { isCorrectStateSetterName, isUseEffectFunc } from '../helpers';
 import { ASSERT_FALSE, REACT_USE_LAYOUT_EFFECT } from '../consts';
 import { stateDeclarationsMap, StateDeclarationInfo } from '../visitors/use-state';
-
-type ReactDependencies = t.Identifier[] | null;
+import { isArrayOfIdentifiers } from './generic';
 
 /** is `useLayoutEffect(callback, dependencies)` */
 export const isReactUseLayoutEffect = (node: t.CallExpression): DatafullAssert<{
@@ -62,28 +61,6 @@ export const isReactSetStateCall = (node: t.CallExpression): DatafullAssert<{
     stateValueName: stateValueName as string,
     setStateArg,
     stateDeclarationInfo,
-  };
-}
-
-const isExpressionsOfType = <T extends t.Expression>(
-  expressions: (t.Expression | null | t.SpreadElement)[],
-  expressionType: T['type']
-): expressions is T[] => expressions.every(exp => exp !== null && exp.type === expressionType);
-
-const isExpressionsOfIdentifier = (
-  expressions: (t.Expression | null | t.SpreadElement)[]
-): expressions is t.Identifier[] => isExpressionsOfType(expressions, 'Identifier');
-
-/** is `[a, b]` - array of identifiers */
-const isArrayOfIdentifiers = (node: t.Expression | t.SpreadElement): DatafullAssert<{
-  elements: t.Identifier[]
-}> => {
-  if (!t.isArrayExpression(node)) return ASSERT_FALSE;
-  if (!isExpressionsOfIdentifier(node.elements)) return ASSERT_FALSE;
-
-  return {
-    result: true,
-    elements: node.elements,
   };
 }
 
@@ -159,3 +136,5 @@ export const isReactUseEffectCallExp = (node: t.CallExpression): DatafullAssert<
     }
   }
 }
+
+type ReactDependencies = t.Identifier[] | null;
