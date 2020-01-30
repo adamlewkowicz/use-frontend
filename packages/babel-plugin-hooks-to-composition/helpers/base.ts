@@ -1,19 +1,19 @@
 import * as t from 'babel-types';
-import { Primitive, PrimitiveObject } from '../types';
+import { Primitive, PrimitiveObject, Literal, AnyFunctionExpression } from '../types';
 import { InitialState } from './types';
 
-const createLiteral = <T extends Primitive>(literal: T): BabelLiteral => {
+const createLiteral = <T extends Primitive>(literal: T): Literal<T> => {
   if (literal === null) {
-    return t.nullLiteral();
+    return t.nullLiteral() as Literal<T>;
   }
 
   switch (typeof literal) {
     case 'number':
-      return t.numericLiteral(literal);
+      return t.numericLiteral(literal) as Literal<T>;
     case 'string':
-      return t.stringLiteral(literal);
+      return t.stringLiteral(literal) as Literal<T>;
     case 'boolean':
-      return t.booleanLiteral(literal);
+      return t.booleanLiteral(literal) as Literal<T>;
     default:
       throw new Error(`Unhandled literal type ${literal}`);
   }
@@ -138,11 +138,3 @@ export const createAssignment = (
     expression
   );
 }
-
-type AnyFunctionExpression = t.FunctionExpression | t.ArrowFunctionExpression;
-
-type BabelLiteral =
-  | t.BooleanLiteral 
-  | t.NullLiteral 
-  | t.StringLiteral 
-  | t.NumericLiteral
