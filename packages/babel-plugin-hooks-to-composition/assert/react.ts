@@ -1,5 +1,5 @@
 import * as t from 'babel-types';
-import { DatafullAssert } from '../types';
+import { DatafullAssert, ExpOrSpread } from '../types';
 import {
   ASSERT_FALSE,
   REACT_USE_LAYOUT_EFFECT,
@@ -13,6 +13,7 @@ import {
 } from '../consts';
 import { stateDeclarationsMap, StateDeclarationInfo } from '../visitors/use-state';
 import { isArrayOfIdentifiers, isCallExpWithName } from './generic';
+import { removeReturnStatementFromFunction } from '../helpers';
 
 /** useRef(...) */
 export const isReactUseRefCallExp = isCallExpWithName(REACT_USE_REF);
@@ -83,31 +84,34 @@ export const isReactSetStateCall = (node: t.CallExpression): DatafullAssert<{
   };
 }
 
-const isReactUseEffectCallback = (callback: t.Expression | t.SpreadElement): DatafullAssert<{
+const isReactUseEffectCallback = (node: ExpOrSpread): DatafullAssert<{
   cleanupCallback: null | t.ArrowFunctionExpression
-  callback: t.ArrowFunctionExpression
+  callbackWithoutCleanup: t.ArrowFunctionExpression
+  originalCallback: t.ArrowFunctionExpression
 }> => {
-  if (!t.isArrowFunctionExpression(callback)) return ASSERT_FALSE;
-  if (!t.isBlock(callback.body)) return ASSERT_FALSE;
+  if (!t.isArrowFunctionExpression(node)) return ASSERT_FALSE;
 
-  const returnStatement = callback.body.body.find(
-    (element): element is t.ReturnStatement => t.isReturnStatement(element)
-  );
+  const {
+    updatedFunction: callbackWithoutCleanup,
+    removedStatement
+  } = removeReturnStatementFromFunction(node);
 
-  if (returnStatement) {
-    if (t.isArrowFunctionExpression(returnStatement.argument)) {
-      const cleanupCallback = returnStatement.argument;
+  const originalCallback = node;
 
-      return {
-        cleanupCallback,
-        callback,
-      }
+  if (removedStatement && t.isArrowFunctionExpression(removedStatement?.argument)) {
+    const cleanupCallback = removedStatement.argument;
+
+    return {
+      cleanupCallback,
+      callbackWithoutCleanup,
+      originalCallback
     }
   }
 
   return {
     cleanupCallback: null,
-    callback,
+    callbackWithoutCleanup,
+    originalCallback
   }
 }
 
@@ -116,6 +120,7 @@ export const isReactUseEffectCallExp = (node: t.CallExpression): DatafullAssert<
   dependencies: ReactDependencies
   cleanupCallback: t.ArrowFunctionExpression | null
   originalCallback: t.ArrowFunctionExpression
+  callbackWithoutCleanup: t.ArrowFunctionExpression
 }> => {
   const assertName = isCallExpWithName(REACT_USE_EFFECT);
 
@@ -127,11 +132,6 @@ export const isReactUseEffectCallExp = (node: t.CallExpression): DatafullAssert<
   
   if (!isReactUseEffectCallbackInfo) return ASSERT_FALSE;
 
-  const {
-    callback: originalCallback,
-    cleanupCallback,
-  } = isReactUseEffectCallbackInfo;
-  
   if (t.isArrayExpression(deps)) {
     const isArrayOfIdentifiersInfo = isArrayOfIdentifiers(deps);
 
@@ -141,15 +141,13 @@ export const isReactUseEffectCallExp = (node: t.CallExpression): DatafullAssert<
 
     return {
       dependencies,
-      originalCallback,
-      cleanupCallback,
+      ...isReactUseEffectCallbackInfo
     }
   } else {
     // no dependencies
     return {
       dependencies: null,
-      originalCallback,
-      cleanupCallback,
+      ...isReactUseEffectCallbackInfo
     }
   }
 }

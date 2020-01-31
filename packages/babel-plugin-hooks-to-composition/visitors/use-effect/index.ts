@@ -3,7 +3,6 @@ import {
   createVueOnMountedCallExp,
   createVueOnUnmounted,
   createVueWatchCallExp,
-  removeReturnStatementFromFunction,
 } from '../../helpers';
 import { Visitor } from 'babel-traverse';
 import { isReactUseEffectCallExp } from '../../assert';
@@ -14,10 +13,14 @@ const replaceUseEffectWithWatch = (): Visitor => ({
 
     if (!isReactUseEffectCallExpInfo) return;
 
-    const { dependencies, originalCallback, cleanupCallback } = isReactUseEffectCallExpInfo;
+    const {
+      dependencies,
+      originalCallback,
+      cleanupCallback,
+      callbackWithoutCleanup,
+    } = isReactUseEffectCallExpInfo;
 
     if (dependencies === null) {
-      // TODO:
       // no dependencies, replace with onUpdated
       const vueOnUpdated = createVueOnUpdatedCallExp(originalCallback);
       return path.replaceWith(vueOnUpdated);
@@ -36,10 +39,6 @@ const replaceUseEffectWithWatch = (): Visitor => ({
 
       // cleanup callback, add additional onUnmounted cleanup lifecycle
       if (cleanupCallback) {
-        const {
-          updatedFunction: callbackWithoutCleanup
-        } = removeReturnStatementFromFunction(originalCallback);
-
         return path.replaceExpressionWithStatements([
           createVueOnMountedCallExp(callbackWithoutCleanup),
           createVueOnUnmounted(cleanupCallback)
