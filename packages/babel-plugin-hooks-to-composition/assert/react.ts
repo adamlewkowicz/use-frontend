@@ -61,7 +61,7 @@ export const isReactUseLayoutEffect = (node: t.CallExpression): DatafullAssert<{
 /** is `setCounter(5)` */
 export const isReactSetStateCall = (node: t.CallExpression): DatafullAssert<{
   stateValueName: string,
-  setStateArg: t.Expression | t.SpreadElement
+  setStateArg: ExpOrSpread
   stateDeclarationInfo: StateDeclarationInfo
 }> => {
 
@@ -153,7 +153,7 @@ export const isReactUseEffectCallExp = (node: t.CallExpression): DatafullAssert<
 }
 
 const isUseStateFunc = (exp: t.Expression): DatafullAssert<{
-  initialStateValue: t.Expression | t.SpreadElement
+  initialStateValue: ExpOrSpread
 }> => {
   if (!t.isCallExpression(exp)) return ASSERT_FALSE;
   if (!t.isIdentifier(exp.callee)) return ASSERT_FALSE;
@@ -189,9 +189,10 @@ const isReactStateDeclarationArray = (id: t.LVal): DatafullAssert<{
 
 /** is `[counter, setCounter] = useState(0)` */
 export const isReactStateDeclarator = (declarator: t.VariableDeclarator): DatafullAssert<{
-  initialStateValue: t.Expression | t.SpreadElement,
+  initialStateValue: ExpOrSpread,
   stateValue: t.Identifier,
   stateSetter: t.Identifier,
+  initialStateValueType: 'primitive' | 'object'
 }> => {
   const arrayDeclarationInfo = isReactStateDeclarationArray(declarator.id);
   const useStateInfo = isUseStateFunc(declarator.init);
@@ -201,11 +202,13 @@ export const isReactStateDeclarator = (declarator: t.VariableDeclarator): Datafu
 
   const { initialStateValue } = useStateInfo;
   const { stateSetter, stateValue } = arrayDeclarationInfo;
+  const initialStateValueType = t.isLiteral(initialStateValue) ? 'primitive' : 'object';
 
   return {
     initialStateValue,
     stateValue,
     stateSetter,
+    initialStateValueType,
   };
 }
 

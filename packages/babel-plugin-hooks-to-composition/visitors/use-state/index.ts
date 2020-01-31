@@ -31,13 +31,13 @@ const replaceUseStateWithReactiveOrRef = (): Visitor => ({
       stateValue,
       stateSetter,
       initialStateValue,
+      initialStateValueType,
     } = stateDeclarationInfo;
 
     const stateValueName = stateValue.name;
     const stateSetterName = stateSetter.name;
 
-    // state has primitive type
-    if (t.isLiteral(initialStateValue)) {
+    if (initialStateValueType === 'primitive') {
       // replace with React's useRef to make use-ref visitors do the job
       // with replacing .current to .value
       const vueRefDeclarator = createVueRefDeclarator(
@@ -74,7 +74,7 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
     const { setStateArg, stateValueName, stateDeclarationInfo } = isReactSetStateCallInfo;
 
     const isVueRef = stateDeclarationInfo.type === 'vue_ref';
-    const createIdentifierOrMember = isVueRef ? createVueRefMemberExp : t.identifier;
+    const createIdentifierOrMemberHandler = isVueRef ? createVueRefMemberExp : t.identifier;
 
     const createAssignmentHandler = isVueRef
       ? createVueRefValueAssignment
@@ -105,7 +105,7 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
         if (t.isIdentifier(body)) {
           const stateValueAssignment = createAssignmentHandler(
             stateValueName as string,
-            createIdentifierOrMember(stateValueName)
+            createIdentifierOrMemberHandler(stateValueName)
           );
           return path.replaceWith(stateValueAssignment);
         }
@@ -116,7 +116,7 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
         // changed name of variable to delcared by state
         const updatedBinaryExpression = t.binaryExpression(
           body.operator,
-          createIdentifierOrMember(stateValueName),
+          createIdentifierOrMemberHandler(stateValueName),
           body.right
         );
 
