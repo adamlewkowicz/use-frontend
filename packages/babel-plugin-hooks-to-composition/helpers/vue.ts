@@ -18,6 +18,7 @@ import {
   VUE_ON_UNMOUNTED,
   VUE_PREV,
   VUE_COMPUTED,
+  OPERATOR,
 } from '../consts';
 import { AnyFunctionExpression, ExpOrSpread } from '../types';
 
@@ -73,7 +74,7 @@ export const createVueRefValueAssignment = (
   variableName: string,
   expression: t.Expression
 ): t.AssignmentExpression => t.assignmentExpression(
-  '=',
+  OPERATOR.equal,
   createVueRefMemberExp(variableName),
   expression
 );

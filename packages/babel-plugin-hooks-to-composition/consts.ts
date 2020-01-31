@@ -27,3 +27,7 @@ export const VUE_PREV = 'prev' as const;
 
 // common
 export const ASSERT_FALSE: DatafullAssertFalsy = false;
+
+export enum OPERATOR {
+  equal = '='
+}
