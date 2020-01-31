@@ -1,12 +1,8 @@
 import React, { Suspense } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { split } from 'react-ace';
-import 'ace-builds/src-noconflict/mode-javascript';
-import 'ace-builds/src-noconflict/theme-textmate';
 import css from './components/App.module.css';
 import vueLogo from './assets/images/vue-logo.svg';
-import { SplitEditor as CustomSplitEditor } from './components/SplitEditor';
 import { useModal } from './hooks/use-modal';
 import { useReactToVue } from './hooks/use-react-to-vue';
 import { hookExamples } from './examples';
@@ -17,8 +13,6 @@ const DiffEditor = reactLazyNamed(
   () => import('@monaco-editor/react'),
   'DiffEditor'
 );
-
-const SplitEditor = split as any;
 
 const ReactLogo = <img src={logo} alt="React.js logo" className={css.react_logo} />;
 const VueLogo = <img src={vueLogo} alt="Vue.js logo" className={css.vue_logo} />;
@@ -35,6 +29,7 @@ export function App() {
 
   return (
     <div className="App">
+      <h1>Use-frontend</h1>
       <p>Transform React.js Hooks to Vue.js Composition Api</p>
       {hookExamples.map(example => (
         <button
@@ -44,43 +39,42 @@ export function App() {
           {example.name}
         </button>
       ))}
-      <MonacoSplitEditor
-        editors={[
-          {
-            value: reactCode,
-            onChange: setReactCode,
-            error: reactError,
-            header: ReactLogo
-          },
-          {
-            value: vueCode,
-            options: { readOnly: true } as any,
-            header: VueLogo,
-          }
-        ]}
-      />
-      <CustomSplitEditor {...reactToVueContext} />
-      <SplitEditor
-        mode="javascript"
-        splits={2}
-        theme="textmate"
-        fontSize={14}
-        value={[reactCode, vueCode]}
-        onChange={([reactCode]: [string, string]) => {
-          setReactCode(reactCode);
-        }}
-        style={{ width: '80vw', height: '80vh', margin: '0 auto' }}
-        enableBasicAutocompletion
-      />
-      {reactError && (
-        <>
-          <h2>Error</h2>
-          <p>{reactError.message}</p>
-        </>
-      )}
-      <button onClick={modalContext.open}>
-        Show differences
-      </button>
+      <div className={css.content}>
+        <MonacoSplitEditor
+          editors={[
+            {
+              value: reactCode,
+              onChange: setReactCode,
+              error: reactError,
+              header: (
+                <>
+                  {ReactLogo}
+                  <p className={css.desc}>React.js Hooks</p>
+                </>
+              )
+            },
+            {
+              value: vueCode,
+              options: { readOnly: true } as any,
+              header: (
+                <>
+                  {VueLogo}
+                  <p className={css.desc}>Vue.js Composition Api</p>
+                </>
+              )
+            }
+          ]}
+        />
+        {reactError && (
+          <>
+            <h2>Error</h2>
+            <p>{reactError.message}</p>
+          </>
+        )}
+        <button onClick={modalContext.open}>
+          Show differences
+        </button>
+      </div>
       <Suspense fallback="Loading">
         <Modal>
           <DiffEditor

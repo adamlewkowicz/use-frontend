@@ -76,8 +76,8 @@ export const MonacoEditor = (props: MonacoEditorProps) => {
       <NativeMonacoEditor
         language="javascript"
         value={props.value}
-        height="500px"
-        width="500px"
+        height="600px"
+        width="40vw"
         onChange={handleOnChange}
         editorDidMount={handleEditorDidMount}
         options={props.options as any}

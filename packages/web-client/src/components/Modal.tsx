@@ -57,6 +57,16 @@ const Container = styled.div`
   z-index: 10;
   background: rgba(1,1,1,.4);
   padding: 50px 0;
+  animation: fade-in .35s ease;
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
 `
 
 const Content = styled.div`
@@ -64,6 +74,16 @@ const Content = styled.div`
   height: 90%;
   margin: 0 auto;
   overflow-y: auto;
+  animation: slide-in .35s ease;
+
+  @keyframes slide-in {
+    0% {
+      transform: translateY(-50px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
 `
 
 export default Modal;
