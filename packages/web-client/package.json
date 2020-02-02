@@ -5,15 +5,9 @@
   "dependencies": {
     "@material-ui/core": "^4.9.0",
     "@monaco-editor/react": "^3.0.1",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "ace-builds": "^1.4.7",
     "babel-plugin-hooks-to-composition": "^1.0.0",
     "prettier": "^1.19.1",
     "react": "^16.12.0",
-    "react-ace": "^8.0.0",
-    "react-diff-viewer": "^3.0.1",
     "react-dom": "^16.12.0",
     "react-scripts": "3.3.0",
     "styled-components": "^4.4.1"
@@ -41,8 +35,10 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.4.0",
+    "@testing-library/user-event": "^7.2.1",
     "@types/prettier": "^1.19.0",
-    "@types/styled-components": "^4.4.2",
-    "monaco-editor": "^0.19.3"
+    "@types/styled-components": "^4.4.2"
   }
 }
