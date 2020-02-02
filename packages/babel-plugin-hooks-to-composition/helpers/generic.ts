@@ -156,14 +156,14 @@ export const createAssignment = (
 }
 
 /** const variableName = expression; */
-const createVariableDeclarator = <T extends ExpFactory<Parameters<T>>>(
-  expFactory: T
+const createVariableDeclarator = <T extends ExpressionFactory>(
+  expressionFactory: T
 ) => (
   variableName: string,
   ...params: Parameters<T>
 ): t.VariableDeclarator => t.variableDeclarator(
   t.identifier(variableName),
-  expFactory(...params)
+  expressionFactory(...params)
 );
 
-type ExpFactory<T> = (...args: T[]) => t.Expression;
+type ExpressionFactory<T = any> = (...args: T[]) => t.Expression;
