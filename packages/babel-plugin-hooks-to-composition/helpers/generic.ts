@@ -1,12 +1,12 @@
-import * as t from 'babel-types';
 import {
+  t,
   Primitive,
   PrimitiveObject,
   Literal,
   AnyFunctionExpression,
   ExpOrSpread,
+  ExpressionFactory,
 } from '../types';
-import { InitialState } from './types';
 
 const createLiteral = <T extends Primitive>(literal: T): Literal<T> => {
   if (literal === null) {
@@ -72,7 +72,7 @@ export const createGenericCallExp = <T extends ExpOrSpread | ExpOrSpread[] = Exp
 export const createInitialStateCallExp = (
   functionName: string
 ) => (
-  initialState: InitialState
+  initialState: ExpOrSpread
 ): t.CallExpression => createCallExp(functionName, [initialState]);
 
 export const createCallbackCallExp = (
@@ -156,7 +156,7 @@ export const createAssignment = (
 }
 
 /** const variableName = expression; */
-const createVariableDeclarator = <T extends ExpressionFactory>(
+const _createVariableDeclarator = <T extends ExpressionFactory>(
   expressionFactory: T
 ) => (
   variableName: string,
@@ -166,4 +166,19 @@ const createVariableDeclarator = <T extends ExpressionFactory>(
   expressionFactory(...params)
 );
 
-type ExpressionFactory<T = any> = (...args: T[]) => t.Expression;
+/** const variableName = expression; */
+export const createVariableDeclarator = (
+  variableName: string,
+  expression: t.Expression
+): t.VariableDeclarator => t.variableDeclarator(
+  t.identifier(variableName),
+  expression
+);
+
+export const createMemberExp = (
+  variableName: string,
+  propertyName: string
+): t.MemberExpression => t.memberExpression(
+  t.identifier(variableName),
+  t.identifier(propertyName)
+);

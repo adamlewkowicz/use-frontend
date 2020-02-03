@@ -1,10 +1,11 @@
 import * as t from 'babel-types';
-import { InitialState } from './types';
 import {
   createObjectExpression,
   createCallExp,
   updateArrowFunctionBody,
   createGenericCallExp,
+  createVariableDeclarator,
+  createMemberExp,
 } from './generic';
 import {
   VUE_ON_CLEANUP,
@@ -62,9 +63,9 @@ const createVueWatchCallbackWithCleanup = (
 /** variableName.{value} */
 export const createVueRefMemberExp = (
   variableName: string
-): t.MemberExpression => t.memberExpression(
-  t.identifier(variableName),
-  t.identifier(VUE_REF_PROPERTY)
+): t.MemberExpression => createMemberExp(
+  variableName,
+  VUE_REF_PROPERTY
 );
 
 /** variableName.value = expression;
@@ -82,19 +83,19 @@ export const createVueRefValueAssignment = (
 /** const stateName = reactive(initialState); */
 export const createVueReactiveDeclarator = (
   stateName: string,
-  initialState: InitialState,
-): t.VariableDeclarator => t.variableDeclarator(
-  t.identifier(stateName),
+  initialState: ExpOrSpread,
+): t.VariableDeclarator => createVariableDeclarator(
+  stateName,
   createVueReactiveCallExp(initialState)
 );
 
 /** const stateName = ref(initialState); */
 export const createVueRefDeclarator = (
   stateName: string,
-  initialValue: InitialState
-): t.VariableDeclarator => t.variableDeclarator(
-  t.identifier(stateName),
-  createVueRefCallExp(initialValue)
+  initialState: ExpOrSpread
+): t.VariableDeclarator => createVariableDeclarator(
+  stateName,
+  createVueRefCallExp(initialState)
 );
 
 export const createVueWatchCallExp = ({

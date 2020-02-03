@@ -1,10 +1,11 @@
 import * as t from 'babel-types';
 import { Visitor } from 'babel-traverse';
 import { NodePath } from '@babel/core';
-
 interface Babel {
   types: typeof t;
 }
+
+export { t };
 
 export type Primitive = number | string | boolean | null;
 
@@ -36,3 +37,5 @@ export type Literal<T extends Primitive> =
 export type AnyFunctionExpression = t.FunctionExpression | t.ArrowFunctionExpression;
 
 export type ExpOrSpread = t.Expression | t.SpreadElement;
+
+export type ExpressionFactory<T = any> = (...args: T[]) => t.Expression;
