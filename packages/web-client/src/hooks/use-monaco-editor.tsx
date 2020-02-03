@@ -1,11 +1,11 @@
 import { NormalizedError } from '../utils';
 import React, { useRef, useEffect, useState } from 'react';
-import * as EditorApi from 'monaco-editor/esm/vs/editor/editor.api';
 import {
   ControlledEditor as NativeMonacoEditor,
   EditorDidMount,
   ControlledEditorOnChange,
   monaco,
+  Monaco,
 } from '@monaco-editor/react';
 
 const MARKER_NAME = 'custom_marker';
@@ -85,5 +85,4 @@ export const useMonacoEditor = (options: UseMonacoEditorOptions = {}) => {
   }
 }
 
-type Monaco = typeof EditorApi;
 type MonacoEditor = Monaco['editor'];

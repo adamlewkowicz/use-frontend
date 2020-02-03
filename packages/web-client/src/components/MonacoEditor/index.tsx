@@ -3,10 +3,10 @@ import {
   ControlledEditor as NativeMonacoEditor,
   EditorDidMount,
   ControlledEditorOnChange,
+  monaco,
+  Monaco
 } from '@monaco-editor/react';
 import { NormalizedError } from '../../utils';
-import { monaco } from '@monaco-editor/react';
-import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
 import css from './index.module.css';
 
 const MARKER_NAME = 'custom_marker';
@@ -86,5 +86,4 @@ export const MonacoEditor = (props: MonacoEditorProps) => {
   );
 }
 
-type Monaco = typeof monacoEditor;
 type MonacoEditor = Monaco['editor'];
