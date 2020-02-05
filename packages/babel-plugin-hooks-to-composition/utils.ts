@@ -2,6 +2,8 @@ import * as babel from '@babel/core';
 import { VisitorHandler } from './types';
 import { Visitor } from 'babel-traverse';
 
+let refSet = new Set<string>();
+
 export const mountPluginTester = (
   ...plugins: babel.PluginItem[]
 ) => (code: string): string => {
@@ -86,6 +88,12 @@ export const combineVisitors = (
 
   return rootVisitor;
 }
+
+export const trackReactUseRefDeclaration = (variableName: string): void => {
+  if (!refSet.has(variableName)) {
+    refSet.add(variableName);
+  }
+} 
 
 type VisitorMap = {
   [K in keyof Visitor]: VisitorHandler[]

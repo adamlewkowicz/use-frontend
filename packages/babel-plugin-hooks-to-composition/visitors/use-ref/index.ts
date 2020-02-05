@@ -8,14 +8,7 @@ import {
   isReactUseRefVariableDeclarator,
 } from '../../assert';
 import { Visitor } from 'babel-traverse';
-
-export let refSet = new Set();
-
-const trackReactUseRefDeclaration = (variableName: string): void => {
-  if (!refSet.has(variableName)) {
-    refSet.add(variableName);
-  }
-} 
+import { trackReactUseRefDeclaration } from '../../utils';
 
 /** useRef() -> ref() */
 const replaceUseRefWithRef = (): Visitor => ({
