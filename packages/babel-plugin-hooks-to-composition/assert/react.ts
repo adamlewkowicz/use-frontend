@@ -36,38 +36,26 @@ const isReactUseCallbackCallExpName = isCallExpWithName(REACT_USE_CALLBACK);
 /** useEffect(...) */
 const isReactUseEffectCallExpName = isCallExpWithName(REACT_USE_EFFECT);
 
+/** useLayoutEffect(...) */
+const isReactUseLayoutEffectCallExpName = isCallExpWithName(REACT_USE_LAYOUT_EFFECT);
+
 /** useContext(...) */
 export const isReactUseContextCallExpName = isCallExpWithName(REACT_USE_CONTEXT);
 
 /** is `useLayoutEffect(callback, dependencies)` */
-export const isReactUseLayoutEffect = (node: t.CallExpression): DatafullAssert<{
-  // dependencies: ReactDependencies
+export const isReactUseLayoutEffectCallExp = (node: t.CallExpression): DatafullAssert<{
+  callback: AnyFunctionExpression
+  dependencies: ReactDependencies
 }> => {
-  if (!t.isIdentifier(node.callee)) return ASSERT_FALSE;
-  if (node.callee.name !== REACT_USE_LAYOUT_EFFECT) return ASSERT_FALSE;
+  const isUseLayoutEffectNameInfo = isReactUseLayoutEffectCallExpName(node);
+  const isDependencyCallbackInfo = isReactDependencyCallbackCallExp(node);
+  
+  if (!isUseLayoutEffectNameInfo) return ASSERT_FALSE;
+  if (!isDependencyCallbackInfo) return ASSERT_FALSE;
 
-  const [callback, deps] = node.arguments;
-
-  if (!t.isArrowFunctionExpression(callback)) return ASSERT_FALSE;
-
-  const isArrayOfIdentifiersInfo = isArrayOfIdentifiers(deps);
-
-  if (!isArrayOfIdentifiersInfo) return ASSERT_FALSE;
-
-  const { elements: dependencies } = isArrayOfIdentifiersInfo;
-
-
-  if (t.isArrayExpression(dependencies)) {
-    // TODO: handle dependencies
-
-  } else { // no dependencies
-
-    return {
-      // dependencies: null,
-    }
-  }
-
-  return ASSERT_FALSE;
+  return {
+    ...isDependencyCallbackInfo,
+  };
 }
 
 /** is `setCounter(5)` */
@@ -294,10 +282,9 @@ const isReactDependencyCallbackCallExp = (node: t.CallExpression): DatafullAsser
 export const isReactUseCallbackCallExp = (node: t.CallExpression): DatafullAssert<{
   wrappedCallback: AnyFunctionExpression
 }> => {
-  const isReactUseCallbackCallExpNameInfo = isReactUseCallbackCallExpName(node);
   const isReactDependencyCallbackCallExpInfo = isReactDependencyCallbackCallExp(node);
 
-  if (!isReactUseCallbackCallExpNameInfo) return ASSERT_FALSE;
+  if (!isReactUseCallbackCallExpName(node)) return ASSERT_FALSE;
   if (!isReactDependencyCallbackCallExpInfo) return ASSERT_FALSE;
 
   const { callback } = isReactDependencyCallbackCallExpInfo;

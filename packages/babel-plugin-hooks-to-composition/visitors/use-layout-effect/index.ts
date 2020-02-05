@@ -1,13 +1,17 @@
 import { Visitor } from 'babel-traverse';
-import { isReactUseLayoutEffect } from '../../assert';
+import { isReactUseLayoutEffectCallExp } from '../../assert';
+import { createVueOnUnmountedCallExp } from '../../helpers';
 
 const replaceUseLayoutEffectWithOnBeforeMount = (): Visitor => ({
   CallExpression(path) {
-    const isReactUseLayoutEffectInfo = isReactUseLayoutEffect(path.node);
-
+    const isReactUseLayoutEffectInfo = isReactUseLayoutEffectCallExp(path.node);
     if (!isReactUseLayoutEffectInfo) return;
 
-    const {  } = isReactUseLayoutEffectInfo; 
+    const { callback } = isReactUseLayoutEffectInfo;
+    
+    const vueOnUnmountedCallExp = createVueOnUnmountedCallExp(callback);
+    
+    path.replaceWith(vueOnUnmountedCallExp);
   }
 });
 
