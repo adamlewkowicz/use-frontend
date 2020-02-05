@@ -27,14 +27,17 @@ import { removeReturnStatementFromFunction } from '../helpers';
 /** useRef(...) */
 const isReactUseRefCallExpName = isCallExpWithName(REACT_USE_REF);
 
-/** useContext(...) */
-export const isReactUseContextCallExpName = isCallExpWithName(REACT_USE_CONTEXT);
-
 /** useMemo(...) */
 const isReactUseMemoCallExpName = isCallExpWithName(REACT_USE_MEMO);
 
 /** useCallback(...) */
 const isReactUseCallbackCallExpName = isCallExpWithName(REACT_USE_CALLBACK);
+
+/** useEffect(...) */
+const isReactUseEffectCallExpName = isCallExpWithName(REACT_USE_EFFECT);
+
+/** useContext(...) */
+export const isReactUseContextCallExpName = isCallExpWithName(REACT_USE_CONTEXT);
 
 /** is `useLayoutEffect(callback, dependencies)` */
 export const isReactUseLayoutEffect = (node: t.CallExpression): DatafullAssert<{
@@ -131,9 +134,7 @@ export const isReactUseEffectCallExp = (node: t.CallExpression): DatafullAssert<
   originalCallback: t.ArrowFunctionExpression
   callbackWithoutCleanup: t.ArrowFunctionExpression
 }> => {
-  const assertName = isCallExpWithName(REACT_USE_EFFECT);
-
-  if (!assertName(node)) return ASSERT_FALSE;
+  if (!isReactUseEffectCallExpName(node)) return ASSERT_FALSE;
 
   const [callbackExp, dependenciesExp] = node.arguments;
 
@@ -149,15 +150,16 @@ export const isReactUseEffectCallExp = (node: t.CallExpression): DatafullAssert<
   };
 }
 
-const isUseStateFunc = (exp: t.Expression): DatafullAssert<{
+/** is `useState(initialStateValue)` */
+const isReactUseStateCallExp = (node: t.Expression): DatafullAssert<{
   initialStateValue: ExpOrSpread
 }> => {
-  if (!t.isCallExpression(exp)) return ASSERT_FALSE;
-  if (!t.isIdentifier(exp.callee)) return ASSERT_FALSE;
+  if (!t.isCallExpression(node)) return ASSERT_FALSE;
+  if (!t.isIdentifier(node.callee)) return ASSERT_FALSE;
 
-  const [initialStateValue] = exp.arguments;
+  const [initialStateValue] = node.arguments;
 
-  const isNotCalledUseState = exp.callee.name !== REACT_USE_STATE;
+  const isNotCalledUseState = node.callee.name !== REACT_USE_STATE;
   const isNoInitialStateValue = initialStateValue === undefined;
 
   if (isNotCalledUseState) return ASSERT_FALSE;
@@ -192,7 +194,7 @@ export const isReactStateDeclarator = (declarator: t.VariableDeclarator): Datafu
   initialStateValueType: 'primitive' | 'object'
 }> => {
   const arrayDeclarationInfo = isReactStateDeclarationArray(declarator.id);
-  const useStateInfo = isUseStateFunc(declarator.init);
+  const useStateInfo = isReactUseStateCallExp(declarator.init);
 
   if (!useStateInfo) return ASSERT_FALSE;
   if (!arrayDeclarationInfo) return ASSERT_FALSE;
