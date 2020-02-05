@@ -7,16 +7,16 @@ import {
 } from '../types';
 
 const isExpressionsOfType = <T extends t.Expression>(
-  expressions: (t.Expression | null | t.SpreadElement)[],
+  expressions: (ExpOrSpread | null)[],
   expressionType: T['type']
 ): expressions is T[] => expressions.every(exp => exp !== null && exp.type === expressionType);
 
 const isExpressionsOfIdentifier = (
-  expressions: (t.Expression | null | t.SpreadElement)[]
+  expressions: (ExpOrSpread | null)[]
 ): expressions is t.Identifier[] => isExpressionsOfType(expressions, 'Identifier');
 
 /** is `[a, b]` - array of identifiers */
-export const isArrayOfIdentifiers = (node: t.Expression | t.SpreadElement): DatafullAssert<{
+export const isArrayOfIdentifiers = (node: ExpOrSpread): DatafullAssert<{
   elements: t.Identifier[]
 }> => {
   if (!t.isArrayExpression(node)) return ASSERT_FALSE;

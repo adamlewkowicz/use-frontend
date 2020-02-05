@@ -97,7 +97,7 @@ export const updateArrowFunctionBody = <T extends AnyFunctionExpression>(
 
 const updateBodyOfBlockStatement = (
   blockStatement: t.BlockStatement,
-  callback: (statements: t.BlockStatement['body']) => t.BlockStatement['body']
+  callback: (statements: t.Statement[]) => t.Statement[]
 ): t.BlockStatement => {
   return t.blockStatement(
     callback(blockStatement.body),
