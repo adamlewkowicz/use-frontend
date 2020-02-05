@@ -29,7 +29,7 @@ export const createVueOnUpdatedCallExp = createGenericCallExp(VUE_ON_UPDATED);
 
 export const createVueInjectCallExp = createGenericCallExp<ExpOrSpread[]>(VUE_INJECT);
 
-export const createVueOnUnmounted = createGenericCallExp<AnyFunctionExpression>(VUE_ON_UNMOUNTED);
+export const createVueOnUnmountedCallExp = createGenericCallExp<AnyFunctionExpression>(VUE_ON_UNMOUNTED);
 
 export const createVueRefCallExp = createGenericCallExp(VUE_REF);
 

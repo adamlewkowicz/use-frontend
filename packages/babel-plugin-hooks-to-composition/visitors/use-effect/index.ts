@@ -1,7 +1,7 @@
 import {
   createVueOnUpdatedCallExp,
   createVueOnMountedCallExp,
-  createVueOnUnmounted,
+  createVueOnUnmountedCallExp,
   createVueWatchCallExp,
 } from '../../helpers';
 import { Visitor } from 'babel-traverse';
@@ -41,7 +41,7 @@ const replaceUseEffectWithWatch = (): Visitor => ({
       if (cleanupCallback) {
         return path.replaceExpressionWithStatements([
           createVueOnMountedCallExp(callbackWithoutCleanup),
-          createVueOnUnmounted(cleanupCallback)
+          createVueOnUnmountedCallExp(cleanupCallback)
         ]);
       }
 
