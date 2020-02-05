@@ -11,6 +11,12 @@ import { Visitor } from 'babel-traverse';
 
 export let refSet = new Set();
 
+const trackReactUseRefDeclaration = (variableName: string): void => {
+  if (!refSet.has(variableName)) {
+    refSet.add(variableName);
+  }
+} 
+
 /** useRef() -> ref() */
 const replaceUseRefWithRef = (): Visitor => ({
   VariableDeclarator(path) {
@@ -20,10 +26,7 @@ const replaceUseRefWithRef = (): Visitor => ({
 
     const { variableName, initialValue } = isReactUseRefVariableDeclaratorInfo;
 
-    // track .value declarations
-    if (!refSet.has(variableName)) {
-      refSet.add(variableName);
-    }
+    trackReactUseRefDeclaration(variableName);
 
     const vueRefDeclarator = createVueRefDeclarator(variableName, initialValue);
 
