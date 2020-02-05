@@ -17,7 +17,7 @@ import { isArrayOfIdentifiers, isCallExpWithName } from './generic';
 import { removeReturnStatementFromFunction } from '../helpers';
 
 /** useRef(...) */
-export const isReactUseRefCallExp = isCallExpWithName(REACT_USE_REF);
+const isReactUseRefCallExp = isCallExpWithName(REACT_USE_REF);
 
 /** useContext(...) */
 export const isReactUseContextCallExp = isCallExpWithName(REACT_USE_CONTEXT);
@@ -228,16 +228,20 @@ export const isReactMemberExp = (node: t.MemberExpression): DatafullAssert<{
   return { variableName };
 }
 
-/** is `const variableName = useRef(...);` */
+/** is `const variableName = useRef(initialValue);` */
 export const isReactUseRefVariableDeclarator = (node: t.VariableDeclarator): DatafullAssert<{
   variableName: string
+  initialValue: ExpOrSpread
 }> => {
+  const isReactUseRefCallExpInfo = isReactUseRefCallExp(node.init);
+
   if (!t.isIdentifier(node.id)) return ASSERT_FALSE;
-  if (!isReactUseRefCallExp(node.init)) return ASSERT_FALSE;
+  if (!isReactUseRefCallExpInfo) return ASSERT_FALSE;
 
   const variableName = node.id.name;
+  const [initialValue] = isReactUseRefCallExpInfo.args;
 
-  return { variableName };
+  return { variableName, initialValue };
 }
 
 type ReactDependencies = t.Identifier[] | null;

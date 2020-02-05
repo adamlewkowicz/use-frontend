@@ -1,7 +1,9 @@
 
-import { createVueRefCallExp, createVueRefMemberExp } from '../../helpers';
 import {
-  isReactUseRefCallExp,
+  createVueRefMemberExp,
+  createVueRefDeclarator,
+} from '../../helpers';
+import {
   isReactMemberExp,
   isReactUseRefVariableDeclarator,
 } from '../../assert';
@@ -11,12 +13,21 @@ export let refSet = new Set();
 
 /** useRef() -> ref() */
 const replaceUseRefWithRef = (): Visitor => ({
-  CallExpression(path) {
-    if (!isReactUseRefCallExp(path.node)) return;
+  VariableDeclarator(path) {
+    const isReactUseRefVariableDeclaratorInfo = isReactUseRefVariableDeclarator(path.node);
 
-    const vueRefCallExp = createVueRefCallExp(path.node.arguments[0]);
+    if (!isReactUseRefVariableDeclaratorInfo) return;
 
-    return path.replaceWith(vueRefCallExp);
+    const { variableName, initialValue } = isReactUseRefVariableDeclaratorInfo;
+
+    // track .value declarations
+    if (!refSet.has(variableName)) {
+      refSet.add(variableName);
+    }
+
+    const vueRefDeclarator = createVueRefDeclarator(variableName, initialValue);
+
+    path.replaceWith(vueRefDeclarator);
   }
 });
 
@@ -33,18 +44,6 @@ const replaceDotCurrentWithDotValue = (): Visitor => ({
 
     path.replaceWith(vueRefMemberExp);
   },
-  // tracks ".values" declarations
-  VariableDeclarator(path) {
-    const isReactUseRefVariableDeclaratorInfo = isReactUseRefVariableDeclarator(path.node);
-
-    if (!isReactUseRefVariableDeclaratorInfo) return;
-
-    const { variableName } = isReactUseRefVariableDeclaratorInfo;
-
-    if (!refSet.has(variableName)) {
-      refSet.add(variableName);
-    }
-  }
 });
 
 export const useRefVisitors = [

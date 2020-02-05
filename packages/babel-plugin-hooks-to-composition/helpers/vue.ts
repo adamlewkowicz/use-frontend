@@ -31,7 +31,7 @@ export const createVueInjectCallExp = createGenericCallExp<ExpOrSpread[]>(VUE_IN
 
 export const createVueOnUnmountedCallExp = createGenericCallExp<AnyFunctionExpression>(VUE_ON_UNMOUNTED);
 
-export const createVueRefCallExp = createGenericCallExp(VUE_REF);
+const createVueRefCallExp = createGenericCallExp(VUE_REF);
 
 export const createVueComputedCallExp = createGenericCallExp<AnyFunctionExpression>(VUE_COMPUTED);
 
