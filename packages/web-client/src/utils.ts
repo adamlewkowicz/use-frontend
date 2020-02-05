@@ -1,8 +1,8 @@
+import React from 'react';
 import { hooksToCompositionPlugin } from 'babel-plugin-hooks-to-composition';
 import * as babel from '@babel/core';
 import { format as prettierFormatNative } from 'prettier/standalone';
 import prettierBabylon from 'prettier/parser-babylon';
-import React, { FunctionComponent } from 'react';
 
 export const transformCode = (code: string): string | null => {
   const transformedCode = babel.transform(code, {

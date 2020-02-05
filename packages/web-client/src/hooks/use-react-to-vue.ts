@@ -1,17 +1,17 @@
 import { useBabel } from './use-babel';
 import { hooksToCompositionPlugin } from 'babel-plugin-hooks-to-composition';
 import { useState, useEffect } from 'react';
-import { defaultCode } from '../examples';
+import { defaultExample } from '../common/examples';
 import { prettierFormat } from '../utils';
 
 const STORAGE_KEY = 'react_code' as const;
 
 const getInitialCode = (): string => {
   try {
-    const initialCode = localStorage.getItem(STORAGE_KEY) || defaultCode;
+    const initialCode = localStorage.getItem(STORAGE_KEY) || defaultExample.code;
     return prettierFormat(initialCode);
   } catch {
-    return defaultCode;
+    return defaultExample.code;
   }
 }
 
