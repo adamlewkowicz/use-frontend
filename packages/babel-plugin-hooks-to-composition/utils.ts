@@ -93,7 +93,37 @@ export const trackReactUseRefDeclaration = (variableName: string): void => {
   if (!refSet.has(variableName)) {
     refSet.add(variableName);
   }
-} 
+}
+
+
+export const filterOut = <T>(
+  arr: T[],
+  filterCallback: (value: T, index: number, self: T[]) => boolean
+): {
+  preservedItems: T[]
+  removedItems: T[]
+} => {
+  const [preservedItems, removedItems] = arr.reduce<[T[], T[]]>(
+    ([preservedItems, removedItems], item, index, self) => {
+      
+      const shouldBePreserved = filterCallback(item, index, self);
+
+      if (shouldBePreserved) {
+        return [
+          [...preservedItems, item],
+          removedItems
+        ];
+      } else {
+        return [
+          preservedItems,
+          [...removedItems, item]
+        ];
+      }
+    }, [[], []]
+  );
+
+  return { preservedItems, removedItems };
+}
 
 type VisitorMap = {
   [K in keyof Visitor]: VisitorHandler[]

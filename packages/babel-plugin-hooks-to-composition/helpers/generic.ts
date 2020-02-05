@@ -7,6 +7,7 @@ import {
   ExpOrSpread,
   ExpressionFactory,
 } from '../types';
+import { filterOut } from '../utils';
 
 const createLiteral = <T extends Primitive>(literal: T): Literal<T> => {
   if (literal === null) {
@@ -118,16 +119,15 @@ const removeStatementFromFunction = <
 
   // TODO: refactor to pure function
   const updatedFunction = updateArrowFunctionBody(func, (statements) => {
-    removedStatement = statements.find(
-      (statement): statement is S => statement.type === statementType
+    const { preservedItems, removedItems } = filterOut(
+      statements,
+      statement => statement.type === statementType
     );
 
-    if (removedStatement) {
-      return statements.filter(
-        statement => statement.type !== statementType
-      );
-    }
-    return statements;
+    const [firstStatement] = removedItems as S[];
+    removedStatement = firstStatement;
+
+    return preservedItems;
   });
 
   return {
