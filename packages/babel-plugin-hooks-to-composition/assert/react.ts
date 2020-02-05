@@ -25,10 +25,10 @@ import {
 import { removeReturnStatementFromFunction } from '../helpers';
 
 /** useRef(...) */
-const isReactUseRefCallExp = isCallExpWithName(REACT_USE_REF);
+const isReactUseRefCallExpName = isCallExpWithName(REACT_USE_REF);
 
 /** useContext(...) */
-export const isReactUseContextCallExp = isCallExpWithName(REACT_USE_CONTEXT);
+export const isReactUseContextCallExpName = isCallExpWithName(REACT_USE_CONTEXT);
 
 /** useMemo(...) */
 const isReactUseMemoCallExpName = isCallExpWithName(REACT_USE_MEMO);
@@ -229,13 +229,13 @@ export const isReactUseRefVariableDeclarator = (node: t.VariableDeclarator): Dat
   variableName: string
   initialValue: ExpOrSpread
 }> => {
-  const isReactUseRefCallExpInfo = isReactUseRefCallExp(node.init);
+  const isReactUseRefCallExpNameInfo = isReactUseRefCallExpName(node.init);
 
   if (!t.isIdentifier(node.id)) return ASSERT_FALSE;
-  if (!isReactUseRefCallExpInfo) return ASSERT_FALSE;
+  if (!isReactUseRefCallExpNameInfo) return ASSERT_FALSE;
 
   const variableName = node.id.name;
-  const [initialValue] = isReactUseRefCallExpInfo.args;
+  const [initialValue] = isReactUseRefCallExpNameInfo.args;
 
   return { variableName, initialValue };
 }
