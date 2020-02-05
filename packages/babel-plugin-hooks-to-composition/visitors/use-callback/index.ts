@@ -1,24 +1,16 @@
-import * as t from 'babel-types';
 import { Visitor } from 'babel-traverse';
 import { isReactUseCallbackCallExp } from '../../assert';
 import { createVueComputedCallExp } from '../../helpers';
 
 const replaceUseCallbackWithComputed = (): Visitor => ({
   CallExpression(path) {
-    const { node } = path;
+    const isReactUseCallbackCallExpInfo = isReactUseCallbackCallExp(path.node);
 
-    if (!isReactUseCallbackCallExp(node)) return;
+    if (!isReactUseCallbackCallExpInfo) return;
 
-    const [callbackToMemoize] = node.arguments;
+    const { wrappedCallback } = isReactUseCallbackCallExpInfo;
 
-    if (!t.isArrowFunctionExpression(callbackToMemoize)) return;
-
-    const computedCallbackWrapper = t.arrowFunctionExpression(
-      [],
-      callbackToMemoize
-    );
-
-    const vueComputedCallExp = createVueComputedCallExp(computedCallbackWrapper);
+    const vueComputedCallExp = createVueComputedCallExp(wrappedCallback);
 
     path.replaceWith(vueComputedCallExp);
   }

@@ -34,7 +34,7 @@ export const isReactUseContextCallExp = isCallExpWithName(REACT_USE_CONTEXT);
 const isReactUseMemoCallExpName = isCallExpWithName(REACT_USE_MEMO);
 
 /** useCallback(...) */
-export const isReactUseCallbackCallExp = isCallExpWithName(REACT_USE_CALLBACK);
+const isReactUseCallbackCallExpName = isCallExpWithName(REACT_USE_CALLBACK);
 
 /** is `useLayoutEffect(callback, dependencies)` */
 export const isReactUseLayoutEffect = (node: t.CallExpression): DatafullAssert<{
@@ -286,6 +286,26 @@ const isReactDependencyCallbackCallExp = (node: t.CallExpression): DatafullAsser
     ...isReactDependenciesInfo,
     callback: callbackExp
   };
+}
+
+/** is `useCallback(callback, dependencies)` */
+export const isReactUseCallbackCallExp = (node: t.CallExpression): DatafullAssert<{
+  wrappedCallback: AnyFunctionExpression
+}> => {
+  const isReactUseCallbackCallExpNameInfo = isReactUseCallbackCallExpName(node);
+  const isReactDependencyCallbackCallExpInfo = isReactDependencyCallbackCallExp(node);
+
+  if (!isReactUseCallbackCallExpNameInfo) return ASSERT_FALSE;
+  if (!isReactDependencyCallbackCallExpInfo) return ASSERT_FALSE;
+
+  const { callback } = isReactDependencyCallbackCallExpInfo;
+
+  const wrappedCallback = t.arrowFunctionExpression(
+    [],
+    callback
+  );
+
+  return { wrappedCallback };
 }
 
 type ReactDependencies = t.Identifier[] | null;
