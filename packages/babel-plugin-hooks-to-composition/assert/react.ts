@@ -10,6 +10,7 @@ import {
   REACT_USE_EFFECT,
   REACT_USE_STATE,
   REACT_STATE_SETTER_PREFIX,
+  REACT_REF_PROPERTY,
 } from '../consts';
 import { stateDeclarationsMap, StateDeclarationInfo } from '../visitors/use-state';
 import { isArrayOfIdentifiers, isCallExpWithName } from './generic';
@@ -210,6 +211,33 @@ export const isReactStateDeclarator = (declarator: t.VariableDeclarator): Datafu
     stateSetter,
     initialStateValueType,
   };
+}
+
+/** is `variableName.current` */
+export const isReactMemberExp = (node: t.MemberExpression): DatafullAssert<{
+  variableName: string
+}> => {
+  const { object, property } = node;
+
+  if (!t.isIdentifier(object)) return ASSERT_FALSE;
+  if (!t.isIdentifier(property)) return ASSERT_FALSE;
+  if (property.name !== REACT_REF_PROPERTY) return ASSERT_FALSE;
+
+  const variableName = object.name;
+
+  return { variableName };
+}
+
+/** is `const variableName = useRef(...);` */
+export const isReactUseRefVariableDeclarator = (node: t.VariableDeclarator): DatafullAssert<{
+  variableName: string
+}> => {
+  if (!t.isIdentifier(node.id)) return ASSERT_FALSE;
+  if (!isReactUseRefCallExp(node.init)) return ASSERT_FALSE;
+
+  const variableName = node.id.name;
+
+  return { variableName };
 }
 
 type ReactDependencies = t.Identifier[] | null;
