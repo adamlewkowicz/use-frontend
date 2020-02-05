@@ -156,6 +156,7 @@ export const hookExamples = [
   }
 ] as const;
 
-const [{ code: defaultCode }] = hookExamples;
+const [defaultExample] = hookExamples;
+const { code: defaultCode } = defaultExample;
 
-export { defaultCode };
+export { defaultCode, defaultExample };

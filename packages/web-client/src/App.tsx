@@ -1,13 +1,14 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import css from './components/App.module.css';
 import vueLogo from './assets/images/vue-logo.svg';
 import { useModal } from './hooks/use-modal';
 import { useReactToVue } from './hooks/use-react-to-vue';
-import { hookExamples } from './examples';
+import { hookExamples, defaultExample } from './examples';
 import { MonacoSplitEditor } from '../src/components/MonacoSplitEditor';
 import { prettierFormat, reactLazyNamed } from './utils';
+import { Select, MenuItem, makeStyles, InputLabel, FormControl } from '@material-ui/core';
 
 const DiffEditor = reactLazyNamed(
   () => import('@monaco-editor/react'),
@@ -16,6 +17,15 @@ const DiffEditor = reactLazyNamed(
 
 const ReactLogo = <img src={logo} alt="React.js logo" className={css.react_logo} />;
 const VueLogo = <img src={vueLogo} alt="Vue.js logo" className={css.vue_logo} />;
+
+const useStyles = makeStyles(theme => ({
+  select: {
+    background: '#fff',
+    '&$focused': {
+      color:'#000000'
+    }
+  }
+}));
 
 export function App() {
   const reactToVueContext = useReactToVue();
@@ -26,19 +36,42 @@ export function App() {
     vueCode,
   } = reactToVueContext;
   const { Modal, ...modalContext } = useModal();
+  const [activeExample, setActiveExample] = useState<string>(defaultExample.name);
+  const styles = useStyles();
+
+  const handleSelectOnChange: any = (event: React.ChangeEvent<{ value: string }>) => {
+    const exampleName = event.target.value;
+    const foundExample = hookExamples.find(example => example.name === exampleName);
+
+    setActiveExample(exampleName);
+
+    if (foundExample) {
+      setReactCode(prettierFormat(foundExample.code));
+    }
+  }
 
   return (
     <div className="App">
       <h1>Use-frontend</h1>
       <p>Transform React.js Hooks to Vue.js Composition Api</p>
-      {hookExamples.map(example => (
-        <button
-          key={example.name}
-          onClick={() => setReactCode(prettierFormat(example.code))}
+      <FormControl variant="filled">
+        <InputLabel>Example</InputLabel>
+        <Select
+          
+          value={activeExample}
+          onChange={handleSelectOnChange}
+          className={styles.select}
         >
-          {example.name}
-        </button>
-      ))}
+          {hookExamples.map(example => (
+            <MenuItem
+              key={example.name}
+              value={example.name}
+            >
+              {example.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
       <div className={css.content}>
         <MonacoSplitEditor
           editors={[
@@ -49,7 +82,7 @@ export function App() {
               header: (
                 <>
                   {ReactLogo}
-                  <p className={css.desc}>React.js Hooks</p>
+                  <p className={css.desc}>React.js - Hooks</p>
                 </>
               )
             },
@@ -59,7 +92,7 @@ export function App() {
               header: (
                 <>
                   {VueLogo}
-                  <p className={css.desc}>Vue.js Composition Api</p>
+                  <p className={css.desc}>Vue.js - Composition Api</p>
                 </>
               )
             }
