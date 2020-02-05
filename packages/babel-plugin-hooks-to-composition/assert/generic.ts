@@ -1,6 +1,10 @@
-import * as t from 'babel-types';
 import { ASSERT_FALSE } from '../consts';
-import { DatafullAssert, ExpOrSpread, AnyFunctionExpression } from '../types';
+import {
+  t,
+  DatafullAssert,
+  ExpOrSpread,
+  AnyFunctionExpression,
+} from '../types';
 
 const isExpressionsOfType = <T extends t.Expression>(
   expressions: (t.Expression | null | t.SpreadElement)[],

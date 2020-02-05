@@ -135,30 +135,18 @@ export const isReactUseEffectCallExp = (node: t.CallExpression): DatafullAssert<
 
   if (!assertName(node)) return ASSERT_FALSE;
 
-  const [callback, deps] = node.arguments;
+  const [callbackExp, dependenciesExp] = node.arguments;
 
-  const isReactUseEffectCallbackInfo = isReactUseEffectCallback(callback);
+  const isReactUseEffectCallbackInfo = isReactUseEffectCallback(callbackExp);
+  const isReactDependenciesInfo = isReactDependencies(dependenciesExp);
   
   if (!isReactUseEffectCallbackInfo) return ASSERT_FALSE;
+  if (!isReactDependenciesInfo) return ASSERT_FALSE;
 
-  if (t.isArrayExpression(deps)) {
-    const isArrayOfIdentifiersInfo = isArrayOfIdentifiers(deps);
-
-    if (!isArrayOfIdentifiersInfo) return ASSERT_FALSE;
-
-    const { elements: dependencies } = isArrayOfIdentifiersInfo;
-
-    return {
-      dependencies,
-      ...isReactUseEffectCallbackInfo
-    }
-  } else {
-    // no dependencies
-    return {
-      dependencies: null,
-      ...isReactUseEffectCallbackInfo
-    }
-  }
+  return {
+    ...isReactUseEffectCallbackInfo,
+    ...isReactDependenciesInfo
+  };
 }
 
 const isUseStateFunc = (exp: t.Expression): DatafullAssert<{
@@ -257,14 +245,47 @@ export const isReactUseMemoCallExp = (node: t.CallExpression): DatafullAssert<{
   memoizedCallback: AnyFunctionExpression
 }> => {
   const isReactUseMemoCallExpNameInfo = isReactUseMemoCallExpName(node);
+  const isReactDependencyCallbackCallExpInfo = isReactDependencyCallbackCallExp(node);
 
   if (!isReactUseMemoCallExpNameInfo) return ASSERT_FALSE;
+  if (!isReactDependencyCallbackCallExpInfo) return ASSERT_FALSE;
 
-  const [memoizedCallback] = isReactUseMemoCallExpNameInfo.args;
-
-  if (!isAnyFunctionExpression(memoizedCallback)) return ASSERT_FALSE;
+  const { callback: memoizedCallback } = isReactDependencyCallbackCallExpInfo;
 
   return { memoizedCallback };
+}
+
+const isReactDependencies = (node: ExpOrSpread): DatafullAssert<{
+  dependencies: ReactDependencies
+}> => {
+  if (t.isArrayExpression(node)) {
+    const isArrayOfIdentifiersInfo = isArrayOfIdentifiers(node);
+
+    if (!isArrayOfIdentifiersInfo) return ASSERT_FALSE;
+
+    const { elements: dependencies } = isArrayOfIdentifiersInfo;
+
+    return { dependencies };
+  }
+
+  return { dependencies: null };
+}
+
+/** is `callExp(callback, dependencies)` */
+const isReactDependencyCallbackCallExp = (node: t.CallExpression): DatafullAssert<{
+  callback: AnyFunctionExpression
+  dependencies: ReactDependencies
+}> => {
+  const [callbackExp, dependenciesExp] = node.arguments;
+  const isReactDependenciesInfo = isReactDependencies(dependenciesExp);
+  
+  if (!isReactDependenciesInfo) return ASSERT_FALSE;
+  if (!isAnyFunctionExpression(callbackExp)) return ASSERT_FALSE;
+
+  return {
+    ...isReactDependenciesInfo,
+    callback: callbackExp
+  };
 }
 
 type ReactDependencies = t.Identifier[] | null;
