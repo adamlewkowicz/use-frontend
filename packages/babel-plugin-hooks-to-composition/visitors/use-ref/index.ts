@@ -1,12 +1,10 @@
 
-import { createVueRefCallExp } from '../../helpers';
+import { createVueRefCallExp, createVueRefMemberExp } from '../../helpers';
 import * as t from 'babel-types';
 import {
   REACT_REF_PROPERTY,
-  VUE_REF_PROPERTY,
 } from '../../consts';
-import { isReactUseRefCallExp } from '../../assert'; 
-import { combineVisitors } from '../../utils';
+import { isReactUseRefCallExp } from '../../assert';
 import { Visitor } from 'babel-traverse';
 
 export let refSet = new Set();
@@ -32,12 +30,9 @@ const replaceDotCurrentWithDotValue = (): Visitor => ({
     if (property.name !== REACT_REF_PROPERTY) return;
     if (!refSet.has(object.name)) return;
 
-    const vueRefProperty = t.memberExpression(
-      object,
-      t.identifier(VUE_REF_PROPERTY)
-    );
+    const vueRefMemberExp = createVueRefMemberExp(object.name);
 
-    path.replaceWith(vueRefProperty);
+    path.replaceWith(vueRefMemberExp);
   },
   // tracks ".values" declarations
   VariableDeclarator(path) {
@@ -56,7 +51,3 @@ export const useRefVisitors = [
   replaceUseRefWithRef,
   replaceDotCurrentWithDotValue,
 ];
-
-export const useRefPlugin = {
-  visitor: combineVisitors(...useRefVisitors)
-}
