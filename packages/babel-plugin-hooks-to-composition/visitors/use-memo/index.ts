@@ -1,19 +1,16 @@
-import * as t from 'babel-types';
 import { Visitor } from 'babel-traverse';
 import { isReactUseMemoCallExp } from '../../assert';
 import { createVueComputedCallExp } from '../../helpers';
 
 const replaceUseMemoWithComputed = (): Visitor => ({
   CallExpression(path) {
-    const { node } = path;
+    const isReactUseMemoCallExpInfo = isReactUseMemoCallExp(path.node);
 
-    if (!isReactUseMemoCallExp(node)) return;
+    if (!isReactUseMemoCallExpInfo) return;
 
-    const [callbackToMemoize] = node.arguments;
+    const { memoizedCallback } = isReactUseMemoCallExpInfo;
 
-    if (!t.isArrowFunctionExpression(callbackToMemoize)) return;
-
-    const vueComputedCallExp = createVueComputedCallExp(callbackToMemoize);
+    const vueComputedCallExp = createVueComputedCallExp(memoizedCallback);
 
     path.replaceWith(vueComputedCallExp);
   }

@@ -1,6 +1,6 @@
 import * as t from 'babel-types';
 import { ASSERT_FALSE } from '../consts';
-import { DatafullAssert, ExpOrSpread } from '../types';
+import { DatafullAssert, ExpOrSpread, AnyFunctionExpression } from '../types';
 
 const isExpressionsOfType = <T extends t.Expression>(
   expressions: (t.Expression | null | t.SpreadElement)[],
@@ -38,4 +38,16 @@ export const isCallExpWithName = (
   if (callee.name !== functionName) return ASSERT_FALSE;
 
   return { callee, args };
+}
+
+export const isAnyFunctionExpression = (
+  node: ExpOrSpread
+): node is AnyFunctionExpression => {
+  if (
+    t.isFunctionExpression(node) ||
+    t.isArrowFunctionExpression(node)
+  ) {
+    return true;
+  }
+  return false;
 }

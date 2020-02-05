@@ -1,5 +1,9 @@
-import * as t from 'babel-types';
-import { DatafullAssert, ExpOrSpread } from '../types';
+import {
+  t,
+  DatafullAssert,
+  ExpOrSpread,
+  AnyFunctionExpression,
+} from '../types';
 import {
   ASSERT_FALSE,
   REACT_USE_LAYOUT_EFFECT,
@@ -13,7 +17,11 @@ import {
   REACT_REF_PROPERTY,
 } from '../consts';
 import { stateDeclarationsMap, StateDeclarationInfo } from '../visitors/use-state';
-import { isArrayOfIdentifiers, isCallExpWithName } from './generic';
+import {
+  isArrayOfIdentifiers,
+  isCallExpWithName,
+  isAnyFunctionExpression,
+} from './generic';
 import { removeReturnStatementFromFunction } from '../helpers';
 
 /** useRef(...) */
@@ -23,7 +31,7 @@ const isReactUseRefCallExp = isCallExpWithName(REACT_USE_REF);
 export const isReactUseContextCallExp = isCallExpWithName(REACT_USE_CONTEXT);
 
 /** useMemo(...) */
-export const isReactUseMemoCallExp = isCallExpWithName(REACT_USE_MEMO);
+const isReactUseMemoCallExpName = isCallExpWithName(REACT_USE_MEMO);
 
 /** useCallback(...) */
 export const isReactUseCallbackCallExp = isCallExpWithName(REACT_USE_CALLBACK);
@@ -242,6 +250,21 @@ export const isReactUseRefVariableDeclarator = (node: t.VariableDeclarator): Dat
   const [initialValue] = isReactUseRefCallExpInfo.args;
 
   return { variableName, initialValue };
+}
+
+/** is `useMemo(memoizedCallback, ...); */
+export const isReactUseMemoCallExp = (node: t.CallExpression): DatafullAssert<{
+  memoizedCallback: AnyFunctionExpression
+}> => {
+  const isReactUseMemoCallExpNameInfo = isReactUseMemoCallExpName(node);
+
+  if (!isReactUseMemoCallExpNameInfo) return ASSERT_FALSE;
+
+  const [memoizedCallback] = isReactUseMemoCallExpNameInfo.args;
+
+  if (!isAnyFunctionExpression(memoizedCallback)) return ASSERT_FALSE;
+
+  return { memoizedCallback };
 }
 
 type ReactDependencies = t.Identifier[] | null;
