@@ -1,6 +1,6 @@
 import * as babel from '@babel/core';
 import { useState } from 'react';
-import { prettierFormat, normalizeError, NormalizedError } from '../utils';
+import { prettierFormat, normalizeError, NormalizedError } from '../common/utils';
 
 export const useBabel = (plugins?: babel.PluginItem[], usePrettier = true) => {
   const [code, setCode] = useState<string>('');

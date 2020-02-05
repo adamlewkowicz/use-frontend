@@ -6,7 +6,7 @@ import {
   monaco,
   Monaco
 } from '@monaco-editor/react';
-import { NormalizedError } from '../../utils';
+import { NormalizedError } from '../../common/utils';
 import css from './index.module.css';
 
 const MARKER_NAME = 'custom_marker';

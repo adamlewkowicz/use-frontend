@@ -7,7 +7,7 @@ import { useModal } from '../../hooks/use-modal';
 import { useReactToVue } from '../../hooks/use-react-to-vue';
 import { hookExamples, defaultExample } from '../../common/examples';
 import { MonacoSplitEditor } from '../MonacoSplitEditor';
-import { prettierFormat, reactLazyNamed } from '../../utils';
+import { prettierFormat, reactLazyNamed } from '../../common/utils';
 import { Select, MenuItem, makeStyles, InputLabel, FormControl } from '@material-ui/core';
 
 const DiffEditor = reactLazyNamed(

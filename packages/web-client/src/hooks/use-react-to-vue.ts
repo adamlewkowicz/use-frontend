@@ -2,7 +2,7 @@ import { useBabel } from './use-babel';
 import { hooksToCompositionPlugin } from 'babel-plugin-hooks-to-composition';
 import { useState, useEffect } from 'react';
 import { defaultExample } from '../common/examples';
-import { prettierFormat } from '../utils';
+import { prettierFormat } from '../common/utils';
 
 const STORAGE_KEY = 'react_code' as const;
 

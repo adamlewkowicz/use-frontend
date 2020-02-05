@@ -1,4 +1,4 @@
-import { NormalizedError } from '../utils';
+import { NormalizedError } from '../common/utils';
 import React, { useRef, useEffect, useState } from 'react';
 import {
   ControlledEditor as NativeMonacoEditor,
