@@ -18,6 +18,8 @@ Transform React.js Hooks to Vue.js Composition Api
 ### useState
   - [x] replace `useState` with `ref` or `reactive`
   - [x] transform `setState` call with raw expression
+  - [ ] if was transformed to `ref`
+    - [ ] replace every value access with `.value` member property access
   - [ ] transform initial state function provider to `ref` or `reactive` IIFE
   - [ ] unwrap callback's body from `setState` call
     - [x] rename argument to used in state declaration
