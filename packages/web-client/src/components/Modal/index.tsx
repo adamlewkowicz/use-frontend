@@ -25,6 +25,8 @@ export const Modal = (props: ModalProps): ReactPortal => {
     event.stopPropagation();
     event.nativeEvent.stopImmediatePropagation();
 
+    console.log(event.target, containerRef.current)
+
     // TODO: temp workaround
     if (event.target !== containerRef.current) return;
   
@@ -70,10 +72,9 @@ const Container = styled.div`
 `
 
 const Content = styled.div`
-  width: 60%;
-  height: 90%;
+  max-width: 70vw;
+  max-height: 90vh;
   margin: 0 auto;
-  overflow-y: auto;
   animation: slide-in .35s ease;
 
   @keyframes slide-in {

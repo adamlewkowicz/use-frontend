@@ -7,13 +7,9 @@ import { useModal } from '../../hooks/use-modal';
 import { useReactToVue } from '../../hooks/use-react-to-vue';
 import { hookExamples, defaultExample } from '../../common/examples';
 import { MonacoSplitEditor } from '../MonacoSplitEditor';
-import { prettierFormat, reactLazyNamed } from '../../common/utils';
-import { Select, MenuItem, makeStyles, InputLabel, FormControl } from '@material-ui/core';
-
-const DiffEditor = reactLazyNamed(
-  () => import('@monaco-editor/react'),
-  'DiffEditor'
-);
+import { prettierFormat } from '../../common/utils';
+import { Select, MenuItem, makeStyles, InputLabel, FormControl, Button } from '@material-ui/core';
+import { DiffEditor } from '@monaco-editor/react';
 
 const ReactLogo = <img src={reactLogo} alt="React.js logo" className={css.react_logo} />;
 const VueLogo = <img src={vueLogo} alt="Vue.js logo" className={css.vue_logo} />;
@@ -57,7 +53,6 @@ export function App() {
       <FormControl variant="filled">
         <InputLabel>Example</InputLabel>
         <Select
-          
           value={activeExample}
           onChange={handleSelectOnChange}
           className={styles.select}
@@ -104,9 +99,12 @@ export function App() {
             <p>{reactError.message}</p>
           </>
         )}
-        <button onClick={modalContext.open}>
-          Show differences
-        </button>
+        <Button
+          onClick={modalContext.open}
+          variant="contained"
+        >
+          Compare
+        </Button>
       </div>
       <Suspense fallback="Loading">
         <Modal>

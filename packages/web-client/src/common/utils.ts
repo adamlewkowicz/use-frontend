@@ -43,22 +43,6 @@ export const normalizeError = (error: ParseError): NormalizedError => {
     message: error?.message || 'Unknown error'
   }
 }
-
-export const reactLazyNamed = <T, I extends keyof T>(
-  importFactory: () => Promise<T>,
-  importName: I
-  // @ts-ignore
-): React.LazyExoticComponent<T[I]> => {
-  const defaultImportHandler = async () => {
-    const importedModuleObj = await importFactory();
-
-    return {
-      default: importedModuleObj[importName]
-    }
-  }
-
-  return React.lazy(defaultImportHandler as any) as any;
-}
 export interface NormalizedError {
   line: number
   column: number
