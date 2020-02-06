@@ -20,6 +20,7 @@ import {
   VUE_PREV,
   VUE_COMPUTED,
   OPERATOR,
+  VUE_ON_BEFORE_MOUNT,
 } from '../consts';
 import { AnyFunctionExpression, ExpOrSpread } from '../types';
 
@@ -30,6 +31,8 @@ export const createVueOnUpdatedCallExp = createGenericCallExp(VUE_ON_UPDATED);
 export const createVueInjectCallExp = createGenericCallExp<ExpOrSpread[]>(VUE_INJECT);
 
 export const createVueOnUnmountedCallExp = createGenericCallExp<AnyFunctionExpression>(VUE_ON_UNMOUNTED);
+
+export const createVueOnBeforeMountCallExp = createGenericCallExp<AnyFunctionExpression>(VUE_ON_BEFORE_MOUNT);
 
 const createVueRefCallExp = createGenericCallExp(VUE_REF);
 
