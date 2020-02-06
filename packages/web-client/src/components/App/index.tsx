@@ -5,18 +5,10 @@ import { useModal } from '../../hooks/use-modal';
 import { useReactToVue } from '../../hooks/use-react-to-vue';
 import { hookExamples, defaultExample } from '../../common/examples';
 import { prettierFormat } from '../../common/utils';
-import { Select, MenuItem, makeStyles, InputLabel, FormControl, Button } from '@material-ui/core';
+import { MenuItem, Button } from '@material-ui/core';
 import { DiffEditor } from '@monaco-editor/react';
 import { ReactToVueEditor } from '../ReactToVueEditor';
-
-const useStyles = makeStyles(theme => ({
-  select: {
-    background: '#fff',
-    '&$focused': {
-      color:'#000000'
-    }
-  }
-}));
+import { Select as CustomSelect } from '../Select';
 
 export function App() {
   const reactToVueContext = useReactToVue();
@@ -28,9 +20,8 @@ export function App() {
   } = reactToVueContext;
   const { Modal, ...modalContext } = useModal();
   const [activeExample, setActiveExample] = useState<string>(defaultExample.name);
-  const styles = useStyles();
 
-  const handleSelectOnChange: any = (event: React.ChangeEvent<{ value: string }>) => {
+  const handleSelectOnChange = (event: React.ChangeEvent<{ value: string }>) => {
     const exampleName = event.target.value;
     const foundExample = hookExamples.find(example => example.name === exampleName);
 
@@ -47,23 +38,20 @@ export function App() {
       <p className={css.intro}>
         Transform React.js Hooks to Vue.js Composition Api
       </p>
-      <FormControl variant="filled">
-        <InputLabel>Example</InputLabel>
-        <Select
-          value={activeExample}
-          onChange={handleSelectOnChange}
-          className={styles.select}
-        >
-          {hookExamples.map(example => (
-            <MenuItem
-              key={example.name}
-              value={example.name}
-            >
-              {example.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <CustomSelect
+        title="Example"
+        value={activeExample}
+        onChange={handleSelectOnChange as any}
+        options={hookExamples}
+        renderOption={(example) => (
+          <MenuItem
+            key={example.name}
+            value={example.name}
+          >
+            {example.name}
+          </MenuItem>
+        )}
+      />
       <div className={css.content}>
         <ReactToVueEditor {...reactToVueContext} />
         {reactError && (
