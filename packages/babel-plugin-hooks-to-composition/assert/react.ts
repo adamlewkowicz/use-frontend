@@ -262,10 +262,12 @@ const isReactDependencies = (node: ExpOrSpread): DatafullAssert<{
 }
 
 /** is `callExp(callback, dependencies)` */
-const isReactDependencyCallbackCallExp = (node: t.CallExpression): DatafullAssert<{
+const isReactDependencyCallbackCallExp = (node: t.Expression): DatafullAssert<{
   callback: AnyFunctionExpression
   dependencies: ReactDependencies
 }> => {
+  if (!t.isCallExpression(node)) return ASSERT_FALSE;
+  
   const [callbackExp, dependenciesExp] = node.arguments;
   const isReactDependenciesInfo = isReactDependencies(dependenciesExp);
   
