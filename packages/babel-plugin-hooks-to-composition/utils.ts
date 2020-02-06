@@ -95,7 +95,6 @@ export const trackReactUseRefDeclaration = (variableName: string): void => {
   }
 }
 
-
 export const filterOut = <T>(
   arr: T[],
   filterCallback: (value: T, index: number, self: T[]) => boolean

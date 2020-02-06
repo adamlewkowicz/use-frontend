@@ -121,7 +121,7 @@ const removeStatementFromFunction = <
   const updatedFunction = updateArrowFunctionBody(func, (statements) => {
     const { preservedItems, removedItems } = filterOut(
       statements,
-      statement => statement.type === statementType
+      statement => statement.type !== statementType
     );
 
     const [firstStatement] = removedItems as S[];
