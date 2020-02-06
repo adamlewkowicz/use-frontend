@@ -2,7 +2,7 @@ import React, { Suspense, useState } from 'react';
 import reactLogo from '../../assets/images/react-logo.svg';
 import '../../App.css';
 import css from './index.module.css';
-import vueLogo from './assets/images/vue-logo.svg';
+import vueLogo from '../../assets/images/vue-logo.svg';
 import { useModal } from '../../hooks/use-modal';
 import { useReactToVue } from '../../hooks/use-react-to-vue';
 import { hookExamples, defaultExample } from '../../common/examples';
