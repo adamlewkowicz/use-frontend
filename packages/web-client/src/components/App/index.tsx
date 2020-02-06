@@ -49,7 +49,9 @@ export function App() {
   return (
     <div className="App">
       <h1>Use-frontend</h1>
-      <p>Transform React.js Hooks to Vue.js Composition Api</p>
+      <p className={css.intro}>
+        Transform React.js Hooks to Vue.js Composition Api
+      </p>
       <FormControl variant="filled">
         <InputLabel>Example</InputLabel>
         <Select

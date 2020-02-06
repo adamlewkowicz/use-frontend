@@ -8,7 +8,7 @@ export const hookExamples = [
 
         const increment = () => setCounter(v => v + 1);
 
-        return { counter, increment, doubledCounter };        
+        return { counter, increment };        
       }
     `
   },

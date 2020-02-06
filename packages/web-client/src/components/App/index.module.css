@@ -13,11 +13,14 @@
   flex-direction: column;
 }
 
+.intro {
+  margin: 0 0 40px 0;
+}
+
 .desc {
   text-align: center;
   text-transform: uppercase;
   font-size: 12px;
   word-spacing: 2.1px;
   letter-spacing: 0.9px;
-  margin-bottom: 20px;
 }
