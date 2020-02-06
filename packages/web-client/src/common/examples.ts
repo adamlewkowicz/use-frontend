@@ -1,11 +1,15 @@
 
 export const hookExamples = [
   {
-    name: 'Basic example',
+    name: 'useCounter',
     code: `
-      const [counter, setCounter] = useState(0);
+      const useCounter = () => {
+        const [counter, setCounter] = useState(0);
 
-      setCounter(v => v + 1);
+        const increment = () => setCounter(v => v + 1);
+
+        return { counter, increment, doubledCounter };        
+      }
     `
   },
   {
@@ -31,7 +35,7 @@ export const hookExamples = [
     `
   },
   {
-    name: 'Fetch',
+    name: 'useApiData',
     code: `
       const useApiData = () => {
         const [data, setData] = useState(null);
@@ -46,7 +50,7 @@ export const hookExamples = [
             .then(response => response.json())
             .then(json => setData(json))
             .catch(error => setError(error))
-            .finally(() => setIsLoading(true));
+            .finally(() => setIsLoading(false));
       
           return () => abortController.current.abort();
         }, []);
@@ -60,19 +64,8 @@ export const hookExamples = [
     `
   },
   {
-    name: 'Basic hooks',
+    name: 'useInputFocus',
     code: `
-      function useCounter() {
-        const [counter, setCounter] = useState(0);
-      
-        const doubledCounter = useMemo(() => counter * 2, [counter]);
-        
-        const increment = () => setCounter(c => c + 1);
-        
-        return { counter, doubledCounter, increment };
-      }
-      
-      
       function useInputFocus() {
         const inputRef = useRef(null);
       
@@ -84,8 +77,11 @@ export const hookExamples = [
       
         return inputRef;
       }
-      
-      
+    `
+  },
+  {
+    name: 'useTheme',
+    code: `
       function useTheme() {
         const theme = useContext(ThemeContext);
       
