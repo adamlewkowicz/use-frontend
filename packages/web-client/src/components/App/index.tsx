@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import '../../App.css';
 import css from './index.module.css';
 import { useModal } from '../../hooks/use-modal';
 import { useReactToVue } from '../../hooks/use-react-to-vue';
@@ -8,7 +7,7 @@ import { prettierFormat } from '../../common/utils';
 import { MenuItem, Button } from '@material-ui/core';
 import { DiffEditor } from '@monaco-editor/react';
 import { ReactToVueEditor } from '../ReactToVueEditor';
-import { Select as CustomSelect } from '../Select';
+import { Select } from '../Select';
 
 export function App() {
   const reactToVueContext = useReactToVue();
@@ -33,12 +32,12 @@ export function App() {
   }
 
   return (
-    <div className="App">
+    <div className={css.container}>
       <h1>Use-frontend</h1>
       <p className={css.intro}>
         Transform React.js Hooks to Vue.js Composition Api
       </p>
-      <CustomSelect
+      <Select
         title="Example"
         value={activeExample}
         onChange={handleSelectOnChange as any}

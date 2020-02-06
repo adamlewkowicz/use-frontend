@@ -1,4 +1,14 @@
 
+.container {
+  background-color: #353845;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: #fff;
+  min-height: 100vh;
+}
+
 .content {
   padding: 25px;
   box-shadow: 0px 0px 30px 5px rgba(1,1,1,.25);
