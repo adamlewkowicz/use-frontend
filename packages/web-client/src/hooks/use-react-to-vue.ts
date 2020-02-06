@@ -2,7 +2,7 @@ import { useBabel } from './use-babel';
 import { hooksToCompositionPlugin } from 'babel-plugin-hooks-to-composition';
 import { useState, useEffect } from 'react';
 import { defaultExample } from '../common/examples';
-import { prettierFormat } from '../common/utils';
+import { prettierFormat, NormalizedError } from '../common/utils';
 
 const STORAGE_KEY = 'react_code' as const;
 
@@ -15,7 +15,7 @@ const getInitialCode = (): string => {
   }
 }
 
-export const useReactToVue = () => {
+export const useReactToVue = (): UseReactToVueResult => {
   const [reactCode, setReactCode] = useState<string>(getInitialCode);
   
   const {
@@ -35,4 +35,14 @@ export const useReactToVue = () => {
     reactCode,
     setReactCode,
   }
+}
+
+export interface UseReactToVueResult<
+  R extends string = string,
+  V extends string = string
+> {
+  vueCode: V
+  reactCode: R
+  reactError: NormalizedError | null
+  setReactCode: React.Dispatch<React.SetStateAction<R>>
 }
