@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/use-frontend/static/css/main.e1047328.chunk.css",
+    "main.js": "/use-frontend/static/js/main.f8049e3f.chunk.js",
+    "main.js.map": "/use-frontend/static/js/main.f8049e3f.chunk.js.map",
+    "runtime-main.js": "/use-frontend/static/js/runtime-main.0c40ec3a.js",
+    "runtime-main.js.map": "/use-frontend/static/js/runtime-main.0c40ec3a.js.map",
+    "static/js/2.f4bf8d3f.chunk.js": "/use-frontend/static/js/2.f4bf8d3f.chunk.js",
+    "static/js/2.f4bf8d3f.chunk.js.map": "/use-frontend/static/js/2.f4bf8d3f.chunk.js.map",
+    "index.html": "/use-frontend/index.html",
+    "precache-manifest.891d9ff3cd4b3b1f65851479e6345d61.js": "/use-frontend/precache-manifest.891d9ff3cd4b3b1f65851479e6345d61.js",
+    "service-worker.js": "/use-frontend/service-worker.js",
+    "static/css/main.e1047328.chunk.css.map": "/use-frontend/static/css/main.e1047328.chunk.css.map",
+    "static/js/2.f4bf8d3f.chunk.js.LICENSE": "/use-frontend/static/js/2.f4bf8d3f.chunk.js.LICENSE",
+    "static/media/react-logo.svg": "/use-frontend/static/media/react-logo.5d5d9eef.svg",
+    "static/media/vue-logo.svg": "/use-frontend/static/media/vue-logo.9075ee3c.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.0c40ec3a.js",
+    "static/js/2.f4bf8d3f.chunk.js",
+    "static/css/main.e1047328.chunk.css",
+    "static/js/main.f8049e3f.chunk.js"
+  ]
+}
