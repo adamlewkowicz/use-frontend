@@ -1,7 +1,4 @@
-import { mountPluginTester } from "../utils";
-import { hooksToCompositionPlugin } from "../index";
-
-const transform = mountPluginTester(hooksToCompositionPlugin);
+import { transform } from "../utils";
 
 describe("useState", () => {
   describe("state declaration", () => {
@@ -129,25 +126,8 @@ describe("useState", () => {
 
         any.value = any.value + 'a';
         any.value = c.toString();
-        any.value = any.value;"
-      `);
-    });
-  });
-});
-
-describe("useLayoutEffect", () => {
-  describe('when "useLayoutEffect" has dependencies', () => {
-    it('should replace "useLayoutEffect" with synchronous "watch"', () => {
-      const result = transform(`
-        useLayoutEffect(() => {
-
-        }, [a]);
-      `);
-
-      expect(result).toMatchInlineSnapshot(`
-        "watch(() => {
-
-        }, [a]);"
+        any.value = any.value;
+        any.value = event.value;"
       `);
     });
   });

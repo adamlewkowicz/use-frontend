@@ -1,10 +1,7 @@
-import { testVisitors } from "../../utils";
-import { useEffectVisitors } from "./index";
+import { transform } from "../../utils";
 
-describe("useEffect visitors", () => {
-  const transform = testVisitors(...useEffectVisitors);
-
-  describe('when "useEffect" has no dependencies', () => {
+describe("useEffect", () => {
+  describe("when has no dependencies", () => {
     it('should replace "useEffect" with "onUpdated"', () => {
       const result = transform(`useEffect(() => {});`);
 
@@ -12,7 +9,7 @@ describe("useEffect visitors", () => {
     });
   });
 
-  describe('when "useEffect" has empty dependencies', () => {
+  describe("when has empty dependencies", () => {
     it('should replace "useEffect" with "onMounted"', () => {
       const result = transform(`useEffect(() => {}, []);`);
 
@@ -20,7 +17,7 @@ describe("useEffect visitors", () => {
     });
   });
 
-  describe('when "useEffect" has dependencies', () => {
+  describe("when has dependencies", () => {
     it('should replace "useEffect" with "watch"', () => {
       const result = transform(`useEffect(() => {}, [a]);`);
 
@@ -28,8 +25,8 @@ describe("useEffect visitors", () => {
     });
   });
 
-  describe('when "useEffect" returns cleanup callback', () => {
-    describe('when "useEffect" has empty dependencies', () => {
+  describe("when returns cleanup callback", () => {
+    describe("when has empty dependencies", () => {
       it('should create "onMounted" and "onUnmounted" lifecycle methods', () => {
         const result = transform(`
           useEffect(() => {
@@ -38,14 +35,13 @@ describe("useEffect visitors", () => {
         `);
 
         expect(result).toMatchInlineSnapshot(`
-          "onMounted(() => {
-            return () => a;
-          }), onUnmounted(() => a);"
+          "onMounted(() => {}), onUnmounted(
+          () => a);"
         `);
       });
     });
 
-    describe('when "useEffect" has no dependencies', () => {
+    describe("when has no dependencies", () => {
       it('should replace "useEffect" with "onUpdated" and "onUnmounted"', () => {
         const result = transform(`
           useEffect(() => {
@@ -61,7 +57,7 @@ describe("useEffect visitors", () => {
       });
     });
 
-    describe('when "useEffect" has dependencies', () => {
+    describe("when has dependencies", () => {
       it('should replace "useEffect" with "watch"', () => {
         const result = transform(`
           useEffect(() => {

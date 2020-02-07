@@ -1,12 +1,9 @@
-import { testVisitors } from '../../utils';
-import { useMemoVisitors } from './index';
+import { transform } from '../../utils';
 
 describe('useMemo visitors', () => {
 
-  const pluginTester = testVisitors(...useMemoVisitors);
-
-  it('should transform useMemo to computed', () => {
-    const result = pluginTester(
+  it('should transform "useMemo" to "computed"', () => {
+    const result = transform(
       `const doubledCounter = useMemo(() => counter * 2, [counter]);`
     );
 

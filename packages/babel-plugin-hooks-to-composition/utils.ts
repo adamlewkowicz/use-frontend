@@ -1,6 +1,7 @@
 import * as babel from '@babel/core';
 import { VisitorHandler } from './types';
 import { Visitor } from 'babel-traverse';
+import { hooksToCompositionPlugin } from '.';
 
 let refSet = new Set<string>();
 
@@ -123,6 +124,8 @@ export const filterOut = <T>(
 
   return { preservedItems, removedItems };
 }
+
+export const transform = mountPluginTester(hooksToCompositionPlugin);
 
 type VisitorMap = {
   [K in keyof Visitor]: VisitorHandler[]
