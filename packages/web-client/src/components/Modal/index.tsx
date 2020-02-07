@@ -20,17 +20,12 @@ export const Modal = (props: ModalProps): ReactPortal => {
   }, []);
 
   const handleOnClose = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.persist();
-    event.stopPropagation();
-    event.nativeEvent.stopImmediatePropagation();
-
-    // TODO: temp workaround
     if (event.target !== containerRef.current) return;
   
     props.onClose?.();
   }
 
-  const wrapper = (
+  const Wrapper = (
     <div
       className={css.container}
       onClick={handleOnClose}
@@ -43,7 +38,7 @@ export const Modal = (props: ModalProps): ReactPortal => {
   );
 
   return ReactDOM.createPortal(
-    wrapper,
+    Wrapper,
     element.current,
   );
 }
