@@ -1,7 +1,6 @@
 import React, { ReactNode, useEffect, useRef, ReactPortal } from 'react';
 import ReactDOM from 'react-dom';
-import styled from 'styled-components';
-
+import css from './index.module.css';
 interface ModalProps {
   children: ReactNode
   onClose?: () => void
@@ -11,7 +10,7 @@ const modalRoot = document.getElementById('modal');
 
 export const Modal = (props: ModalProps): ReactPortal => {
   const element = useRef<HTMLDivElement>(document.createElement('div'));
-  const containerRef = useRef<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     modalRoot?.appendChild(element.current);
@@ -25,8 +24,6 @@ export const Modal = (props: ModalProps): ReactPortal => {
     event.stopPropagation();
     event.nativeEvent.stopImmediatePropagation();
 
-    console.log(event.target, containerRef.current)
-
     // TODO: temp workaround
     if (event.target !== containerRef.current) return;
   
@@ -34,14 +31,15 @@ export const Modal = (props: ModalProps): ReactPortal => {
   }
 
   const wrapper = (
-    <Container
+    <div
+      className={css.container}
       onClick={handleOnClose}
-      ref={containerRef as any}
+      ref={containerRef}
     >
-      <Content>
+      <div className={css.content}>
         {props.children}
-      </Content>
-    </Container>
+      </div>
+    </div>
   );
 
   return ReactDOM.createPortal(
@@ -49,42 +47,3 @@ export const Modal = (props: ModalProps): ReactPortal => {
     element.current,
   );
 }
-
-const Container = styled.div`
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  top: 0;
-  z-index: 10;
-  background: rgba(1,1,1,.4);
-  padding: 50px 0;
-  animation: fade-in .35s ease;
-
-  @keyframes fade-in {
-    0% {
-      opacity: 0.8;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-`
-
-const Content = styled.div`
-  max-width: 70vw;
-  max-height: 90vh;
-  margin: 0 auto;
-  animation: slide-in .35s ease;
-
-  @keyframes slide-in {
-    0% {
-      transform: translateY(-50px);
-    }
-    100% {
-      transform: translateY(0);
-    }
-  }
-`
-
-export default Modal;
