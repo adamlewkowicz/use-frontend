@@ -1,8 +1,8 @@
 import { transform } from '../../utils';
 
-describe('useRef Visitor', () => {
+describe('useRef', () => {
 
-  it('should replace "useRef" with "ref" ', () => {
+  it('should replace "useRef" with "ref"', () => {
     const result = transform(
       `const input = useRef('');`
     );
@@ -10,7 +10,7 @@ describe('useRef Visitor', () => {
     expect(result).toEqual(`const input = ref('');`);
   });
 
-  it('should replace ".current" to ".value" property', () => {
+  it('should replace ".current" with ".value" property', () => {
     const result = transform(
       `input.current = 'abc';`
     );

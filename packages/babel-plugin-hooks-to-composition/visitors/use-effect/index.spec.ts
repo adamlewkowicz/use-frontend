@@ -42,19 +42,7 @@ describe("useEffect", () => {
     });
 
     describe("when has no dependencies", () => {
-      it('should replace "useEffect" with "onUpdated" and "onUnmounted"', () => {
-        const result = transform(`
-          useEffect(() => {
-            return () => a;
-          });
-        `);
-
-        expect(result).toMatchInlineSnapshot(`
-          "onUpdated(() => {
-            return () => a;
-          });"
-        `);
-      });
+      it.todo('should replace "useEffect" with "onUpdated" and "onUnmounted"');
     });
 
     describe("when has dependencies", () => {

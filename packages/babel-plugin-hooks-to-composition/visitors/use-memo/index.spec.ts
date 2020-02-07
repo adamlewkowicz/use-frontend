@@ -1,6 +1,6 @@
 import { transform } from '../../utils';
 
-describe('useMemo visitors', () => {
+describe('useMemo', () => {
 
   it('should transform "useMemo" to "computed"', () => {
     const result = transform(
