@@ -1,7 +1,15 @@
 {
   "name": "use-frontend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Transform React.js Hooks to Vue.js Composition Api",
+  "keywords": [
+    "React.js",
+    "Vue.js",
+    "Babel",
+    "hooks",
+    "composition api",
+    "transfrom"
+  ],
   "main": "src/index.ts",
   "scripts": {
     "test": "jest",
