@@ -15,7 +15,7 @@
     "test": "jest",
     "dev": "lerna exec \"npm run dev\"",
     "predeploy": "lerna exec \"npm run build\"",
-    "deploy": "lerna exec \"npm run deploy\""
+    "deploy": "lerna run deploy"
   },
   "author": "",
   "license": "ISC",
