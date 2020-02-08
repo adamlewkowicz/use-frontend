@@ -35,7 +35,7 @@ describe("useEffect", () => {
         `);
 
         expect(result).toMatchInlineSnapshot(`
-          "onMounted(() => {}), onUnmounted(
+          "onMounted(() => {});onUnmounted(
           () => a);"
         `);
       });

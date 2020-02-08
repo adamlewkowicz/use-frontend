@@ -116,12 +116,13 @@ const isReactUseEffectCallback = (node: ExpOrSpread): DatafullAssert<{
 }
 
 /** is `useEffect(() => {}, []);` */
-export const isReactUseEffectCallExp = (node: t.CallExpression): DatafullAssert<{
+export const isReactUseEffectCallExp = (node: t.Expression): DatafullAssert<{
   dependencies: ReactDependencies
   cleanupCallback: t.ArrowFunctionExpression | null
   originalCallback: t.ArrowFunctionExpression
   callbackWithoutCleanup: t.ArrowFunctionExpression
 }> => {
+  if (!t.isCallExpression(node)) return ASSERT_FALSE;
   if (!isReactUseEffectCallExpName(node)) return ASSERT_FALSE;
 
   const [callbackExp, dependenciesExp] = node.arguments;
