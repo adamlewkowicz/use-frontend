@@ -62,10 +62,41 @@ const replaceUseStateWithReactiveOrRef = (): Visitor => ({
   },
 });
 
+let visitedIdentifiers = new Set<string>();
+
 /**
  * Replaces `setState(c => c + 1)` with `counter + 1`
  */
 const replaceSetStateCallWithRawExpression = (): Visitor => ({
+  Expression(path) {
+    if (!t.isIdentifier(path.node)) return;
+    if (t.isVariableDeclarator(path.parent)) return;
+    if (t.isCallExpression(path.parent)) return;
+
+    const { node } = path;
+    const { name } = path.node;
+
+    if (visitedIdentifiers.has(node.name)) return;
+
+    const info = [...stateDeclarationsMap]
+      // .map(([setterName, info]) => info)
+      .find(([setterName, info]) => info.stateValueName === name);
+
+    if (!info) return;
+
+    // const updatedName = info[1].stateValueName as string;
+
+    // if (visitedIdentifiers.has(updatedName)) return;
+
+    // path.replaceWith(createVueRefMemberExp(node.name));
+
+    path.replaceWith(t.identifier('ABC'))
+
+    // visitedIdentifiers.add(node.name);
+    // visitedIdentifiers.add(updatedName);
+
+    console.log(node.name, path, info)
+  },
   CallExpression(path) {
     const isReactSetStateCallInfo = isReactSetStateCall(path.node);
 
