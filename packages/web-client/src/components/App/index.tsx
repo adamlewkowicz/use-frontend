@@ -32,7 +32,7 @@ export function App() {
   }
 
   return (
-    <div className={css.container}>
+    <main className={css.container}>
       <h1>Use-frontend</h1>
       <p className={css.intro}>
         Transform React.js Hooks to Vue.js Composition Api
@@ -74,6 +74,6 @@ export function App() {
           height="500px"
         />
       </Modal>
-    </div>
+    </main>
   );
 }

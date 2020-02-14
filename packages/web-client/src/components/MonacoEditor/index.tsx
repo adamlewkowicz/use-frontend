@@ -76,14 +76,17 @@ export const MonacoEditor = (props: MonacoEditorProps) => {
       <NativeMonacoEditor
         language="javascript"
         value={props.value}
-        height="600px"
-        width="40vw"
+        height={HEIGHT}
+        width={WIDTH}
         onChange={handleOnChange}
         editorDidMount={handleEditorDidMount}
-        options={props.options as any}
+        options={props.options}
       />
     </div>
   );
 }
+
+const HEIGHT = '500px';
+const WIDTH = '38vw';
 
 type MonacoEditor = Monaco['editor'];
