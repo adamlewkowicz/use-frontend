@@ -2,5 +2,6 @@ language: node_js
 node_js:
   - "12.6"
 script:
+  - npx lerna bootstrap
   - cd ./packages/babel-plugin-hooks-to-composition
   - npm test
