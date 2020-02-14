@@ -1,6 +1,6 @@
 {
   "name": "web-client",
-  "version": "1.0.1-beta",
+  "version": "1.0.2-beta",
   "private": true,
   "homepage": "https://alk831.github.io/use-frontend/",
   "dependencies": {
