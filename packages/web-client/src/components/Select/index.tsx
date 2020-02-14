@@ -7,14 +7,14 @@ import {
   SelectProps as MaterialSelectProps
 } from '@material-ui/core';
 
-interface SelectProps<T extends object> extends MaterialSelectProps {
+interface SelectProps<T> extends MaterialSelectProps {
   title: string
   value?: unknown
   options: readonly T[]
   renderOption: (v: T) => ReactNode
 }
 
-export function Select<T extends object>(props: SelectProps<T>) {
+export function Select<T>(props: SelectProps<T>) {
   const styles = useStyles();
   const {
     title,
@@ -25,11 +25,10 @@ export function Select<T extends object>(props: SelectProps<T>) {
   } = props;
 
   return (
-    <FormControl variant="filled">
+    <FormControl variant="filled" className={styles.form}>
       <InputLabel>{title}</InputLabel>
       <MaterialSelect
         value={value}
-        className={styles.select}
         {...selectProps}
       >
         {options.map(renderOption)}
@@ -39,10 +38,8 @@ export function Select<T extends object>(props: SelectProps<T>) {
 }
 
 const useStyles = makeStyles(theme => ({
-  select: {
+  form: {
     background: '#fff',
-    '&$focused': {
-      color:'#000000'
-    }
+    borderRadius: theme.shape.borderRadius,
   }
 }));
