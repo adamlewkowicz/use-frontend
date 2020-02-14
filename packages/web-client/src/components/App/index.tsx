@@ -20,13 +20,14 @@ export function App() {
   const { Modal, ...modalContext } = useModal();
   const [activeExample, setActiveExample] = useState<string>(defaultExample.name);
 
-  const handleSelectOnChange = (event: React.ChangeEvent<{ value: string }>) => {
+  const handleSelectOnChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const exampleName = event.target.value;
+    if (typeof exampleName !== 'string') return;
+
     const foundExample = hookExamples.find(example => example.name === exampleName);
 
-    setActiveExample(exampleName);
-
     if (foundExample) {
+      setActiveExample(exampleName);
       setReactCode(prettierFormat(foundExample.code));
     }
   }
@@ -40,7 +41,7 @@ export function App() {
       <Select
         title="Example"
         value={activeExample}
-        onChange={handleSelectOnChange as any}
+        onChange={handleSelectOnChange}
         options={hookExamples}
         renderOption={(example) => (
           <MenuItem
