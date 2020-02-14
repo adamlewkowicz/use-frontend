@@ -10,11 +10,11 @@
 }
 
 .heading_container {
-  margin-top: 0.67em;
+  margin-top: 20px;
 }
 
 .heading {
-  margin-top: 0;
+  margin: 0;
 }
 
 .version {
@@ -34,5 +34,5 @@
 }
 
 .intro {
-  margin: 0 0 40px 0;
+  margin: 8px 0 40px 0;
 }
