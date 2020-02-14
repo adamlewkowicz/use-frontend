@@ -1,4 +1,4 @@
-# Use-Frontend
+# use-frontend
 [![Build Status](https://travis-ci.com/alk831/use-frontend.svg?branch=master)](https://travis-ci.com/alk831/use-frontend)
 
 Transform React.js Hooks to Vue.js Composition Api
