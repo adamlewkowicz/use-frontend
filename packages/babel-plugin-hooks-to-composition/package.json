@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-hooks-to-composition",
-  "version": "1.0.0-beta",
+  "version": "1.0.3-beta",
   "description": "",
   "main": "./dist/index.js",
   "scripts": {
