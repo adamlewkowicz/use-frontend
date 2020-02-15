@@ -74,13 +74,13 @@ let visitedIdentifiers = new Set<string>();
 const replaceSetStateCallWithRawExpression = (): Visitor => ({
   Expression(path) {
     if (!t.isIdentifier(path.node)) return;
-    if (t.isVariableDeclarator(path.parent)) return;
+    // if (t.isVariableDeclarator(path.parent)) return;
     if (t.isCallExpression(path.parent)) return;
 
     const { node } = path;
     const { name } = path.node;
 
-    if (visitedIdentifiers.has(node.name)) return;
+    // if (visitedIdentifiers.has(node.name)) return;
 
     const info = [...stateDeclarationsMap]
       // .map(([setterName, info]) => info)
@@ -88,16 +88,15 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
 
     if (!info) return;
 
-    // const updatedName = info[1].stateValueName as string;
+    const data: any = path.data || {};
 
-    // if (visitedIdentifiers.has(updatedName)) return;
-
-    // path.replaceWith(createVueRefMemberExp(node.name));
-
-    path.replaceWith(t.identifier('ABC'))
-
-    // visitedIdentifiers.add(node.name);
-    // visitedIdentifiers.add(updatedName);
+    if (data.visited !== true) {
+      // path.replaceWith(createVueRefMemberExp(node.name));
+      path.replaceWith(t.identifier(info[1].stateValueName as string + "__SPEC"));
+      data.visited = true;
+      
+      path.data = data;
+    }
 
     console.log(node.name, path, info)
   },
