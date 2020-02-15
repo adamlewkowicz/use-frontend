@@ -9,6 +9,21 @@
   min-height: 100vh;
 }
 
+.heading_container {
+  margin-top: 20px;
+}
+
+.heading {
+  margin: 0;
+}
+
+.version {
+  font-size: 0.8em;
+  color: #616472;
+  margin-bottom: -10px;
+  display: block;
+}
+
 .content {
   padding: 25px;
   box-shadow: 0px 0px 30px 5px rgba(1,1,1,.25);
@@ -19,5 +34,5 @@
 }
 
 .intro {
-  margin: 0 0 40px 0;
+  margin: 8px 0 40px 0;
 }

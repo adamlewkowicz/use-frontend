@@ -8,6 +8,7 @@ import { MenuItem, Button } from '@material-ui/core';
 import { DiffEditor } from '@monaco-editor/react';
 import { ReactToVueEditor } from '../ReactToVueEditor';
 import { Select } from '../Select';
+import pkg from '../../../package.json';
 
 export function App() {
   const reactToVueContext = useReactToVue();
@@ -20,27 +21,35 @@ export function App() {
   const { Modal, ...modalContext } = useModal();
   const [activeExample, setActiveExample] = useState<string>(defaultExample.name);
 
-  const handleSelectOnChange = (event: React.ChangeEvent<{ value: string }>) => {
+  const handleSelectOnChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const exampleName = event.target.value;
+    if (typeof exampleName !== 'string') return;
+
     const foundExample = hookExamples.find(example => example.name === exampleName);
 
-    setActiveExample(exampleName);
-
     if (foundExample) {
+      setActiveExample(exampleName);
       setReactCode(prettierFormat(foundExample.code));
     }
   }
 
   return (
-    <div className={css.container}>
-      <h1>Use-frontend</h1>
+    <main className={css.container}>
+      <div className={css.heading_container}>
+        <span className={css.version}>
+          {pkg.version}
+        </span>
+        <h1 className={css.heading}>
+          use-frontend
+        </h1>
+      </div>
       <p className={css.intro}>
         Transform React.js Hooks to Vue.js Composition Api
       </p>
       <Select
         title="Example"
         value={activeExample}
-        onChange={handleSelectOnChange as any}
+        onChange={handleSelectOnChange}
         options={hookExamples}
         renderOption={(example) => (
           <MenuItem
@@ -74,6 +83,6 @@ export function App() {
           height="500px"
         />
       </Modal>
-    </div>
+    </main>
   );
 }
