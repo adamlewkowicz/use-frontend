@@ -182,3 +182,9 @@ export const createMemberExp = (
   t.identifier(variableName),
   t.identifier(propertyName)
 );
+
+export const createExpressionStatements = (
+  ...expressions: t.Expression[]
+): t.ExpressionStatement[] => expressions.map(
+  exp => t.expressionStatement(exp)
+);

@@ -3,6 +3,7 @@ import {
   createVueOnMountedCallExp,
   createVueOnUnmountedCallExp,
   createVueWatchCallExp,
+  createExpressionStatements,
 } from '../../helpers';
 import { Visitor } from 'babel-traverse';
 import { isReactUseEffectCallExp } from '../../assert';
@@ -41,10 +42,12 @@ const replaceUseEffectWithWatch = (): Visitor => ({
 
       // has cleanup callback, add additional onUnmounted cleanup lifecycle
       if (cleanupCallback) {
-        return path.replaceWithMultiple([
-          createVueOnMountedCallExp(callbackWithoutCleanup),
-          createVueOnUnmountedCallExp(cleanupCallback)
-        ]);
+        return path.replaceWithMultiple(
+          createExpressionStatements(
+            createVueOnMountedCallExp(callbackWithoutCleanup),
+            createVueOnUnmountedCallExp(cleanupCallback),
+          )
+        );
       }
 
       return path.replaceWith(vueOnMounted);
