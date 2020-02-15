@@ -7,7 +7,11 @@ import {
   createVueRefValueAssignment,
   createVueRefMemberExp,
 } from '../../helpers';
-import { isReactSetStateCall, isReactStateDeclarator } from '../../assert';
+import {
+  isReactSetStateCall,
+  isReactStateDeclarator,
+  isAnyFunctionExpression,
+} from '../../assert';
 
 interface StateValueName extends String {}
 interface StateSetterName extends String {}
@@ -70,13 +74,13 @@ let visitedIdentifiers = new Set<string>();
 const replaceSetStateCallWithRawExpression = (): Visitor => ({
   Expression(path) {
     if (!t.isIdentifier(path.node)) return;
-    if (t.isVariableDeclarator(path.parent)) return;
+    // if (t.isVariableDeclarator(path.parent)) return;
     if (t.isCallExpression(path.parent)) return;
 
     const { node } = path;
     const { name } = path.node;
 
-    if (visitedIdentifiers.has(node.name)) return;
+    // if (visitedIdentifiers.has(node.name)) return;
 
     const info = [...stateDeclarationsMap]
       // .map(([setterName, info]) => info)
@@ -84,16 +88,15 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
 
     if (!info) return;
 
-    // const updatedName = info[1].stateValueName as string;
+    const data: any = path.data || {};
 
-    // if (visitedIdentifiers.has(updatedName)) return;
-
-    // path.replaceWith(createVueRefMemberExp(node.name));
-
-    path.replaceWith(t.identifier('ABC'))
-
-    // visitedIdentifiers.add(node.name);
-    // visitedIdentifiers.add(updatedName);
+    if (data.visited !== true) {
+      // path.replaceWith(createVueRefMemberExp(node.name));
+      path.replaceWith(t.identifier(info[1].stateValueName as string + "__SPEC"));
+      data.visited = true;
+      
+      path.data = data;
+    }
 
     console.log(node.name, path, info)
   },
@@ -111,53 +114,41 @@ const replaceSetStateCallWithRawExpression = (): Visitor => ({
       ? createVueRefValueAssignment
       : createAssignment;
 
-    switch(setStateArg.type) {
-      // setCounter(nextCounter / 4 / null / false / [...abc] / counter + 1 / 'abc' / abc.toString() / {} / event.value)
-      case 'Identifier':
-      case 'NumericLiteral':
-      case 'NullLiteral':
-      case 'BooleanLiteral':
-      case 'ArrayExpression':
-      case 'BinaryExpression':
-      case 'StringLiteral':
-      case 'CallExpression':
-      case 'ObjectExpression':
-      case 'MemberExpression':
+    if (isAnyFunctionExpression(setStateArg)) {
+      const { body } = setStateArg;
+
+      // is setState(v => v)
+      if (t.isIdentifier(body)) {
         const stateValueAssignment = createAssignmentHandler(
           stateValueName as string,
-          setStateArg
+          createIdentifierOrMemberHandler(stateValueName)
         );
-        return path.replaceWith(stateValueAssignment);
-
-      case 'ArrowFunctionExpression': {
-        const { body } = setStateArg;
-
-        // is setState(v => v)
-        if (t.isIdentifier(body)) {
-          const stateValueAssignment = createAssignmentHandler(
-            stateValueName as string,
-            createIdentifierOrMemberHandler(stateValueName)
-          );
-          return path.replaceWith(stateValueAssignment);
-        }
-
-        if (!t.isBinaryExpression(body)) return;
-        if (!t.isIdentifier(body.left)) return;
-
-        // changed name of variable to delcared by state
-        const updatedBinaryExpression = t.binaryExpression(
-          body.operator,
-          createIdentifierOrMemberHandler(stateValueName),
-          body.right
-        );
-
-        const stateValueAssignment = createAssignmentHandler(
-          stateValueName as string,
-          updatedBinaryExpression,
-        );
-  
         return path.replaceWith(stateValueAssignment);
       }
+
+      if (!t.isBinaryExpression(body)) return;
+      if (!t.isIdentifier(body.left)) return;
+
+      // changed name of variable to delcared by state
+      const updatedBinaryExpression = t.binaryExpression(
+        body.operator,
+        createIdentifierOrMemberHandler(stateValueName),
+        body.right
+      );
+
+      const stateValueAssignment = createAssignmentHandler(
+        stateValueName as string,
+        updatedBinaryExpression,
+      );
+
+      return path.replaceWith(stateValueAssignment);
+
+    } else if (!t.isSpreadElement(setStateArg)) {
+      const stateValueAssignment = createAssignmentHandler(
+        stateValueName as string,
+        setStateArg
+      );
+      return path.replaceWith(stateValueAssignment);
     }
   },
 })

@@ -1,12 +1,14 @@
 {
   "name": "babel-plugin-hooks-to-composition",
-  "version": "0.1.0",
+  "version": "1.0.0-beta",
   "description": "",
   "main": "./dist/index.js",
   "scripts": {
-    "test": "jest",
-    "build": "tsc -d",
-    "dev": "tsc -d -w",
+    "test": "jest --verbose --colors",
+    "pretest": "npm run build",
+    "cleanup": "rimraf ./dist",
+    "build": "npm run cleanup && tsc -d",
+    "dev": "npm run cleanup && tsc -d -w",
     "typecheck": "tsc --noEmit"
   },
   "author": "",
@@ -26,6 +28,7 @@
     "@types/prettier": "^1.19.0",
     "jest": "^24.9.0",
     "prettier": "^1.19.1",
+    "rimraf": "^3.0.2",
     "ts-jest": "^24.2.0",
     "typescript": "^3.7.4"
   }

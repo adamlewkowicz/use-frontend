@@ -27,7 +27,9 @@ export const hookExamples = [
         useEffect(() => {
           window.addEventListener("mousemove", update);
       
-          return () => window.removeEventListener("mousemove", update);
+          return () => {
+            window.removeEventListener("mousemove", update);
+          }
         }, []);
         
         return { x, y };
@@ -52,7 +54,9 @@ export const hookExamples = [
             .catch(error => setError(error))
             .finally(() => setIsLoading(false));
       
-          return () => abortController.current.abort();
+          return () => {
+            abortController.current.abort();
+          }
         }, []);
         
         return {

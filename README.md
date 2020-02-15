@@ -1,6 +1,15 @@
-# Use-Frontend
+# use-frontend
+[![Build Status](https://travis-ci.com/alk831/use-frontend.svg?branch=master)](https://travis-ci.com/alk831/use-frontend)
+
 Transform React.js Hooks to Vue.js Composition Api
 
+```js
+const [counter, setCounter] = useState(0); // React Hooks
+
+// Transforms into
+
+const counter = reactive(0); // Vue Composition Api
+```
 
 ## TODO:
 ### useEffect
