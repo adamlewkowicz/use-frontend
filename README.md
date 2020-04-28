@@ -11,7 +11,13 @@ const [counter, setCounter] = useState(0); // React Hooks
 const counter = reactive(0); // Vue Composition Api
 ```
 
-## TODO:
+## Local installation
+Clone the respository and run `npm i`.
+
+To run dev server execute `npm run dev` command.
+
+
+## Todo
 ### useEffect
   - [x] remove cleanup callback from `onMounted`
   - [x] create `watch` if contains dependencies
@@ -44,3 +50,6 @@ const counter = reactive(0); // Vue Composition Api
   - [x] replace `useLayoutEffect` with `onBeforeMount`
   - [ ] if has cleanup callback
     - [ ] create additional `onUnmounted` lifecycle hook
+    
+## License
+[MIT](LICENSE)
